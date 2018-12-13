@@ -1,9 +1,15 @@
+
+    // INIZIALIZZARE ALLEGRO
+    // INIZIALIZZARE VARIABILI E COMPONENTI
+    // GAME LOOP
+        // LOGICA
+        // REDRAW
+    // ALLEGRO_DESTROY
+
 #include <iostream>
 using namespace std;
 
-int main () {
-
-    cout <<"Repo_Push_TEST"<<endl
-
-return 0;
+ int main ()
+{
+    return 0;
 }
