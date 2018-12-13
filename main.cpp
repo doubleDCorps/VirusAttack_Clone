@@ -35,10 +35,16 @@ using namespace std;
 
     //__________VARIABLES_____________________
     ALLEGRO_DISPLAY_MODE disp_data;
-    al_get_display_mode(0, &disp_data);
-    al_set_new_display_flags(ALLEGRO_WINDOWED);
+     for(unsigned i{}; i < al_get_num_display_modes(); ++i)
+    {
+        al_get_display_mode(i, &disp_data);
+        if(disp_data.width >= 800 && disp_data.width <= 900 && disp_data.height >= 600 && disp_data.height <= 700)
+            break;
+    }
 
-    bool key[4] = { false, false, false, false };
+    al_set_new_display_flags(ALLEGRO_WINDOWED);
+    
+    bool key[4] = { false, false, false, false };    
 
     ALLEGRO_TIMER *timer = al_create_timer(1.0/disp_data.refresh_rate);
     ALLEGRO_DISPLAY *display = al_create_display(disp_data.width, disp_data.height);
@@ -57,8 +63,8 @@ using namespace std;
     al_set_target_bitmap(bouncer);
     al_clear_to_color(al_map_rgb(0, 0, 0));
     al_set_target_bitmap(al_get_backbuffer(display));
-    float bouncer_x=float(disp_data.width)/2 - 32/2;
-    float bouncer_y=float(disp_data.height)/2 - 32/2;
+    float bouncer_x = float(disp_data.width)/2 - 32/2;
+    float bouncer_y = float(disp_data.height)/2 - 32/2;
     al_draw_bitmap(bouncer, bouncer_x, bouncer_y, 0);
     
 
@@ -74,6 +80,7 @@ using namespace std;
 
     bool redraw=true;
     bool STOP=false;
+    float bouncer_dx {-4.0}, bouncer_dy {4.0};
 
     while(!STOP) {
 
@@ -83,11 +90,26 @@ using namespace std;
 
         al_wait_for_event(coda_eventi, &evento);
 
-        if(evento.type == ALLEGRO_EVENT_DISPLAY_CLOSE)
+         if(evento.type == ALLEGRO_EVENT_TIMER)
+        {
+            if(bouncer_x < 0 || bouncer_x > disp_data.width - 32)
+                bouncer_dx = -bouncer_dx;
+
+            if(bouncer_y < 0 || bouncer_y > disp_data.height - 32)
+                bouncer_dy = -bouncer_dy;
+
+            bouncer_x += bouncer_dx;
+            bouncer_y += bouncer_dy;
+
+            redraw = true;
+        }
+         else if(evento.type == ALLEGRO_EVENT_DISPLAY_CLOSE)
+        {
             STOP = true;
+        }
 
         if(redraw && al_is_event_queue_empty(coda_eventi)) {
-            
+
             redraw = false;
             al_clear_to_color(al_map_rgb(255,255,255));
             al_draw_bitmap(bouncer, bouncer_x, bouncer_y, 0);
