@@ -4,4 +4,5 @@ A clone of the game VirusAttack (developed by Code This Lab S.r.l. in HTML5), re
 Still work in progess.
 
 Authors: Davide Caligiuri, Davide Gena
+
 Course: https://www.mat.unical.it/informatica/ProgrammazioneAdOggetti
