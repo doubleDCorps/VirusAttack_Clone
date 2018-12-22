@@ -179,6 +179,8 @@
          if(redraw && al_is_event_queue_empty(coda_eventi))
         {
             redraw = false;
+
+            al_clear_to_color(al_map_rgb(255, 255, 255));
             
             for(auto it : test_list)
                 al_draw_bitmap(bordr, it.first, it.second, 0);
@@ -206,9 +208,6 @@
              for(unsigned i{}; i < abs(test_list.begin()->first - write_x); i += 10)
                 al_draw_bitmap(bordr, min(test_list.begin()->first, write_x) + i, write_y, 0);
 
-            al_set_target_bitmap(bouncer);
-            al_clear_to_color(al_map_rgb(rand()%256, rand()%256, rand()%256));
-            al_set_target_bitmap(al_get_backbuffer(display));
             al_draw_bitmap(bouncer, bouncer_x, bouncer_y, 0);
             al_flip_display();    
         }        
