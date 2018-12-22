@@ -18,6 +18,7 @@
 
  int main ()
 {
+    srand(0);
     //_________________INIT____________________
      if(!al_init())
     {   
@@ -68,14 +69,19 @@
     al_register_event_source(coda_eventi, al_get_keyboard_event_source());
     
     //_______________BORDER______________________
-    list< pair<int, int> > test_list{{20, 20},   {275, 20},
-                                     {275, 77},  {500, 77},
-                                     {500, 20},  {600, 20}, 
-                                     {600, 200}, {500, 200}, 
-                                     {500, 300}, {600, 300},
-                                     {600, 400}, {20, 400},
-                                     {20, 150},  {120, 150}, 
-                                     {120, 80},  {20, 80}};
+    list< pair<int, int> > test_list{{20, 20},//   {285, 20},
+                                     //{285, 77},  {500, 77},
+                                     //{500, 20},  
+                                     {600, 20}, 
+                                     //{600, 200},// {550, 200}, 
+                                     //{550, 300}, {600, 300},
+                                     {600, 400},// {450, 400}, 
+                                     //{450, 330}, {110, 330},
+                                     //{110, 400},
+                                     {20, 400}
+                                     //{20, 180},  {170, 180}, 
+                                     //{170, 120}, {20, 120}
+                                     };
     list< pair<int, int> > test_cist;
     
     Border tehone(test_list.begin(), test_list.end(), test_cist.begin(), test_cist.end(), nullptr, nullptr);
@@ -148,16 +154,16 @@
             if(t == NONE)
                 touch_x = touch_y = false;
 
-             if(!touch_x && t == VERTICAL)
-            {
-                bouncer_dx = -bouncer_dx;
-                touch_x = true;
-            }
-
-             if(!touch_y && t == HORIZONTAL)
+             if(!touch_y && (t == HORIZONTAL || t == BOTH))
             {    
                 bouncer_dy = -bouncer_dy;
                 touch_y = true;
+            }
+
+             if(!touch_x && (t == VERTICAL || t == BOTH))
+            {
+                bouncer_dx = -bouncer_dx;
+                touch_x = true;
             }
 
             bouncer_x += bouncer_dx;
@@ -173,7 +179,6 @@
          if(redraw && al_is_event_queue_empty(coda_eventi))
         {
             redraw = false;
-            al_clear_to_color(al_map_rgb(255,255,255));
             
             for(auto it : test_list)
                 al_draw_bitmap(bordr, it.first, it.second, 0);
@@ -201,6 +206,9 @@
              for(unsigned i{}; i < abs(test_list.begin()->first - write_x); i += 10)
                 al_draw_bitmap(bordr, min(test_list.begin()->first, write_x) + i, write_y, 0);
 
+            al_set_target_bitmap(bouncer);
+            al_clear_to_color(al_map_rgb(rand()%256, rand()%256, rand()%256));
+            al_set_target_bitmap(al_get_backbuffer(display));
             al_draw_bitmap(bouncer, bouncer_x, bouncer_y, 0);
             al_flip_display();    
         }        

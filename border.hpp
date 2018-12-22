@@ -24,7 +24,7 @@ Entity -> Player -> Enemy -> Mob -> Spawn -> main
 #include<ctime>
 using namespace std;
 
- enum Side : int {NONE, HORIZONTAL, VERTICAL};
+ enum Side : int {NONE, HORIZONTAL, VERTICAL, BOTH};
 
  bool _range(int, int, int);
  bool hitbox(int, int, int, int, int, int, int, int);

@@ -1,19 +1,18 @@
 #include "border.hpp"
 
- bool _range(int contains, int lower, int upper)
+ bool _range(int first, int second, int lower_bound, int upper_bound)
 {
-    return contains >= lower && contains <= upper;
+    return (first >= lower_bound && first <= upper_bound)
+        || (second >= lower_bound && second <= upper_bound);
 }
 
- bool hitbox(int x1, int y1, int w1, int h1, int x2, int y2, int w2, int h2)
+ bool hitbox(int x1a, int y1a, int x1b, int y1b, int x2a, int y2a, int x2b, int y2b)
 {
     return
-        ((_range(x1, min(x2, x2 + w2), max(x2, x2 + w2)) || _range(x1 + w1, min(x2, x2 + w2), max(x2, x2 + w2)))
-      || (_range(x2, min(x1, x1 + w1), max(x1, x1 + w1)) || _range(x2 + w2, min(x1, x1 + w1), max(x1, x1 + w1)))
-        )
-    &&  ((_range(y1, min(y2, y2 + h2), max(y2, y2 + h2)) || _range(y1 + h1, min(y2, y2 + h2), max(y2, y2 + h2)))
-      || (_range(y2, min(y1, y1 + h1), max(y1, y1 + h1)) || _range(y2 + h2, min(y1, y1 + h1), max(y1, y1 + h1)))
-        );
+        ((_range(x1a, x1b, min(x2a, x2b), max(x2a, x2b)))
+        || (_range(x2a, x2b, min(x1a, x1b), max(x1a, x1b))))
+    &&  ((_range(y1a, y1b, min(y2a, y2b), max(y2a, y2b)))
+        || (_range(y2a, y2b, min(y1a, y1b), max(y1a, y1b))));
 }
 
 
@@ -25,18 +24,25 @@
 
  Side Border::in_border(array<float, 4> p)
 {
+    Side temp{NONE};
      for(auto it {border.begin()}; it != border.end(); ++it)
     {
         if(it->first != next(it)->first)
-        if( hitbox( p[0], p[1], p[2], p[3], it->first, it->second, next(it)->first - it->first, 20))
-            return HORIZONTAL;
+         if( hitbox( p[0], p[1], p[0] + p[2], p[1] + p[3], it->first, it->second, next(it)->first, it->second + 20))
+        {
+            if(temp == VERTICAL) return BOTH;
+            temp = HORIZONTAL;
+        }
         
         if(it->second != next(it)->second)
-        if( hitbox( p[0], p[1], p[2], p[3], it->first, it->second, 20, next(it)->second - it->second))
-            return VERTICAL;
+         if( hitbox( p[0], p[1], p[0] + p[2], p[1] + p[3], it->first, it->second, it->first + 20, next(it)->second))
+        {
+            if(temp == HORIZONTAL) return BOTH;
+            temp = VERTICAL;
+        }
     }
 
-    return NONE;
+    return temp;
 }
 
  Side Border::in_trace(array<float, 4> p)
