@@ -1,39 +1,13 @@
+#include "polygon.hpp"
 
-// INIZIALIZZARE ALLEGRO
-    //al_init
-    //al_keyboard
-// INIZIALIZZARE VARIABILI E COMPONENTI
-    //disp_data
-    //display
-    //timer
-    //bouncer
-    //event queue
-// GAME LOOP
-    // LOGICA : dobbiamo gestire il movimento, il cambiamento dei bordi, e le collisioni
-    // REDRAW
-// ALLEGRO_DESTROY
-
-#include <iostream>
-#include <allegro5/allegro.h>
-#include <allegro5/allegro_image.h>
-using namespace std;
-
- int main ()
+ int main()
 {
-    //_________________INIT____________________
+    srand(time(0));
     if(!al_init())
-    {   
-        cerr << "init_error: failed to initialize Allegro!\n";
         return -1;
-    }
-
-     if(!al_install_keyboard())
-    {
-        cerr << "init_error: failed to initialize keyboard!\n";
+    if(!al_install_keyboard())
         return -1;
-    }
-
-    //__________VARIABLES_____________________
+    
     ALLEGRO_DISPLAY_MODE disp_data;
      for(unsigned i{}; i < al_get_num_display_modes(); ++i)
     {
@@ -41,86 +15,160 @@ using namespace std;
         if(disp_data.width >= 800 && disp_data.width <= 900 && disp_data.height >= 600 && disp_data.height <= 700)
             break;
     }
-
     al_set_new_display_flags(ALLEGRO_WINDOWED);
     
-    bool key[4] = { false, false, false, false };    
-
     ALLEGRO_TIMER *timer = al_create_timer(1.0/disp_data.refresh_rate);
+     if(!timer)
+        return -1;
+    
     ALLEGRO_DISPLAY *display = al_create_display(disp_data.width, disp_data.height);
      if(!display)
     {   
-        cerr << "disp_error: failed to initialize display!\n";
         al_destroy_timer(timer);
         return -1;
     }
-    ALLEGRO_BITMAP *bouncer = al_create_bitmap(32, 32);
-    ALLEGRO_EVENT_QUEUE *coda_eventi = al_create_event_queue();
-
-
-
-    //________________BOUNCER____________________    
-    al_set_target_bitmap(bouncer);
-    al_clear_to_color(al_map_rgb(0, 0, 0));
-    al_set_target_bitmap(al_get_backbuffer(display));
-    float bouncer_x = float(disp_data.width)/2 - 32/2;
-    float bouncer_y = float(disp_data.height)/2 - 32/2;
-    al_draw_bitmap(bouncer, bouncer_x, bouncer_y, 0);
     
+    ALLEGRO_EVENT_QUEUE *coda_eventi = al_create_event_queue();
+     if(!coda_eventi)
+    {
+        al_destroy_display(display);
+        al_destroy_timer(timer);
+        return -1;
+    }
 
+    ALLEGRO_BITMAP* bouncer[12];
+    float bouncer_x[12];
+    float bouncer_y[12];
+    list<pair<float, float>> bouncer_v;
+    
+    const int enemy_velocity{50};
 
-    //________________EVENT-QUEUE__________________
+     for(unsigned i{}; i<12 ; ++i)
+    {   
+        bouncer[i] = al_create_bitmap(30, 30);
+        bouncer_x[i] = float(800)/2 - 30/2;
+        bouncer_y[i] = float(600)/2 - 30/2;
+    }
+
+     while(bouncer_v.size() < 12)
+    {
+        bool presente{ false };
+        int int_dx{ rand()%(enemy_velocity-12)+2 };
+        int int_dy{ enemy_velocity-int_dx };
+
+        for(auto& i : bouncer_v) 
+         if(int_dx == i.first && int_dy == i.second)
+        {
+            presente = true;
+            break;
+        }
+
+        if(!presente)
+            bouncer_v.push_back({int_dx, int_dy});   
+    }
+
+    int i{};
+     for(auto& k : bouncer_v)
+    {
+         if(i <= 3)
+        {
+            k.first  = float((k.first)*-1.0)/10;
+            k.second = float(k.second)/10; //max 1.5 min 0.2
+        }
+         else if(i >= 4 && i <= 6)
+        {
+            k.first  = float(k.first)/10;
+            k.second = float(k.second)/10;
+        }
+         else if(i >= 7 && i <= 9)
+        {
+            k.first  = float(k.first)/10;
+            k.second = float((k.second)*-1.0)/10;
+        }
+         else if(i >= 10 && i <= 12)
+        {
+            k.first  = float((k.first)*-1.0)/10;
+            k.second = float((k.second)*-1.0)/10;
+        }
+
+        ++i;
+    }
+
+     for(unsigned i{}; i < 12; ++i)
+    {
+        al_set_target_bitmap(bouncer[i]);
+        al_clear_to_color(al_map_rgb(rand()%256, rand()%256, rand()%256));
+    }
+
+        al_set_target_bitmap(al_get_backbuffer(display));
+        al_clear_to_color(al_map_rgb(255, 255, 255));
+
+    for(unsigned i{}; i < 12; ++i)
+        al_draw_bitmap(bouncer[i], bouncer_x[i], bouncer_y[i], 0);
+
+    al_flip_display();
+
+    Polygon poly;
+
+    bool redraw {true};
+    bool STOP {false};
+
     al_register_event_source(coda_eventi, al_get_display_event_source(display));
     al_register_event_source(coda_eventi, al_get_timer_event_source(timer));
     al_register_event_source(coda_eventi, al_get_keyboard_event_source());
-    al_clear_to_color(al_map_rgb(255,255,255));
-    al_flip_display();
     al_start_timer(timer);
 
+     while(!STOP)
+    {
+        ALLEGRO_EVENT ev;
+        al_wait_for_event(coda_eventi, &ev);
 
-    bool redraw=true;
-    bool STOP=false;
-    float bouncer_dx {-4.0}, bouncer_dy {4.0};
-
-    while(!STOP) {
-
-        ALLEGRO_EVENT evento;
-
-        //implementazione MOVESET;
-
-        al_wait_for_event(coda_eventi, &evento);
-
-         if(evento.type == ALLEGRO_EVENT_TIMER)
+         if(ev.type == ALLEGRO_EVENT_DISPLAY_CLOSE)
+            STOP = true;
+         else if(ev.type == ALLEGRO_EVENT_TIMER)
         {
-            if(bouncer_x < 0 || bouncer_x > disp_data.width - 32)
-                bouncer_dx = -bouncer_dx;
+             for(unsigned i{}; i < bouncer_v.size(); ++i)
+            {
+                 if(poly.hitsB({bouncer_x[i], bouncer_y[i], 30, 30, 
+                                next(bouncer_v.begin(), i)->first, next(bouncer_v.begin(), i)->second}) == X)
+                {    
+                    next(bouncer_v.begin(), i)->first = -next(bouncer_v.begin(), i)->first;
+                }
+                 if(poly.hitsB({bouncer_x[i], bouncer_y[i], 30, 30, 
+                                next(bouncer_v.begin(), i)->first, next(bouncer_v.begin(), i)->second}) == Y)
+                {    
+                    next(bouncer_v.begin(), i)->second = -next(bouncer_v.begin(), i)->second;
+                }
+            }
 
-            if(bouncer_y < 0 || bouncer_y > disp_data.height - 32)
-                bouncer_dy = -bouncer_dy;
-
-            bouncer_x += bouncer_dx;
-            bouncer_y += bouncer_dy;
+             for(unsigned i{}; i < 12; ++i)
+            {
+                bouncer_x[i] += next(bouncer_v.begin(), i)->first;
+                bouncer_y[i] += next(bouncer_v.begin(), i)->second;
+            }
 
             redraw = true;
         }
-         else if(evento.type == ALLEGRO_EVENT_DISPLAY_CLOSE)
+
+        if(redraw && al_is_event_queue_empty(coda_eventi))
         {
-            STOP = true;
-        }
-
-        if(redraw && al_is_event_queue_empty(coda_eventi)) {
-
             redraw = false;
-            al_clear_to_color(al_map_rgb(255,255,255));
-            al_draw_bitmap(bouncer, bouncer_x, bouncer_y, 0);
+
+             for(unsigned i{}; i < 12; ++i)
+            {
+                al_draw_bitmap(bouncer[i], bouncer_x[i], bouncer_y[i], 0);
+            }
+
             al_flip_display();
-            
-            }        
-              
+        }
     }
+
+    //cout << endl << poly.getArea() << endl;
     
+    for(auto i : bouncer)
+        al_destroy_bitmap(i);
+
     al_destroy_event_queue(coda_eventi);
-    al_destroy_bitmap(bouncer);
     al_destroy_display(display);
     al_destroy_timer(timer);
 

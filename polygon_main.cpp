@@ -14,7 +14,7 @@
 // ALLEGRO_DESTROY
 
 
-#include"border.hpp"
+#include"polygon.hpp"
 
  int main ()
 {
@@ -84,7 +84,7 @@
                                      };
     list< pair<int, int> > test_cist;
     
-    Border tehone(test_list.begin(), test_list.end(), test_cist.begin(), test_cist.end(), nullptr, nullptr);
+    Polygon poly(test_list.begin(), test_list.end(), bordr, tracr);
 
     //________________FIRST DRAW___________________
 
@@ -149,7 +149,7 @@
 
          if(evento.type == ALLEGRO_EVENT_TIMER)
         {
-            t = tehone.in_border({bouncer_x, bouncer_y, 25, 25});
+            t = poly.hitsB({bouncer_x, bouncer_y, 25, 25});
             
             if(t == NONE)
                 touch_x = touch_y = false;

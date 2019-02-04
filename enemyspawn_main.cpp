@@ -97,9 +97,9 @@ using namespace std;
     bool STOP=false;
 
 
-//____________________________________________________
+//____________________________________________________VELOCITA' NEMICI: dove va messa?
     srand(time(0));
-    const short enemy_velocity = 15;
+    const short enemy_velocity = 25;
     vector<pair<float, float>> bouncer_cord;
 
 
@@ -109,7 +109,7 @@ while(bouncer_cord.size()<12) {
     int int_dx = rand()%13+2, int_dy = enemy_velocity-int_dx;
 
     for(unsigned i=0;i<bouncer_cord.size();i++) 
-        if(int_dx == bouncer_cord[i].first and int_dy == bouncer_cord[i].second)
+        if(int_dx == bouncer_cord[i].first && int_dy == bouncer_cord[i].second)
             presente = true;
 
     if(presente == false)
