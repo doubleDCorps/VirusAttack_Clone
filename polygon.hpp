@@ -30,7 +30,7 @@ using namespace std;
 
  enum AXIS : int {none = 0, X = 1, Y = 2};
 
- bool _range(int first, int second, int lower_bound, int upper_bound);
+ inline bool _range(int first, int second, int lower_bound, int upper_bound);
  bool hitbox(int x1a, int y1a, int x1b, int y1b, int x2a, int y2a, int x2b, int y2b);
 
  class Polygon
@@ -43,8 +43,8 @@ using namespace std;
         ALLEGRO_BITMAP* trace_pic;
 
         AXIS hits(const array<float, 6>&, const list<pair<int,int> >&) const;
-        inline list<pair<int,int> >::const_iterator successor(list<pair<int,int> >::const_iterator, const list<pair<int,int> >&) const;
-        //void update_Polygon(); //fa lo splice di trace in Polygon
+        list<pair<int,int> >::const_iterator successor(list<pair<int,int> >::const_iterator, const list<pair<int,int> >&) const;
+        void update_Polygon();
     
     public:
         Polygon(): border( {{125, 25}, {625, 25}, {625, 525}, {125, 525}} ) {}
@@ -52,10 +52,10 @@ using namespace std;
                 ALLEGRO_BITMAP* _b = nullptr, ALLEGRO_BITMAP* _t = nullptr): 
                 border(bb, eb), border_pic(_b), trace_pic(_t) {}
         
-        AXIS hitsB (array<float, 6>) const; //verifica se l'oggetto è sul bordo
-        AXIS hitsT (array<float, 6>) const; //verifica se l'oggetto è sulla traccia
-        //bool is_inside(pair<int, int>) const; //determina la posizione rispetto al bordo (dentro/fuori)
-        bool add_point(pair<int, int>); //aggiunge un punto alla traccia; se la traccia si ricollega a border, allora si chiama update
+        AXIS hitsB (array<float, 6>) const;
+        AXIS hitsT (array<float, 6>) const;
+        bool is_inside(pair<int, int>) const; //determina la posizione rispetto al bordo (dentro/fuori)
+        bool add_point(pair<int, int>);
         int getArea() const;
 
 };

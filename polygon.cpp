@@ -24,21 +24,22 @@
  AXIS Polygon::hits(const array<float, 6>& p, const list<pair<int,int> >& ref) const
 {
     //p : [0] = coord_x, [1] = coord_y, [2] = width, [3] = height, [4] = x_velocity, [5] = y_velocity
-
+    //spessore hitbox bordo/traccia : 20  
+ 
      for(auto it {ref.begin()}; it != ref.end(); ++it)
     {
-        if((p[5] > 0 && it->second - p[1] > -5) || (p[5]< 0 && it->second - p[1] < 5))
+        if((p[5] >= 0 && it->second - p[1] > -5) || (p[5] <= 0 && it->second - p[1] < 5))
          if(it->first != successor(it, ref)->first)
         {
             if(hitbox(p[0], p[1], p[0] + p[2], p[1] + p[3], 
-                                it->first, it->second, successor(it, ref)->first, it->second + 20)) //20 : spessore bordo    
+                                it->first, it->second, successor(it, ref)->first, it->second + 20))     
                 return Y;
         }
-        if((p[4] > 0 && it->first - p[0] > -5) || (p[4] < 0 && it->first - p[0] < 5))
+        if((p[4] >= 0 && it->first - p[0] > -5) || (p[4] <= 0 && it->first - p[0] < 5))
          if(it->second != successor(it, ref)->second)
         {
             if(hitbox(p[0], p[1], p[0] + p[2], p[1] + p[3], 
-                                it->first, it->second, it->first + 20, successor(it, ref)->second)) //20 : spessore bordo
+                                it->first, it->second, it->first + 20, successor(it, ref)->second))
                 return X;
         }
     }
@@ -46,24 +47,48 @@
     return none;
 }
 
+ void Polygon::updatePolygon() //DIPENDE DAL BOSS
+{
+    //front di trace va nella corretta posizione
+    //back di trace va nella corretta posizione
+    //elimina gli elementi in mezzo
+    //splice del resto
+}
+
  AXIS Polygon::hitsB(array<float, 6> p) const { return hits(p, border); }
 
  AXIS Polygon::hitsT(array<float, 6> p) const { return hits(p, trace);  }
 
+ bool is_inside(pair<int, int>) const
+{
+    //DA IMPLEMENTARE
+    //how?
+    return false;
+}
+
  bool Polygon::add_point(pair<int, int> p)
 {
-    // da implementare; dipenderà dalla condizione di avvio di updatePolygon()
-    if((trace.rbegin()->first  == (--trace.rbegin())->first  && trace.rbegin()->first == p.first) ||
-       (trace.rbegin()->second == (--trace.rbegin())->second && trace.rbegin()->second == p.second))
+    if((trace.back().first  == (--trace.rbegin())->first  && trace.back().first == p.first) ||
+       (trace.back().second == (--trace.rbegin())->second && trace.back().second == p.second))
     {
         trace.back() = p;
-        //update qui?
+         if(hitsB({trace.back().first, trace.back().second, 0, 0, 0, 0} != none)
+        {
+            updatePolygon();
+            return true;
+        }
     }
      else
     {
         trace.push_back(p);
-        //update qui?
+         if(hitsB({trace.back().first, trace.back().second, 0, 0, 0, 0} != none)
+        {   
+            updatePolygon();
+            return true;
+        }
     }
+
+    return false;
 }
 
  int Polygon::getArea() const
@@ -76,32 +101,3 @@
 
     return (area*50)/(base_h*base_w);
 }
-
-
-/*
-
-#include<iostream>
- int main()
-{
-    list< pair<int, int> > test_list{{100, 0}, {700, 0}, {700, 100}, {800, 100}, {800, 500}, {700, 500}, {700, 600}, {100, 600}, {100, 500}, {0, 500}, {0, 100}, {100, 100}};
-    
-    Polygon test(test_list.begin(), test_list.end());
-
-    cout << test.hitsB({0, 0, 32, 32}) << endl << test.getArea() << endl;
-
-    return 0;
-}
-
-//{{100, 0}, {700, 0}, {700, 100}, {800, 100}, {800, 500}, {700, 500}, {700, 600}, {100, 600}, {100, 500}, {0, 500}, {0, 100}, {100, 100}};
-//cross shape
-
-//{{100, 0}, {800, 0}, {800, 600}, {0, 600}, {0, 100}, {100, 100}};
-//angolo 1
-
-//{{100, 0}, {800, 0}, {800, 500}, {700, 500}, {700, 600}, {0, 600}, {0, 100}, {100, 100}};
-//angoli 1 e 3 
-
-//{{100, 0}, {700, 0}, {700, 100}, {800, 100}, {800, 600}, {0, 600}, {0, 100}, {100, 100}};
-//angoli 1 e 2
-
-*/

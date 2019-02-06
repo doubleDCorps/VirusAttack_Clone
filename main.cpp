@@ -36,6 +36,8 @@
         return -1;
     }
 
+    //START__________DA MUOVERE IN ENTITY E ENEMY
+
     ALLEGRO_BITMAP* bouncer[12];
     float bouncer_x[12];
     float bouncer_y[12];
@@ -73,7 +75,7 @@
          if(i <= 3)
         {
             k.first  = float((k.first)*-1.0)/10;
-            k.second = float(k.second)/10; //max 1.5 min 0.2
+            k.second = float(k.second)/10;
         }
          else if(i >= 4 && i <= 6)
         {
@@ -106,6 +108,8 @@
     for(unsigned i{}; i < 12; ++i)
         al_draw_bitmap(bouncer[i], bouncer_x[i], bouncer_y[i], 0);
 
+    //END___________DA MUOVERE IN ENTITY E ENEMY
+
     al_flip_display();
 
     Polygon poly;
@@ -129,23 +133,31 @@
         {
              for(unsigned i{}; i < bouncer_v.size(); ++i)
             {
+                //Enemy[i].update( poly.hitsB( Enemy[i].getData() ) ); sarebbe l'idea
+                //START___________DA MUOVERE IN ENTITY E ENEMY 
                  if(poly.hitsB({bouncer_x[i], bouncer_y[i], 30, 30, 
                                 next(bouncer_v.begin(), i)->first, next(bouncer_v.begin(), i)->second}) == X)
-                {    
+                {   
                     next(bouncer_v.begin(), i)->first = -next(bouncer_v.begin(), i)->first;
                 }
                  if(poly.hitsB({bouncer_x[i], bouncer_y[i], 30, 30, 
                                 next(bouncer_v.begin(), i)->first, next(bouncer_v.begin(), i)->second}) == Y)
-                {    
+                {   
+                    
                     next(bouncer_v.begin(), i)->second = -next(bouncer_v.begin(), i)->second;
                 }
+                //END___________DA MUOVERE IN ENTITY E ENEMY 
             }
+
+            //START__________DA MUOVERE IN ENTITY E ENEMY
 
              for(unsigned i{}; i < 12; ++i)
             {
                 bouncer_x[i] += next(bouncer_v.begin(), i)->first;
                 bouncer_y[i] += next(bouncer_v.begin(), i)->second;
             }
+
+            //END___________DA MUOVERE IN ENTITY E ENEMY
 
             redraw = true;
         }
@@ -162,8 +174,6 @@
             al_flip_display();
         }
     }
-
-    //cout << endl << poly.getArea() << endl;
     
     for(auto i : bouncer)
         al_destroy_bitmap(i);
