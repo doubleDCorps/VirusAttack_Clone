@@ -1,8 +1,5 @@
 /*
-Polygon
-  |
-  v
-Entity -> Player -> Enemy -> Mob -> Spawn -> main
+Entity -> Player -> Enemy -> Boss -> Minion -> Polygon -> main
                               |       |
                               v       v
                              ...     ...
