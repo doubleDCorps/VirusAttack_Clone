@@ -1,5 +1,14 @@
 #include "Entity.h"
 
+ void print(ALLEGRO_BITMAP* buffer) const
+{
+     if(image!=nullptr && buffer!=nullptr)
+    {
+        //if(al_get_target_bitmap()!=buffer)  al_set_target_bitmap(buffer);
+        //drawing operations
+    }
+}
+
 int Entity::getWidth_hitbox()const { return width_hitbox; }
 
 int Entity::getHeight_hitbox()const { return height_hitbox; }

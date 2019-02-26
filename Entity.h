@@ -28,7 +28,7 @@ enum KEYS : int {none = 0, UP = 1, LEFT = 2, DOWN = 3, RIGHT = 4};
 
         virtual ~Entity() = 0;
 
-        //void print(ALLEGRO_BITMAP* buffer) const;
+        void print(ALLEGRO_BITMAP* buffer) const; //da implementare
             
         int getWidth_hitbox() const;
         int getHeight_hitbox() const;
