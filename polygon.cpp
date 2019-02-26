@@ -1,103 +1,163 @@
 #include "polygon.hpp"
-
- bool _range(int first, int second, int lower_bound, int upper_bound)
-{
-    return (first >= lower_bound && first <= upper_bound)
-        || (second >= lower_bound && second <= upper_bound);
-}
-
+/*
+    Date due hitbox quadrate, definite da quattro coordinate (due su x e due su y)
+    hitbox() verifica se un punto o una parte di una hitbox ha compenetrato l'altra,
+    ovvero se una parte delle coordinate di una hitbox è compreso fra la coordinata minore e maggiore 
+    dell'altra hitbox (questo contemporaneamente su entrambi gli assi, x e y, per evitare
+    che, ad esempio, oggetti con stesse coordinate x ma estremamente distanti lungo l'altro asse y
+    siano erroneamente considerati come compenetrazione).
+*/
  bool hitbox(int x1a, int y1a, int x1b, int y1b, int x2a, int y2a, int x2b, int y2b)
 {
     return
-        ((_range(x1a, x1b, min(x2a, x2b), max(x2a, x2b)))
-        || (_range(x2a, x2b, min(x1a, x1b), max(x1a, x1b))))
-    &&  ((_range(y1a, y1b, min(y2a, y2b), max(y2a, y2b)))
-        || (_range(y2a, y2b, min(y1a, y1b), max(y1a, y1b))));
+        (in_range(x1a, min(x2a, x2b), max(x2a, x2b)) || in_range(x1b, min(x2a, x2b), max(x2a, x2b)) ||
+         in_range(x2a, min(x1a, x1b), max(x1a, x1b)) || in_range(x2b, min(x1a, x1b), max(x1a, x1b)) )
+     && (in_range(y1a, min(y2a, y2b), max(y2a, y2b)) || in_range(y1b, min(y2a, y2b), max(y2a, y2b)) ||
+         in_range(y2a, min(y1a, y1b), max(y1a, y1b)) || in_range(y2b, min(y1a, y1b), max(y1a, y1b)) );
 }
-
- list<pair<int,int> >::const_iterator Polygon::successor(list<pair<int,int> >::const_iterator it, const list<pair<int,int> >& ref) const
+/*
+    Se il punto p rispetta le condizioni di ordinamento, viene aggiunto alla fine o all'inizio
+    della lista e viene restituito true; altrimenti viene restituito false.
+*/
+ bool GameList::push(int x, int y)
 {
-    return 
-        ++it == ref.end() ? ref.begin() : it;
+    if(empty()) push_back({x, y});
+    else if(size()== 1 && (x == back().first || y == back().second) )                    push_back({x, y});
+    else if(size()== 1 && (x == front().first || y == front().second) )                  push_front({x, y});
+    else if(size() >= 2 && x == back().first && back().second == (++rbegin())->second)   push_back({x, y});
+    else if(size() >= 2 && y == back().second && back().first == (++rbegin())->first)    push_back({x, y});
+    else if(size() >= 2 && x == front().first && front().second == (++begin())->second)  push_front({x, y});
+    else if(size() >= 2 && y == front().second && front().first == (++begin())->first)   push_front({x, y});
+    else if(size() >= 2 && x == back().first && back().first == (++rbegin())->first)     back() = {x, y};
+    else if(size() >= 2 && y == back().second && back().second == (++rbegin())->second)  back() = {x, y};
+    else if(size() >= 2 && x == front().first && front().first == (++begin())->first)    front() = {x, y};
+    else if(size() >= 2 && y == front().second && front().second == (++begin())->second) front() = {x, y};
+    else        return false;
+    return true;
 }
-
- AXIS Polygon::hits(const array<float, 6>& p, const list<pair<int,int> >& ref) const
+/*
+    Data una coppia di coordinate p, verifica se esiste una coppia di elementi della lista tali che il punto ricada nel
+    segmento che li connette. 
+*/
+ bool GameList::is_adj(int x, int y, int w, int h) const
 {
-    //p : [0] = coord_x, [1] = coord_y, [2] = width, [3] = height, [4] = x_velocity, [5] = y_velocity
-    //spessore hitbox bordo/traccia : 20  
- 
-     for(auto it {ref.begin()}; it != ref.end(); ++it)
+    for(auto it{ begin() }; it!=end(); ++it)
+     if(hitbox(x, y, x+w, y+h, it->first, it->second, successor(it)->first, successor(it)->second) )
+        return true;
+    return false;
+}
+/*
+    Per un dato oggetto definito dalla sua hitbox (primi quattro parametri) e dalla sua
+    velocità (ultimi due parametri) viene verificata per ogni coppia di punti nella lista
+    (ciascuna rappresentante un segmento) se si verifica una collisione fra la hitbox e il
+    segmento; se la collisione avviene, si restituisce una variabile che riconosce lungo quale
+    asse è avvenuto la collisione (X o Y), altrimenti lo stato "none" (euqivalente a 0).
+*/
+ AXIS GameList::hits(int x1, int y1, int w1, int h1, int vx, int vy) const
+{
+    if(empty()) return none;
+
+     for(auto it{ begin() }; it != end(); ++it)
     {
-        if((p[5] >= 0 && it->second - p[1] > -5) || (p[5] <= 0 && it->second - p[1] < 5))
-         if(it->first != successor(it, ref)->first)
-        {
-            if(hitbox(p[0], p[1], p[0] + p[2], p[1] + p[3], 
-                                it->first, it->second, successor(it, ref)->first, it->second + 20))     
-                return Y;
-        }
-        if((p[4] >= 0 && it->first - p[0] > -5) || (p[4] <= 0 && it->first - p[0] < 5))
-         if(it->second != successor(it, ref)->second)
-        {
-            if(hitbox(p[0], p[1], p[0] + p[2], p[1] + p[3], 
-                                it->first, it->second, it->first + 20, successor(it, ref)->second))
-                return X;
-        }
+        const int& x2{ it->first }, x3{ successor(it)->first };
+        const int& y2{ it->second }, y3{ successor(it)->second };
+
+        if(x2!=x3 && (vy>=0 && y2-y1 > -5 || vy<=0 && y2-y1 < 5) && hitbox(x1, y1, x1+w1, y1+h1, x2, y2, x3, y2+20) )
+            return Y;
+        
+        if(y2!=y3 && (vx>=0 && x2-x1 > -5 || vx<=0 && x2-x1 < 5) && hitbox(x1, y1, x1+w1, y1+h1, x2, y2, x2+20, y3) )
+            return X;
     }
     
     return none;
 }
-
- void Polygon::updatePolygon() //DIPENDE DAL BOSS
+/*
+    Data una hitbox associata ad un oggetto, si applica lo stesso algoritmo
+    usato per il calcolo dell'area per decidere se l'oggetto si trova all'esterno dell'area definita 
+    dalla lista: si verifica la presenza o meno di collisioni fra la hitbox e l'area descritta da ogni
+    coppia di punti e per quelle in cui la collisione avviene si considera adeguatamente se l'area
+    possiede segno "negativo" o "positivo", associando le aree positive a quelle interne al poligono
+    e quelle negative alle aree esterne al poligono.
+*/
+ bool GameList::inside(int x, int y, int w, int h) const
 {
-    //front di trace va nella corretta posizione
-    //back di trace va nella corretta posizione
-    //elimina gli elementi in mezzo
-    //splice del resto
-}
+    if(empty()) return false;
 
- AXIS Polygon::hitsB(array<float, 6> p) const { return hits(p, border); }
+    int cont{};
 
- AXIS Polygon::hitsT(array<float, 6> p) const { return hits(p, trace);  }
-
- bool is_inside(pair<int, int>) const
-{
-    //DA IMPLEMENTARE
-    //how?
-    return false;
-}
-
- bool Polygon::add_point(pair<int, int> p)
-{
-    if((trace.back().first  == (--trace.rbegin())->first  && trace.back().first == p.first) ||
-       (trace.back().second == (--trace.rbegin())->second && trace.back().second == p.second))
+     for(auto it{ begin() }; it!=end(); ++it)
     {
-        trace.back() = p;
-         if(hitsB({trace.back().first, trace.back().second, 0, 0, 0, 0} != none)
+        const int& x1{ it->first }, x2{ successor(it)->first };
+        const int& y1{ it->second }, y2{ successor(it)->second };
+
+         if(hitbox(x, y, x+w, y+h, 0, min(y1, y2), max(x1, x2), max(y1, y2)) )
         {
-            updatePolygon();
-            return true;
+            if(y2-y1 < 0) --cont;
+            if(y2-y2 > 0) ++cont;
         }
     }
-     else
+
+    return cont <= 0 ? false : true;
+}
+/*
+    Dato un bitmap da trattare come buffer temporaneo, viene targettato per il disegno
+    e viene poi successivamente disegnato il poligono rappresentato dalla lista manipolando
+    l'immagine che fa da "font" per l'intero bordo.
+*//*
+ void GameList::print(ALLEGRO_BITMAP* buffer) const
+{
+    if(empty()) return;
+
+     if(pic!=nullptr && buffer!=nullptr)
     {
-        trace.push_back(p);
-         if(hitsB({trace.back().first, trace.back().second, 0, 0, 0, 0} != none)
-        {   
-            updatePolygon();
-            return true;
-        }
+        //if(al_get_target_bitmap()!=buffer)  al_set_target_bitmap(buffer);
+        //drawing operations
+    }
+}*/
+
+
+
+/*
+    Viene calcolata l'area utilizzando il seguente algoritmo:
+    dato un poligono chiuso definito da una lista di coordinate (x, y) concatenate,
+    dove con concatenate si intende che almeno un elemento di ogni coppia è uguale a quello
+    del successivo e che ogni coppia ha l'elemento opposto in comune rispetto alla precedente,
+    si sommano le aree rettangolari ottenute da ogni coppia di coordinate concantenate, sfruttando
+    la differenza fra le y per determinare il "segno" che indichi se l'area appartiene
+    alla figura descritta (positiva) o altrimenti (negatva).
+    La somma viene poi dimezzata per ottenere il valore numerico corrispondente all'area del poligono.
+*/
+ int GameArea::getArea() const
+{
+    if(border.empty()) return -1;
+
+    int area{};
+    for(auto it{ border.begin() }; it!=border.end(); ++it)
+        area+=(it->first+border.successor(it)->first)*(border.successor(it)->second-it->second);
+    area/=2;
+
+    return area;
+}
+/*
+    Aggiorna automaticamente la traccia all'ultima posizione nota del giocatore;
+    se l'ultimo elemento della traccia è allineato con border, si aggiorna la lista border
+    in base alla posizione del Boss.
+*/
+ bool GameArea::update()
+{
+     if(trace.push(Player->getX(), Player->getY()) && border.is_adj(trace.back().first, trace.back().second, 10, 10) )
+    {
+        if(insideTrace(Boss->getX(), Boss->getY()) )
+            for(auto i : border)
+             if(insideTrace(i.first, i.second))  trace.push(i.first, i.second);
+        else
+            for(auto i : border)
+             if(!insideTrace(i.first, i.second)) trace.push(i.first, i.second);
+
+        border=trace;
+        trace.clear();
+        return true;
     }
 
     return false;
-}
-
- int Polygon::getArea() const
-{
-    int area{};
-
-    for(auto it{ border.begin() }; it != border.end(); ++it)
-        area += (it->first + successor(it, border)->first) *
-                (successor(it, border)->second - it->second);
-
-    return (area*50)/(base_h*base_w);
 }

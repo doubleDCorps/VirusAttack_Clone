@@ -1,60 +1,75 @@
 /*
 Entity -> Player -> Enemy -> Boss -> Minion -> Polygon -> main
-                              |       |
-                              v       v
-                             ...     ...
-
+                              v         v
+                             ...       ...
 */
-
 #ifndef POLY_HPP
 #define POLY_HPP
-
-#include<allegro5/allegro.h>
-#include<allegro5/allegro_image.h>
-#include<iostream>
-#include<algorithm>
-#include<iterator>
-#include<utility>
-#include<vector>
-#include<list>
-#include<array>
-#include<cstdlib>
-#include<ctime>
-using namespace std;
-
- const int base_w = 500;
- const int base_h = 500;
-
- enum AXIS : int {none = 0, X = 1, Y = 2};
-
- inline bool _range(int first, int second, int lower_bound, int upper_bound);
- bool hitbox(int x1a, int y1a, int x1b, int y1b, int x2a, int y2a, int x2b, int y2b);
-
- class Polygon
-{
-    private:
-        list<pair<int,int> > border;
-        list<pair<int,int> > trace;
-        
-        ALLEGRO_BITMAP* border_pic;
-        ALLEGRO_BITMAP* trace_pic;
-
-        AXIS hits(const array<float, 6>&, const list<pair<int,int> >&) const;
-        list<pair<int,int> >::const_iterator successor(list<pair<int,int> >::const_iterator, const list<pair<int,int> >&) const;
-        void update_Polygon();
+#include"Enemy.h"
     
-    public:
-        Polygon(): border( {{125, 25}, {625, 25}, {625, 525}, {125, 525}} ) {}
-        Polygon(list<pair<int,int> >::const_iterator bb, list<pair<int,int> >::const_iterator eb,
-                ALLEGRO_BITMAP* _b = nullptr, ALLEGRO_BITMAP* _t = nullptr): 
-                border(bb, eb), border_pic(_b), trace_pic(_t) {}
-        
-        AXIS hitsB (array<float, 6>) const;
-        AXIS hitsT (array<float, 6>) const;
-        bool is_inside(pair<int, int>) const; //determina la posizione rispetto al bordo (dentro/fuori)
-        bool add_point(pair<int, int>);
-        int getArea() const;
+inline bool in_range(int first, int lower_bound, int upper_bound) { return first>=lower_bound && first<=upper_bound; }
+bool hitbox(int x1a, int y1a, int x1b, int y1b, int x2a, int y2a, int x2b, int y2b);
+/*
+    GameList è una lista di coppie di coordinate circolare e ordinata secondo il seguente criterio:
+    per ogni coppia di elementi a1 e a2 consecutivi, la coppia precedente a0 e a1 sarà tale che
+    se una coordinata è in comune fra a0 e a1, allora la coordinata opposta sarà in comune fra a1 e a2.
+    Poichè la lista è circolare, ciò può essere valido anche per la coppia aN a0 (ultimo elemento - primo elemento).
+    Inoltre GameList contiene un puntatore alla bitmap, utilizzata per rappresentare graficamente i segmenti
+    composti da ogni coppia di elementi della lista.
+*/
+ class GameArea;
 
+ class GameList: private perimeter
+{
+    friend GameArea;
+    public:
+        GameList(ALLEGRO_BITMAP* m = nullptr, const perimeter& p = {}): pic(m) { for(auto& i : p) push(i.first, i.second); }
+        bool push(int x, int y);
+        bool is_adj(int x, int y, int w=0, int h=0) const;
+        AXIS hits(int x1, int y1, int w1=0, int h1=0, int vx=0, int vy=0) const;
+        bool inside(int x, int y, int w=0, int h=0) const;
+        //void print(ALLEGRO_BITMAP* buffer) const; // da implementare
+        const ALLEGRO_BITMAP* getPic() const    { return pic; }
+        void setPic(const ALLEGRO_BITMAP* p)    { pic = p; }
+        
+    private:
+        const ALLEGRO_BITMAP* pic;
+        inline auto successor(perimeter::iterator it)                       { return ++it == end() ? begin() : it; }
+        inline auto successor(perimeter::const_iterator it) const           { return ++it == cend() ? cbegin() : it; }
+        inline auto successor(perimeter::reverse_iterator it)               { return ++it == rend() ? rbegin() : it; }
+        inline auto successor(perimeter::const_reverse_iterator it) const   { return ++it == crend() ? crbegin() : it; }
+};
+/*
+    GameArea rappresenta l'area di gioco, formata da:
+    -un poligono rappresentante il bordo dell'area di gioco (border);
+    -una linea spezzata rappresentante il tracciato del giocatore (trace);
+    -un puntatore costante al giocatore (Player);
+    -un puntatore costante al boss di livello (Boss);
+    Essa gestisce tutte le routine riguardante la collisione col bordo, la posizione rispetto all'area di gioco
+    (esterno/interno), l'aggiornamento dei bordi dell'area di gioco durante la partita, e il calcolo dell'area.
+*/
+ class GameArea
+{
+    public:
+        GameArea(): border(), trace(), Boss(nullptr), Player(nullptr) {}
+        GameArea(const perimeter& b, ALLEGRO_BITMAP* m, ALLEGRO_BITMAP* n, const Entity* B=nullptr, const Entity* P=nullptr)
+            : border(m, b), trace(n), Boss(B), Player(P) {}     
+        
+        inline AXIS hitsBorder(int x1, int y1, int w1=0, int h1=0, int vx=0, int vy=0) const    { return border.hits(x1, y1, w1, h1, vx, vy); }
+        inline bool insideBorder(int x, int y, int w=0, int h=0) const                          { return border.inside(x, y, w, h); }
+        inline void printBorder(ALLEGRO_BITMAP* buffer) const                                   { border.print(buffer); }  
+        inline AXIS hitsTrace(int x1, int y1, int w1=0, int h1=0, int vx=0, int vy=0) const     { return trace.hits(x1, y1, w1, h1, vx, vy); }
+        inline bool insideTrace(int x, int y, int w=0, int h=0) const                           { return trace.inside(x, y, w, h); }
+        inline void printTrace(ALLEGRO_BITMAP* buffer) const                                    { trace.print(buffer); }
+        bool update();
+        void clear() { trace.clear(); }
+        int getArea() const;
+    
+    private:
+        GameList border;
+        GameList trace;
+        const Entity* Boss;
+        const Entity* Player;
 };
 
 #endif
