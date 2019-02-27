@@ -16,8 +16,8 @@
         
         inline bool move(KEYS k);
 
-        unsigned getLifes() const   { return lifes; }
-        void loseLife()             { --lifes; }
+        unsigned getLifes() const { return lifes; }
+        void loseLife() { lifes==0 ? lifes : --lifes; }
         
         bool getSafe() const { return is_safe; }
         void setSafe(bool s) { is_safe = s; }

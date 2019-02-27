@@ -21,12 +21,12 @@ enum KEYS : int {none = 0, UP = 1, LEFT = 2, DOWN = 3, RIGHT = 4};
         ALLEGRO_BITMAP *image;
         int width_hitbox, height_hitbox;
         float velocity_x, velocity_y, cord_x, cord_y;
-        
+
+        ~Entity() {};
+    
     public:
         Entity(int x = 0, int y = 0, int vx = 0, int vy = 0, int wh = 0, int hh = 0, ALLEGRO_BITMAP* p = nullptr):
             cord_x(x), cord_y(y), velocity_x(vx), velocity_y(vy), width_hitbox(wh), height_hitbox(hh), image(p) {}
-
-        virtual ~Entity() = 0;
 
         void print(ALLEGRO_BITMAP* buffer) const; //da implementare
             
@@ -44,4 +44,5 @@ enum KEYS : int {none = 0, UP = 1, LEFT = 2, DOWN = 3, RIGHT = 4};
         void setCord_x(float);
         void setCord_y(float);
 };
+
 #endif

@@ -5,7 +5,7 @@ Entity -> Player -> Enemy -> Boss -> Minion -> Polygon -> main
 */
 #ifndef POLY_HPP
 #define POLY_HPP
-#include"Enemy.h"
+#include"Minion.h"
     
 inline bool in_range(int first, int lower_bound, int upper_bound) { return first>=lower_bound && first<=upper_bound; }
 bool hitbox(int x1a, int y1a, int x1b, int y1b, int x2a, int y2a, int x2b, int y2b);

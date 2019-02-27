@@ -1,6 +1,6 @@
 #include"Player.h"
 
- void Player::move(KEYS k)
+ bool Player::move(KEYS k)
 {
      if(position != k)
     {
@@ -12,4 +12,6 @@
         if(k%2 == position%2)
             is_safe = false;
     }
+
+    return is_safe;
 }
