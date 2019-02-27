@@ -36,6 +36,7 @@ enum KEYS : int {none = 0, UP = 1, LEFT = 2, DOWN = 3, RIGHT = 4};
         float getVelocity_y() const;
         float getCord_x() const;
         float getCord_y() const;
+        ALLEGRO_BITMAP *getBitmap() const;
 
         void setWidth_hitbox(int);
         void setHeight_hitbox(int);
@@ -43,6 +44,7 @@ enum KEYS : int {none = 0, UP = 1, LEFT = 2, DOWN = 3, RIGHT = 4};
         void setVelocity_y(float);
         void setCord_x(float);
         void setCord_y(float);
+        void setBitmap(ALLEGRO_BITMAP*);
 };
 
 #endif

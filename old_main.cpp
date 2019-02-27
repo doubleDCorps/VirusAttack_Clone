@@ -74,7 +74,7 @@
     {
          if(i <= 3)
         {
-            k.first  = float((k.first)*-1.0)/10;
+            k.first = float((k.first)*-1.0)/10;
             k.second = float(k.second)/10;
         }
          else if(i >= 4 && i <= 6)

@@ -43,9 +43,73 @@ void level();
     ALLEGRO_EVENT_QUEUE *coda_eventi = al_create_event_queue();
      if(!coda_eventi) { al_destroy_display(display); al_destroy_timer(timer); return -1; }
 
-    Minion minions[12];
 
-    //
+vector<Minion> minions(12, {float(800)/2 - 30/2, float(600)/2 - 30/2, 0, 0, 30+2*2, 30+2*2, al_create_bitmap(30,30), true}); //spawn centrale temporaneo
+
+const int enemy_velocity{50}; //in class variable?
+
+int cont_minion=0;
+ while(cont_minion<12)
+{
+        bool presente{ false };
+        int int_dx{ rand()%(enemy_velocity-12)+2 };
+        int int_dy{ enemy_velocity-int_dx };
+
+        for(unsigned i{};i<12;i++)
+             if(int_dx==minions[i].getVelocity_x() && int_dy==minions[i].getVelocity_y())
+            {
+                presente = true;
+                break;
+            }
+
+         if(!presente)
+        {
+            minions[cont].setVelocity_x(int_dx);
+            minions[cont].setVelocity_y(int_dy);
+            cont_minion++;
+        }
+}
+
+ for(unsigned i{};i<12;i++)
+{
+     if(i <= 3)
+    {
+        minions[i].setVelocity_x(float((minions[i].getVelocity_x())*-1.0)/10);
+        minions[i].setVelocity_y(float(minions[i].getVelocity_y())/10);
+    }
+     else if(i >= 4 && i <= 6)
+    {
+        minions[i].setVelocity_x(float(minions[i].getVelocity_x())/10);
+        minions[i].setVelocity_y(float(minions[i].getVelocity_y())/10);
+    }
+     else if(i >= 7 && i <= 9)
+    {
+        minions[i].setVelocity_x(float(minions[i].getVelocity_x())/10);
+        minions[i].setVelocity_y(float((minions[i].getVelocity_y())*-1.0)/10);
+    }
+     else if(i >= 10 && i <= 12)
+    {
+        minions[i].setVelocity_x(float((minions[i].getVelocity_x())*-1.0)/10);
+        minions[i].setVelocity_y(float((minions[i].getVelocity_y())*-1.0)/10);
+    }
+
+    ++i;
+}
+
+
+ for(unsigned i{}; i < 12; ++i)
+{
+    al_set_target_bitmap(minions[i].getBitmap());
+    al_clear_to_color(al_map_rgb(0, 0, 0);
+}
+
+    al_set_target_bitmap(al_get_backbuffer(display));
+    al_clear_to_color(al_map_rgb(255, 255, 255));
+
+for(unsigned i{}; i < 12; ++i)
+    al_draw_bitmap(minions[i].getBitmap(), minions[i].getCord_x(), minions[i].getCord_y(), 0);
+
+al_flip_display();
 
     Boss boss;
     Player player;

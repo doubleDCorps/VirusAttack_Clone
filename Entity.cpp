@@ -21,6 +21,8 @@ float Entity::getCord_x()const { return cord_x; }
 
 float Entity::getCord_y()const { return cord_y; }
 
+ALLEGRO_BITMAP *getBitmap() const { return image; }
+
 void Entity::setWidth_hitbox(int w) { width_hitbox=w; }
 
 void Entity::setHeight_hitbox(int h) { height_hitbox=h; }
@@ -32,3 +34,6 @@ void Entity::setVelocity_y(float vy) { velocity_y=vy; }
 void Entity::setCord_x(float cx) { cord_x=cx; }
 
 void Entity::setCord_y(float cy) { cord_y=cy; }
+
+void setBitmap(ALLEGRO_BITMAP *i) { image=i; } 
+
