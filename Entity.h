@@ -43,11 +43,11 @@ enum KEYS : int {none = 0, UP = 1, LEFT = 2, DOWN = 3, RIGHT = 4};
             data(x, y, wh, hh, vx, vy), image(p) {}
 
         const ALLEGRO_BITMAP *getBitmap() const { return image; }
-        void setBitmap(ALLEGRO_BITMAP* p) { image = p; }
+        void setBitmap(ALLEGRO_BITMAP* p)       { image = p; }
 
-        const EntityData& getData() const { return data; }
-        void setData(const EntityData& E) { data = E; }
-        //void update() ? aggiorna le posizioni secondo l'AXIS ricevuto (none in questo caso indica X and Y)
+        const EntityData& getData() const       { return data; }
+        void setData(const EntityData& E)       { data = E; }
+        //void update() ? aggiorna le posizioni secondo l'AXIS ricevuto (none in questo caso indica X and Y; per eliminare Enemy)
         float getCord_x() const             { return data.c[0]; }
         float getCord_y() const             { return data.c[1]; }
         float getWidth_hitbox() const       { return data.c[2]; }

@@ -1,18 +1,21 @@
 /*
-    Il display verrà realizzato sovrapponendo una sequenza di bitmap con alpha,
+    Il display si potrebbe realizzare sovrapponendo una sequenza di bitmap con alpha,
     ciascuna legata ad oggetti con una determinata frequenza di aggiornamento:
-    la bitmap legata allo sfondo necessiterà di meno aggiornamenti rispetto alla bitmap
-    che contiene i nemici ad esempio. Ogni "canale" avrà la sua gestione separata dei dati
-    e delle immagini, quindi ogni "canale" sarà responsabile della sua scrittura sul display.
+    la bitmap legata allo sfondo necessiterebbe di meno aggiornamenti rispetto alla bitmap
+    che contiene i nemici ad esempio. Ogni "canale" avrebbe la sua gestione separata dei dati
+    e delle immagini, quindi ogni "canale" sarebbe responsabile della sua scrittura sul display.
 */
 /*
-    Entity è trascurabile come classe: se usata, servirà solo ad evitare di riscrivere codice in Player
-    ed Enemy, ma non verrà nè istanziata nè usata come tipo del puntatore per i polimorfismi.
-    Potenzialmente, Entity conterrebbe:
-        - coordinate x, y
-        - dimensione hitbox d (ipotizziamo tutte le enità avranno hitbox quadrata)
-        - velocità x, y
-        - bitmap da stampare
+    E' necessaria la classe Enemy? Al momento sembra solo complessità inutile.
+*/
+/*
+    TODO LIST:
+    -
+    -
+    -
+    -
+    -
+    -
 */
 #include"polygon.h"
 
@@ -137,22 +140,22 @@ al_flip_display();
             STOP = true;
          else if(ev.type == ALLEGRO_EVENT_TIMER)
         {
+            poly.update();
              for(unsigned i{}; i < 12; ++i)
             {
-                poly.update();
                  if(poly.getArea()*100/(w*h) <= 30)
                 {
                     //hai vinto il livello!
                 }
                 //if: player.getLifes()==0 do: //hai perso!
-                 if(!poly.insideBorder(minions[i].getCord_x(), minions[i].getCord_y(), minions[i].getWidth_hitbox()) )
+                 if(!poly.insideBorder(minions[i].getData() ) );
                 {
                     minions[i].setAlive(false);
                 }
                 //if: minions.size()<12    do: boss.spawn()
                  if(minions[i].getAlive() )
                 {
-                    minions[i].update(poly.hitsBorder(minions[i].getCord_x(), minions[i].getCord_y(), minions[i].getWidth_hitbox(), minions[i].getHeight_hitbox(), minions[i].getVelocity_x(), minions[i].getVelocity_y()) );
+                    minions[i].update(poly.hitsBorder(minions[i].getData() ) );
                 }
             }
 
