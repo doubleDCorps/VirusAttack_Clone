@@ -1,4 +1,4 @@
-#include "polygon.hpp"
+#include "polygon.h"
 /*
     Date due hitbox quadrate, definite da quattro coordinate (due su x e due su y)
     hitbox() verifica se un punto o una parte di una hitbox ha compenetrato l'altra,
@@ -145,14 +145,14 @@
 */
  bool GameArea::update()
 {
-     if(trace.push(Player->getX(), Player->getY()) && border.is_adj(trace.back().first, trace.back().second, 10, 10) )
+     if(trace.push(Player->getCord_x(), Player->getCord_y()) && border.is_adj(trace.back().first, trace.back().second, 10, 10) )
     {
-        if(insideTrace(Boss->getX(), Boss->getY()) )
+        if(trace.inside(Boss->getCord_x(), Boss->getCord_y()) )
             for(auto i : border)
-             if(insideTrace(i.first, i.second))  trace.push(i.first, i.second);
+             if(trace.inside(i.first, i.second))  trace.push(i.first, i.second);
         else
             for(auto i : border)
-             if(!insideTrace(i.first, i.second)) trace.push(i.first, i.second);
+             if(!trace.inside(i.first, i.second)) trace.push(i.first, i.second);
 
         border=trace;
         trace.clear();

@@ -1,22 +1,3 @@
-/*
-    Il display si potrebbe realizzare sovrapponendo una sequenza di bitmap con alpha,
-    ciascuna legata ad oggetti con una determinata frequenza di aggiornamento:
-    la bitmap legata allo sfondo necessiterebbe di meno aggiornamenti rispetto alla bitmap
-    che contiene i nemici ad esempio. Ogni "canale" avrebbe la sua gestione separata dei dati
-    e delle immagini, quindi ogni "canale" sarebbe responsabile della sua scrittura sul display.
-*/
-/*
-    E' necessaria la classe Enemy? Al momento sembra solo complessità inutile.
-*/
-/*
-    TODO LIST:
-    -
-    -
-    -
-    -
-    -
-    -
-*/
 #include"polygon.h"
 
 void menu();
@@ -46,14 +27,13 @@ void level();
     ALLEGRO_EVENT_QUEUE *coda_eventi = al_create_event_queue();
      if(!coda_eventi) { al_destroy_display(display); al_destroy_timer(timer); return -1; }
 
+    vector<Minion> minions(12, {float(800)/2 - 30/2, float(600)/2 - 30/2, 0, 0, 30+2*2, 30+2*2, al_create_bitmap(30,30), true}); //spawn centrale temporaneo
 
-vector<Minion> minions(12, {float(800)/2 - 30/2, float(600)/2 - 30/2, 0, 0, 30+2*2, 30+2*2, al_create_bitmap(30,30), true}); //spawn centrale temporaneo
+    const int enemy_velocity{50}; //in class variable?
 
-const int enemy_velocity{50}; //in class variable?
-
-int cont_minion=0;
- while(cont_minion<12)
-{
+    int cont_minion=0;
+     while(cont_minion<12)
+    {
         bool presente{ false };
         int int_dx{ rand()%(enemy_velocity-12)+2 };
         int int_dy{ enemy_velocity-int_dx };
@@ -67,58 +47,65 @@ int cont_minion=0;
 
          if(!presente)
         {
-            minions[cont].setVelocity_x(int_dx);
-            minions[cont].setVelocity_y(int_dy);
+            minions[cont_minion].setVelocity_x(int_dx);
+            minions[cont_minion].setVelocity_y(int_dy);
             cont_minion++;
         }
-}
-
- for(unsigned i{};i<12;i++)
-{
-     if(i <= 3)
-    {
-        minions[i].setVelocity_x(float((minions[i].getVelocity_x())*-1.0)/10);
-        minions[i].setVelocity_y(float(minions[i].getVelocity_y())/10);
-    }
-     else if(i >= 4 && i <= 6)
-    {
-        minions[i].setVelocity_x(float(minions[i].getVelocity_x())/10);
-        minions[i].setVelocity_y(float(minions[i].getVelocity_y())/10);
-    }
-     else if(i >= 7 && i <= 9)
-    {
-        minions[i].setVelocity_x(float(minions[i].getVelocity_x())/10);
-        minions[i].setVelocity_y(float((minions[i].getVelocity_y())*-1.0)/10);
-    }
-     else if(i >= 10 && i <= 12)
-    {
-        minions[i].setVelocity_x(float((minions[i].getVelocity_x())*-1.0)/10);
-        minions[i].setVelocity_y(float((minions[i].getVelocity_y())*-1.0)/10);
     }
 
-    ++i;
-}
+     for(unsigned i{};i<12;i++)
+    {
+         if(i <= 3)
+        {
+            minions[i].setVelocity_x(float((minions[i].getVelocity_x())*-1.0)/10);
+            minions[i].setVelocity_y(float(minions[i].getVelocity_y())/10);
+        }
+         else if(i >= 4 && i <= 6)
+        {
+            minions[i].setVelocity_x(float(minions[i].getVelocity_x())/10);
+            minions[i].setVelocity_y(float(minions[i].getVelocity_y())/10);
+        }
+         else if(i >= 7 && i <= 9)
+        {
+            minions[i].setVelocity_x(float(minions[i].getVelocity_x())/10);
+            minions[i].setVelocity_y(float((minions[i].getVelocity_y())*-1.0)/10);
+        }
+         else if(i >= 10 && i <= 12)
+        {
+            minions[i].setVelocity_x(float((minions[i].getVelocity_x())*-1.0)/10);
+            minions[i].setVelocity_y(float((minions[i].getVelocity_y())*-1.0)/10);
+        }
+
+        ++i;
+    }
 
 
- for(unsigned i{}; i < 12; ++i)
-{
-    al_set_target_bitmap(minions[i].getBitmap());
-    al_clear_to_color(al_map_rgb(0, 0, 0);
-}
+     for(unsigned i{}; i < 12; ++i)
+    {
+        al_set_target_bitmap(minions[i].getBitmap());
+        al_clear_to_color(al_map_rgb(0, 0, 0));
+    }
 
-    al_set_target_bitmap(al_get_backbuffer(display));
-    al_clear_to_color(al_map_rgb(255, 255, 255));
+        al_set_target_bitmap(al_get_backbuffer(display));
+        al_clear_to_color(al_map_rgb(255, 255, 255));
 
-for(unsigned i{}; i < 12; ++i)
-    al_draw_bitmap(minions[i].getBitmap(), minions[i].getCord_x(), minions[i].getCord_y(), 0);
+    for(unsigned i{}; i < 12; ++i)
+        al_draw_bitmap(minions[i].getBitmap(), minions[i].getCord_x(), minions[i].getCord_y(), 0);
 
-al_flip_display();
+    al_flip_display();
 
-    Boss boss;
+
+    Boss boss(float(800)/2 - 30/2, float(600)/2 - 30/2, -1, -1, 30+2*2, 30+2*2, al_create_bitmap(30,30));
     Player player;
-    GameArea poly(/**/, /**/, /**/, boss, player);
 
-    //
+    perimeter p = { {25, 25}, {525, 25}, {525, 525}, {25, 525} };
+
+    int w = 500;
+    int h = 500;
+    ALLEGRO_BITMAP* t = nullptr;
+    GameArea poly(p, t, t, &boss, &player);
+
+    //???
 
     bool redraw {true};
     bool STOP {false};
@@ -127,9 +114,6 @@ al_flip_display();
     al_register_event_source(coda_eventi, al_get_timer_event_source(timer));
     al_register_event_source(coda_eventi, al_get_keyboard_event_source());
     al_start_timer(timer);
-
-    int w;
-    int h;
 
      while(!STOP)
     {
@@ -145,7 +129,8 @@ al_flip_display();
             {
                  if(poly.getArea()*100/(w*h) <= 30)
                 {
-                    //hai vinto il livello!
+                    STOP = true;
+                    break;
                 }
                 //if: player.getLifes()==0 do: //hai perso!
                  if(!poly.insideBorder(minions[i].getData() ) );
@@ -168,7 +153,8 @@ al_flip_display();
             al_clear_to_color(al_map_rgb(255, 255, 255) );
             for(unsigned i{}; i < 12; ++i)
              if(minions[i].getAlive() )
-                minions[i].print(al_get_backbuffer() );
+                //minions[i].print(al_get_backbuffer() )
+                ;
             
             al_flip_display();
         }
@@ -176,11 +162,11 @@ al_flip_display();
 
     for(unsigned i{}; i < 12; ++i)
         cout<<"("<<minions[i].getCord_y()<<", "<<minions[i].getCord_x()<<") "
-        <<poly.is_inside(minions[i].getCord_x(), minions[i].getCord_y())<<' '
+        <<poly.insideBorder(minions[i].getData() )<<' '
         <<minions[i].getAlive()<<endl;
     
-    for(auto i : bouncer)
-        al_destroy_bitmap(i);
+    for(auto i : minions)
+        al_destroy_bitmap(i.getBitmap());
 
     al_destroy_event_queue(coda_eventi);
     al_destroy_display(display);

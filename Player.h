@@ -1,5 +1,6 @@
-#ifndef PLAY_HPP
-#define PLAY_HPP
+#ifndef PLAY_H_
+#define PLAY_H_
+
 #include"Entity.h"
 
  class Player : public Entity
@@ -11,8 +12,8 @@
 
     protected:
     public:
-        Player(float x=0, float y=0, float vx=0, float vy=0, float wh=0, float hh=0, ALLEGRO_BITMAP* p=nullptr, unsigned l=1, AXIS s=X, KEYS p=none)
-            : Entity(x, y, vx, vy, wh, hh, p), lifes(l), is_safe(s), position(p) {}
+        Player(float x=0, float y=0, float vx=0, float vy=0, float wh=0, float hh=0, ALLEGRO_BITMAP* p=nullptr, unsigned l=1, AXIS s=X, KEYS k=still)
+            : Entity(x, y, vx, vy, wh, hh, p), lifes(l), is_safe(s), position(k) {}
         
         inline bool move(KEYS k);
 

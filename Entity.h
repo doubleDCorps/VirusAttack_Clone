@@ -1,32 +1,35 @@
-#ifndef ENEMY_H_
-#define ENEMY_H_
+#ifndef ENTITY_H_
+#define ENTITY_H_
 
 #include<allegro5/allegro.h>
 #include<allegro5/allegro_image.h>
 #include<array>
 #include<iostream>
 #include<utility>
+#include<vector>
 #include<list>
 #include<cstdlib>
 using namespace std;
 
 typedef list<pair<int, int> > perimeter;
 enum AXIS : int {none = 0, X = 1, Y = 2};
-enum KEYS : int {none = 0, UP = 1, LEFT = 2, DOWN = 3, RIGHT = 4};
+enum KEYS : int {still = 0, UP = 1, LEFT = 2, DOWN = 3, RIGHT = 4};
 
  struct HitboxData
 {
-    float c[4];
-    HitboxData(float a, float b, float d=0f, float e=0f): c({a, b, d, e}) {}
-    virtual ~HitboxData() {};
-    pair<float, float> getCord(){ return {c[0], c[1]}; }
-    pair<float, float> getDim() { return {c[2], c[3]}; }
+    protected:
+        ~HitboxData() {};
+    public:
+        float c[4];
+        HitboxData(float a, float b, float d=0, float e=0): c{a, b, d, e} {}
+        pair<float, float> getCord(){ return {c[0], c[1]}; }
+        pair<float, float> getDim() { return {c[2], c[3]}; }
 };
 
  struct EntityData: public HitboxData
 {
     float v[2];
-    EntityData(float a, float b, float c, float d, float e=0f, float f=0f): HitboxData(a, b, e, f), v({c, d}) {}
+    EntityData(float a, float b, float c, float d, float e=0, float f=0): HitboxData(a, b, e, f), v{c, d} {}
     pair<float, float> getVel() { return {v[0], v[1]}; }
 };
 
@@ -43,6 +46,7 @@ enum KEYS : int {none = 0, UP = 1, LEFT = 2, DOWN = 3, RIGHT = 4};
             data(x, y, wh, hh, vx, vy), image(p) {}
 
         const ALLEGRO_BITMAP *getBitmap() const { return image; }
+        ALLEGRO_BITMAP *getBitmap()             { return image; }
         void setBitmap(ALLEGRO_BITMAP* p)       { image = p; }
 
         const EntityData& getData() const       { return data; }
