@@ -2,9 +2,9 @@
 
  void Enemy::update(AXIS v)
 {
-    if(v == X) velocity_x = -velocity_x;
-    if(v == Y) velocity_y = -velocity_y;
+    if(v == X) data.v[0] = -data.v[0];
+    if(v == Y) data.v[1] = -data.v[1];
 
-    cord_x += velocity_x;
-    cord_y += velocity_y;
+    data.c[0] += data.v[0];
+    data.c[1] += data.v[1];
 }

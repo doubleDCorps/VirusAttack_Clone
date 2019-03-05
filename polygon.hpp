@@ -55,12 +55,12 @@ bool hitbox(int x1a, int y1a, int x1b, int y1b, int x2a, int y2a, int x2b, int y
         GameArea(const perimeter& b, ALLEGRO_BITMAP* m, ALLEGRO_BITMAP* n, const Entity* B=nullptr, const Entity* P=nullptr)
             : border(m, b), trace(n), Boss(B), Player(P) {}     
         
-        inline AXIS hitsBorder(int x1, int y1, int w1=0, int h1=0, int vx=0, int vy=0) const    { return border.hits(x1, y1, w1, h1, vx, vy); }
-        inline bool insideBorder(int x, int y, int w=0, int h=0) const                          { return border.inside(x, y, w, h); }
-        inline void printBorder(ALLEGRO_BITMAP* buffer) const                                   { border.print(buffer); }  
-        inline AXIS hitsTrace(int x1, int y1, int w1=0, int h1=0, int vx=0, int vy=0) const     { return trace.hits(x1, y1, w1, h1, vx, vy); }
-        inline bool insideTrace(int x, int y, int w=0, int h=0) const                           { return trace.inside(x, y, w, h); }
-        inline void printTrace(ALLEGRO_BITMAP* buffer) const                                    { trace.print(buffer); }
+        inline AXIS hitsBorder(const EntityData& D) const       { return border.hits(D.c[0], D.c[1], D.c[2], D.c[3], D.v[0], D.v[1]); }
+        inline bool insideBorder(const HitboxData& D) const     { return border.inside(D.c[0], D.c[1], D.c[2], D.c[3]); }
+        //inline void printBorder(ALLEGRO_BITMAP* buffer) const   { border.print(buffer); }  
+        inline AXIS hitsTrace(const EntityData& D) const        { return trace.hits(D.c[0], D.c[1], D.c[2], D.c[3], D.v[0], D.v[1]); }
+        inline bool insideTrace(const HitboxData& D) const      { return trace.inside(D.c[0], D.c[1], D.c[2], D.c[3]); }
+        //inline void printTrace(ALLEGRO_BITMAP* buffer) const    { trace.print(buffer); }
         bool update();
         void clear() { trace.clear(); }
         int getArea() const;
