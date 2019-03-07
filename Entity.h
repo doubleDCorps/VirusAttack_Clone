@@ -29,7 +29,7 @@ enum KEYS : int {still = 0, UP = 1, LEFT = 2, DOWN = 3, RIGHT = 4};
  struct EntityData: public HitboxData
 {
     float v[2];
-    EntityData(float a, float b, float c, float d, float e=0, float f=0): HitboxData(a, b, e, f), v{c, d} {}
+    EntityData(float a, float b, float c=0, float d=0, float e=0, float f=0): HitboxData(a, b, e, f), v{c, d} {}
     pair<float, float> getVel() { return {v[0], v[1]}; }
 };
 
@@ -43,7 +43,7 @@ enum KEYS : int {still = 0, UP = 1, LEFT = 2, DOWN = 3, RIGHT = 4};
     
     public:
         Entity(float x = 0, float y = 0, float vx = 0, float vy = 0, float wh = 0, float hh = 0, ALLEGRO_BITMAP* p = nullptr):
-            data(x, y, wh, hh, vx, vy), image(p) {}
+            data(x, y, vx, vy, wh, hh), image(p) {}
 
         const ALLEGRO_BITMAP *getBitmap() const { return image; }
         ALLEGRO_BITMAP *getBitmap()             { return image; }

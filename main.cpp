@@ -142,7 +142,7 @@ void level(ALLEGRO_DISPLAY*, ALLEGRO_TIMER*);
             STOP = true;
          else if(ev.type == ALLEGRO_EVENT_TIMER)
         {
-            poly.update();
+            //poly.update();
              for(unsigned i{}; i < 12; ++i)
             {
                 /*if(poly.getArea()*100/(w*h) <= 30)
@@ -154,11 +154,11 @@ void level(ALLEGRO_DISPLAY*, ALLEGRO_TIMER*);
                 {
                     STOP = true;
                     break;
-                }*//*
+                }*/
                  if(!poly.insideBorder(minions[i].getData() ) );
                 {
                     minions[i].setAlive(false);
-                }*/
+                }
                  if(minions[i].getAlive() )
                 {
                     minions[i].update(poly.hitsBorder(minions[i].getData() ) );
@@ -176,9 +176,9 @@ void level(ALLEGRO_DISPLAY*, ALLEGRO_TIMER*);
             for(auto it : minions)
              if(it.getAlive())
             {
-                al_draw_bitmap(it.getBitmap(), it.getCord_x(), it.getCord_y(), 0);
+                al_draw_bitmap(it.getBitmap(), it.getCord_x(), it.getCord_y(), 0); //questo va nel print dei minion
             };
-            al_draw_bitmap(boss.getBitmap(), boss.getCord_x(), boss.getCord_y(), 0);
+            al_draw_bitmap(boss.getBitmap(), boss.getCord_x(), boss.getCord_y(), 0); //questo va nel print del boss
             
             al_flip_display();
         }
