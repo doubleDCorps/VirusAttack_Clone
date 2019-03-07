@@ -59,7 +59,7 @@ void level(ALLEGRO_DISPLAY*, ALLEGRO_TIMER*);
         }
     }
 
-     for(unsigned i{};i<12;i++)
+     for(unsigned i{}; i<12; i++)
     {
          if(i <= 3)
         {
@@ -82,7 +82,6 @@ void level(ALLEGRO_DISPLAY*, ALLEGRO_TIMER*);
             minions[i].setVelocity_y(float((minions[i].getVelocity_y())*-1.0)/10);
         }
 
-        ++i;
     }
 
      for(unsigned i{}; i < 12; ++i)
@@ -183,21 +182,12 @@ void level(ALLEGRO_DISPLAY*, ALLEGRO_TIMER*);
             al_flip_display();
         }
     }
-    
-    for(unsigned i{}; i < 12; ++i)
-        cout<<"("<<minions[i].getCord_x()<<", "<<minions[i].getCord_y()<<") "
-        <<"speed: "<<"("<<minions[i].getVelocity_x()<<", "<<minions[i].getVelocity_y()<<") "
-        <<poly.insideBorder(minions[i].getData() )<<' '
-        <<minions[i].getAlive()<<endl;
-
-    //al_rest(2.0);
 
     for(auto i : minions)
         al_destroy_bitmap(i.getBitmap());
     al_destroy_bitmap(boss.getBitmap());
 
     al_destroy_event_queue(coda_eventi);
-    //al_stop_timer(timer);
 
     return;
 }
