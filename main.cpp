@@ -59,7 +59,7 @@ void level(ALLEGRO_DISPLAY*, ALLEGRO_TIMER*);
         }
     }
 
-     for(unsigned i{}; i<12; i++)
+     for(unsigned i{};i<12;i++)
     {
          if(i <= 3)
         {
@@ -82,6 +82,7 @@ void level(ALLEGRO_DISPLAY*, ALLEGRO_TIMER*);
             minions[i].setVelocity_y(float((minions[i].getVelocity_y())*-1.0)/10);
         }
 
+        ++i;
     }
 
      for(unsigned i{}; i < 12; ++i)
@@ -109,7 +110,7 @@ void level(ALLEGRO_DISPLAY*, ALLEGRO_TIMER*);
 
     enemy_init(minions, display);
 
-    Boss boss(float(800)/2 - 30/2, float(600)/2 - 30/2, -0.5, -0.5, 30+2*2, 30+2*2, al_create_bitmap(30,30));
+    Boss boss(float(800)/2 - 30/2, float(600)/2 - 30/2, -0.3, -1.2, 30+2*2, 30+2*2, al_create_bitmap(30,30));
     
     al_set_target_bitmap(boss.getBitmap());
     al_clear_to_color(al_map_rgb(255, 0, 0));
@@ -141,7 +142,7 @@ void level(ALLEGRO_DISPLAY*, ALLEGRO_TIMER*);
             STOP = true;
          else if(ev.type == ALLEGRO_EVENT_TIMER)
         {
-            poly.update();
+            //poly.update();
              for(unsigned i{}; i < 12; ++i)
             {
                  if(poly.getArea()*100/(w*h) <= 30)
@@ -154,16 +155,17 @@ void level(ALLEGRO_DISPLAY*, ALLEGRO_TIMER*);
                     STOP = true;
                     break;
                 }
-                 if(!poly.insideBorder(minions[i].getData() ) )
+                 if(!poly.insideBorder(minions[i].getData()))
                 {
                     minions[i].setAlive(false);
                 }
-                 if(minions[i].getAlive() )
+                 if(minions[i].getAlive())
                 {
-                    minions[i].update(poly.hitsBorder(minions[i].getData() ) );
+                    minions[i].update(poly.hitsBorder(minions[i].getData()));
                 }
-                boss.update(poly.hitsBorder(boss.getData() ) );
             }
+
+            boss.update(poly.hitsBorder(boss.getData()));
 
             redraw = true;
         }
