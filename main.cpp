@@ -1,6 +1,5 @@
 #include"polygon.h"
 
-void menu();
 void enemy_init(const vector<Minion>&, ALLEGRO_DISPLAY*);
 void level(ALLEGRO_DISPLAY*, ALLEGRO_TIMER*);
 
@@ -33,6 +32,12 @@ void level(ALLEGRO_DISPLAY*, ALLEGRO_TIMER*);
     return 0;
 }
 
+
+
+
+
+
+
  void enemy_init(vector<Minion>& minions, ALLEGRO_DISPLAY* display)
 {
     const int enemy_velocity{25};
@@ -44,8 +49,8 @@ void level(ALLEGRO_DISPLAY*, ALLEGRO_TIMER*);
         int int_dx{ rand()%(enemy_velocity-12)+2 };
         int int_dy{ enemy_velocity-int_dx };
 
-        for(unsigned i{};i<12;i++)
-             if(int_dx==minions[i].getVelocity_x() && int_dy==minions[i].getVelocity_y())
+        for(auto& it : minions)
+             if(int_dx==it.getVelocity_x() && int_dy==it.getVelocity_y())
             {
                 presente = true;
                 break;
@@ -83,20 +88,28 @@ void level(ALLEGRO_DISPLAY*, ALLEGRO_TIMER*);
         }
     }
 
-     for(unsigned i{}; i < 12; ++i)
+     for(auto& it : minions)
     {
-        al_set_target_bitmap(minions[i].getBitmap());
+        al_set_target_bitmap(it.getBitmap());
         al_clear_to_color(al_map_rgb(0, 0, 0));
     }
 
     al_set_target_bitmap(al_get_backbuffer(display));
     al_clear_to_color(al_map_rgb(255, 255, 255));
 
-    for(unsigned i{}; i < 12; ++i)
-        al_draw_bitmap(minions[i].getBitmap(), minions[i].getCord_x(), minions[i].getCord_y(), 0);
+    for(auto& it : minions)
+        al_draw_bitmap(it.getBitmap(), it.getCord_x(), it.getCord_y(), 0);
 
     al_flip_display();
 }
+
+
+
+
+
+
+
+
 
  void level(ALLEGRO_DISPLAY* display, ALLEGRO_TIMER* timer)
 {
@@ -114,17 +127,22 @@ void level(ALLEGRO_DISPLAY*, ALLEGRO_TIMER*);
     al_clear_to_color(al_map_rgb(255, 0, 0));
     al_set_target_bitmap(al_get_backbuffer(display));
     
-    Player player(25, 25, 0, 0, 30, 30, nullptr);
+    Player player(275, 25, 0, 0, 30, 30, al_create_bitmap(30,30));
 
-    perimeter p = { {25, 25}, {525, 25}, {525, 525}, {25, 525} };
+    al_set_target_bitmap(player.getBitmap());
+    al_clear_to_color(al_map_rgb(0, 255, 0));
+    al_set_target_bitmap(al_get_backbuffer(display));
 
-    int w = 500;
-    int h = 500;
-    ALLEGRO_BITMAP* t = nullptr; //DA IMPLEMENTARE!
+    perimeter p{ {25, 25}, {525, 25}, {525, 525}, {25, 525} };
+
+    ALLEGRO_BITMAP* t{ nullptr }; //DA IMPLEMENTARE!
     GameArea poly(p, t, t, &boss, &player);
 
     bool redraw {true};
     bool STOP {false};
+    int w{ 500 };
+    int h{ 500 };
+    KEYS actual_key{still};
 
     al_register_event_source(coda_eventi, al_get_display_event_source(display));
     al_register_event_source(coda_eventi, al_get_timer_event_source(timer));
@@ -140,29 +158,28 @@ void level(ALLEGRO_DISPLAY*, ALLEGRO_TIMER*);
             STOP = true;
          else if(ev.type == ALLEGRO_EVENT_TIMER)
         {
-            //poly.update();
-             for(unsigned i{}; i < 12; ++i)
+            if(ev.type == ALLEGRO_EVENT_KEY_DOWN)
+             switch(ev.keyboard.keycode)
             {
-                 if(poly.getArea()*100/(w*h) <= 30)
-                {
-                    STOP = true;
-                    break;
-                }
-                 if(!player.getLifes())
-                {
-                    STOP = true;
-                    break;
-                }
-                 if(!poly.insideBorder(minions[i].getData()))
-                {
-                    minions[i].setAlive(false);
-                }
-                 if(minions[i].getAlive())
-                {
-                    minions[i].update(poly.hitsBorder(minions[i].getData()));
-                }
+                case ALLEGRO_KEY_ESCAPE: STOP = true;        break;
+                case ALLEGRO_KEY_UP:     actual_key = UP;    break;
+                case ALLEGRO_KEY_DOWN:   actual_key = DOWN;  break;
+                case ALLEGRO_KEY_LEFT:   actual_key = LEFT;  break;
+                case ALLEGRO_KEY_RIGHT:  actual_key = RIGHT; break;
+            }
+             else if(ev.type == ALLEGRO_EVENT_KEY_UP)
+                actual_key = still;
+
+            //poly.update();
+             for(auto& it : minions)
+            {
+                 if(poly.getArea()*100/(w*h) <= 30)     { STOP = true;            break;            }
+                 if(!player.getLifes())                 { STOP = true;            break;            }
+                 if(!poly.insideBorder(it.getData()))   { it.setAlive(false);                       }
+                 if(it.getAlive())                      { it.update(poly.hitsBorder(it.getData())); }
             }
 
+            player.move(actual_key);
             boss.update(poly.hitsBorder(boss.getData()));
 
             redraw = true;
@@ -171,20 +188,21 @@ void level(ALLEGRO_DISPLAY*, ALLEGRO_TIMER*);
         {
             redraw = false;
 
-            al_clear_to_color(al_map_rgb(255, 255, 255) );
+            al_clear_to_color(al_map_rgb(255, 255, 255));
             for(auto it : minions)
              if(it.getAlive())
-            {
-                al_draw_bitmap(it.getBitmap(), it.getCord_x(), it.getCord_y(), 0); //questo va nel print dei minion
-            };
-            al_draw_bitmap(boss.getBitmap(), boss.getCord_x(), boss.getCord_y(), 0); //questo va nel print del boss
+                al_draw_bitmap(it.getBitmap(), it.getCord_x(), it.getCord_y(), 0);      //questo va nel print dei minion
+
+            al_draw_bitmap(boss.getBitmap(), boss.getCord_x(), boss.getCord_y(), 0);        //questo va nel print del boss
+            al_draw_bitmap(player.getBitmap(), player.getCord_x(), player.getCord_y(), 0);  //questo va nel print del boss
             
             al_flip_display();
         }
     }
 
-    for(auto i : minions)
+    for(auto& i : minions)
         al_destroy_bitmap(i.getBitmap());
+
     al_destroy_bitmap(boss.getBitmap());
 
     al_destroy_event_queue(coda_eventi);
