@@ -93,7 +93,7 @@
          if(hitbox(x, y, x+w, y+h, 0, min(y1, y2), max(x1, x2), max(y1, y2)) )
         {
             if(y2-y1 < 0) --cont;
-            if(y2-y2 > 0) ++cont;
+            if(y2-y1 > 0) ++cont;
         }
     }
 
@@ -145,6 +145,7 @@
 */
  bool GameArea::update()
 {
+    if(trace.size() > 1)
      if(trace.push(Player->getCord_x(), Player->getCord_y()) && border.is_adj(trace.back().first, trace.back().second, 10, 10) )
     {
         if(trace.inside(Boss->getCord_x(), Boss->getCord_y()) )
