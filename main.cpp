@@ -110,10 +110,10 @@ void level(ALLEGRO_DISPLAY*, ALLEGRO_TIMER*);
 
     enemy_init(minions, display);
 
-    Boss boss(float(800)/2 - 30/2, float(600)/2 - 30/2, -1, -1, 30+2*2, 30+2*2, al_create_bitmap(30,30));
+    Boss boss(float(800)/2 - 30/2, float(600)/2 - 30/2, -0.5, -0.5, 30+2*2, 30+2*2, al_create_bitmap(30,30));
     
     al_set_target_bitmap(boss.getBitmap());
-    al_clear_to_color(al_map_rgb(77, 77, 77));
+    al_clear_to_color(al_map_rgb(255, 0, 0));
     al_set_target_bitmap(al_get_backbuffer(display));
     
     Player player(25, 25, 0, 0, 30, 30, nullptr);
@@ -142,20 +142,20 @@ void level(ALLEGRO_DISPLAY*, ALLEGRO_TIMER*);
             STOP = true;
          else if(ev.type == ALLEGRO_EVENT_TIMER)
         {
-            //poly.update();
+            poly.update();
              for(unsigned i{}; i < 12; ++i)
             {
-                /*if(poly.getArea()*100/(w*h) <= 30)
+                 if(poly.getArea()*100/(w*h) <= 30)
                 {
                     STOP = true;
                     break;
-                }*//*
+                }
                  if(!player.getLifes())
                 {
                     STOP = true;
                     break;
-                }*/
-                 if(!poly.insideBorder(minions[i].getData() ) );
+                }
+                 if(!poly.insideBorder(minions[i].getData() ) )
                 {
                     minions[i].setAlive(false);
                 }
@@ -197,7 +197,7 @@ void level(ALLEGRO_DISPLAY*, ALLEGRO_TIMER*);
     al_destroy_bitmap(boss.getBitmap());
 
     al_destroy_event_queue(coda_eventi);
-    al_stop_timer(timer);
+    //al_stop_timer(timer);
 
     return;
 }

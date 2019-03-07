@@ -8,7 +8,7 @@ Entity -> Player -> Enemy -> Boss -> Minion -> Polygon -> main
 #include"Enemy.h"
     
 inline bool in_range(int first, int lower_bound, int upper_bound) { return first>=lower_bound && first<=upper_bound; }
-bool hitbox(int x1a, int y1a, int x1b, int y1b, int x2a, int y2a, int x2b, int y2b);
+inline bool hitbox(int x1a, int y1a, int x1b, int y1b, int x2a, int y2a, int x2b, int y2b);
 /*
     GameList è una lista di coppie di coordinate circolare e ordinata secondo il seguente criterio:
     per ogni coppia di elementi a1 e a2 consecutivi, la coppia precedente a0 e a1 sarà tale che

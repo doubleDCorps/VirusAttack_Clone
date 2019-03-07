@@ -81,16 +81,17 @@
 */
  bool GameList::inside(int x, int y, int w, int h) const
 {
-    if(empty()) return false;
+    if(empty()) return true;
 
     int cont{};
 
-     for(auto it{ begin() }; it!=end(); ++it)
+     for(auto it{ begin() }; it != end(); ++it)
     {
-        const int& x1{ it->first }, x2{ successor(it)->first };
-        const int& y1{ it->second }, y2{ successor(it)->second };
+        int y1{ it->second };
+        int y2{ successor(it)->second };
 
-         if(hitbox(x, y, x+w, y+h, 0, min(y1, y2), max(x1, x2), max(y1, y2)) )
+        if(y2-y1!=0)
+         if(hitbox(x, y, x+w, y+h, 0, min(y1, y2), it->first, max(y1, y2) ) )
         {
             if(y2-y1 < 0) --cont;
             if(y2-y1 > 0) ++cont;
