@@ -81,8 +81,6 @@ void level(ALLEGRO_DISPLAY*, ALLEGRO_TIMER*);
             minions[i].setVelocity_x(float((minions[i].getVelocity_x())*-1.0)/10);
             minions[i].setVelocity_y(float((minions[i].getVelocity_y())*-1.0)/10);
         }
-
-        ++i;
     }
 
      for(unsigned i{}; i < 12; ++i)
