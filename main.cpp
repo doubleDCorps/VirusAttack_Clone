@@ -2,6 +2,7 @@
 
 void enemy_init(const vector<Minion>&, ALLEGRO_DISPLAY*);
 void level(ALLEGRO_DISPLAY*, ALLEGRO_TIMER*);
+void spawn(vector<Minion>& minions, Boss& boss);
 
  int main()
 {
@@ -117,7 +118,7 @@ void level(ALLEGRO_DISPLAY*, ALLEGRO_TIMER*);
      if(!coda_eventi) 
     { al_destroy_display(display); al_destroy_timer(timer); return; }
 
-    vector<Minion> minions(12, {float(800)/2 - 30/2, float(600)/2 - 30/2, 0, 0, 30+2*2, 30+2*2, al_create_bitmap(30,30), true});
+    vector<Minion> minions(12, {float(800)/2 - 30/2, float(600)/2 - 30/2, 0, 0, 30+2*2, 30+2*2, al_create_bitmap(30,30), false});
 
     enemy_init(minions, display);
 
@@ -149,6 +150,8 @@ void level(ALLEGRO_DISPLAY*, ALLEGRO_TIMER*);
     al_register_event_source(coda_eventi, al_get_keyboard_event_source());
     al_start_timer(timer);
 
+    int spawn_time{0};
+    bool first_spawn{true};
      while(!STOP)
     {
         ALLEGRO_EVENT ev;
@@ -180,7 +183,16 @@ void level(ALLEGRO_DISPLAY*, ALLEGRO_TIMER*);
             }
 
             player.move(actual_key);
-            boss.update(poly.hitsBorder(boss.getData()));
+
+            spawn_time++;
+            if((spawn_time<300 || spawn_time>420) && (spawn_time<2101 || spawn_time>2221))
+                boss.update(poly.hitsBorder(boss.getData()));
+            if(spawn_time==360 || spawn_time==2161) {
+                spawn(minions, boss);
+                if(spawn_time!=360)
+                    spawn_time=360;
+                }
+                
 
             redraw = true;
         }
@@ -208,4 +220,13 @@ void level(ALLEGRO_DISPLAY*, ALLEGRO_TIMER*);
     al_destroy_event_queue(coda_eventi);
 
     return;
+}
+
+void spawn(vector<Minion>& minions, Boss& boss) {
+    for(unsigned i{}; i<minions.size(); i++)
+        if(minions[i].getAlive()==false) {
+            minions[i].setAlive(true);
+            minions[i].setCord_x(boss.getCord_x());
+            minions[i].setCord_y(boss.getCord_y());
+        }   
 }

@@ -15,7 +15,7 @@
         Player(float x=0, float y=0, float vx=0, float vy=0, float wh=0, float hh=0, ALLEGRO_BITMAP* p=nullptr, unsigned l=1, AXIS s=X, KEYS k=still)
             : Entity(x, y, vx, vy, wh, hh, p), lifes(l), is_safe(s), position(k) {}
         
-        inline bool move(KEYS k);
+        bool move(KEYS k);
 
         unsigned getLifes() const { return lifes; }
         void loseLife() { lifes==0 ? lifes : --lifes; }
