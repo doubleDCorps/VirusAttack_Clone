@@ -1,10 +1,11 @@
 #include"polygon.h"
+#include<allegro5/allegro.h>
 
 void enemy_init(const vector<Minion>&, ALLEGRO_DISPLAY*);
 void level(ALLEGRO_DISPLAY*, ALLEGRO_TIMER*);
 void spawn(vector<Minion>& minions, Boss& boss);
 
- int main()
+ int main(int argc, char** argv)
 {
     srand(time(0));
     if(!al_init())              return -1;
@@ -136,13 +137,13 @@ void spawn(vector<Minion>& minions, Boss& boss);
 
     perimeter p{ {25, 25}, {525, 25}, {525, 525}, {25, 525} };
 
-    ALLEGRO_BITMAP* t{ nullptr }; //DA IMPLEMENTARE!
-    GameArea poly(p, t, t, &boss, &player);
+    GameArea poly(p, &boss, &player);
 
     bool redraw {true};
     bool STOP {false};
     int w{ 500 };
     int h{ 500 };
+    bool space {false};
     KEYS actual_key{still};
 
     al_register_event_source(coda_eventi, al_get_display_event_source(display));
