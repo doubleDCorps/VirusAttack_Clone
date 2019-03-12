@@ -1,36 +1,21 @@
 #include "polygon.h"
-/*
-    Date due hitbox quadrate, definite da quattro coordinate (due su x e due su y)
-    hitbox() verifica se un punto o una parte di una hitbox ha compenetrato l'altra,
-    ovvero se una parte delle coordinate di una hitbox è compreso fra la coordinata minore e maggiore 
-    dell'altra hitbox (questo contemporaneamente su entrambi gli assi, x e y, per evitare
-    che, ad esempio, oggetti con stesse coordinate x ma estremamente distanti lungo l'altro asse y
-    siano erroneamente considerati come compenetrazione).
-*/
- bool hitbox(int x1a, int y1a, int x1b, int y1b, int x2a, int y2a, int x2b, int y2b)
-{
-    return
-        (in_range(x1a, min(x2a, x2b), max(x2a, x2b)) || in_range(x1b, min(x2a, x2b), max(x2a, x2b)) ||
-         in_range(x2a, min(x1a, x1b), max(x1a, x1b)) || in_range(x2b, min(x1a, x1b), max(x1a, x1b)) )
-     && (in_range(y1a, min(y2a, y2b), max(y2a, y2b)) || in_range(y1b, min(y2a, y2b), max(y2a, y2b)) ||
-         in_range(y2a, min(y1a, y1b), max(y1a, y1b)) || in_range(y2b, min(y1a, y1b), max(y1a, y1b)) );
-}
+
 /*
     Se il punto p rispetta le condizioni di ordinamento, viene aggiunto alla fine o all'inizio
     della lista e viene restituito true; altrimenti viene restituito false.
 */
  bool GameList::push(int x, int y)
 {
-    if(empty()) push_back({x, y});
-    else if(size()== 1 && (x == back().first || y == back().second) )                    push_back({x, y});
-    else if(size()== 1 && (x == front().first || y == front().second) )                  push_front({x, y});
-    else if(size() >= 2 && x == back().first && back().second == (++rbegin())->second)   push_back({x, y});
+    if(empty())                                                                          push_back( {x, y} );
+    else if(size() == 1 && (x == back().first || y == back().second) )                   push_back( {x, y} );
+    else if(size() == 1 && (x == front().first || y == front().second) )                 push_front( {x, y} );
+    else if(size() >= 2 && x == back().first && back().second == (++rbegin())->second)   push_back( {x, y} );
     else if(size() >= 2 && x == back().first && back().first == (++rbegin())->first)     back() = {x, y};
-    else if(size() >= 2 && y == back().second && back().first == (++rbegin())->first)    push_back({x, y});
+    else if(size() >= 2 && y == back().second && back().first == (++rbegin())->first)    push_back( {x, y} );
     else if(size() >= 2 && y == back().second && back().second == (++rbegin())->second)  back() = {x, y};
-    else if(size() >= 2 && x == front().first && front().second == (++begin())->second)  push_front({x, y});
+    else if(size() >= 2 && x == front().first && front().second == (++begin())->second)  push_front( {x, y} );
     else if(size() >= 2 && x == front().first && front().first == (++begin())->first)    front() = {x, y};
-    else if(size() >= 2 && y == front().second && front().first == (++begin())->first)   push_front({x, y});
+    else if(size() >= 2 && y == front().second && front().first == (++begin())->first)   push_front( {x, y} );
     else if(size() >= 2 && y == front().second && front().second == (++begin())->second) front() = {x, y};
     else        return false;
     return true;
@@ -62,10 +47,10 @@
         const int& x2{ it->first }, x3{ successor(it)->first };
         const int& y2{ it->second }, y3{ successor(it)->second };
 
-        if(x2!=x3 && (vy>=0 && y2-y1 > -5 || vy<=0 && y2-y1 < 5) && hitbox(x1, y1, x1+w1, y1+h1, x2, y2, x3, y2+20) )
+        if(x2!=x3 && (vy>=0 && y2-y1 > -5 || vy<=0 && y2-y1 < 5) && hitbox(x1, y1, x1+w1, y1+h1, x2, y2, x3, y2+15) )
             return Y;
         
-        if(y2!=y3 && (vx>=0 && x2-x1 > -5 || vx<=0 && x2-x1 < 5) && hitbox(x1, y1, x1+w1, y1+h1, x2, y2, x2+20, y3) )
+        if(y2!=y3 && (vx>=0 && x2-x1 > -5 || vx<=0 && x2-x1 < 5) && hitbox(x1, y1, x1+w1, y1+h1, x2, y2, x2+15, y3) )
             return X;
     }
     
@@ -104,17 +89,33 @@
     Dato un bitmap da trattare come buffer temporaneo, viene targettato per il disegno
     e viene poi successivamente disegnato il poligono rappresentato dalla lista manipolando
     l'immagine che fa da "font" per l'intero bordo.
-*//*
+*/
  void GameList::print(ALLEGRO_BITMAP* buffer) const
 {
     if(empty()) return;
 
-     if(pic!=nullptr && buffer!=nullptr)
+     if(buffer!=nullptr)
     {
-        //if(al_get_target_bitmap()!=buffer)  al_set_target_bitmap(buffer);
-        //drawing operations
+        ALLEGRO_BITMAP* temp;
+         for(auto it{ begin() }; it != end(); ++it)
+        {
+            if(it->first == successor(it)->first)
+                temp = al_create_bitmap(15, abs(it->second - successor(it)->second));
+            else
+                temp = al_create_bitmap(abs(it->first - successor(it)->first), 15);
+            
+            al_set_target_bitmap(temp);
+            al_clear_to_color(al_map_rgb(80, 80, 80));
+            al_set_target_backbuffer(al_get_current_display());    
+            al_draw_bitmap(temp, min(it->first, successor(it)->first), min(it->second, successor(it)->second), 0);
+
+            al_destroy_bitmap(temp);
+            temp = nullptr;
+        }
+
+        al_set_target_backbuffer(al_get_current_display());
     }
-}*/
+}
 
 
 
@@ -146,7 +147,7 @@
 */
  bool GameArea::update()
 {
-    if(trace.size() > 1)
+    if(trace.size() > 0)
      if(trace.push(Player->getCord_x(), Player->getCord_y()) && border.is_adj(trace.back().first, trace.back().second, 10, 10) )
     {
         if(trace.inside(Boss->getCord_x(), Boss->getCord_y()) )
@@ -160,6 +161,8 @@
         trace.clear();
         return true;
     }
+    else
+        trace.push(Player->getCord_x(), Player->getCord_y());
 
     return false;
 }

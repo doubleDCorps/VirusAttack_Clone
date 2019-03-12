@@ -128,7 +128,7 @@ void spawn(vector<Minion>& minions, Boss& boss);
     al_clear_to_color(al_map_rgb(255, 0, 0));
     al_set_target_bitmap(al_get_backbuffer(display));
     
-    Player player(275, 25, 0, 0, 30, 30, al_create_bitmap(30,30));
+    Player player(275, 25, 4, 30, 30, al_create_bitmap(30,30));
 
     al_set_target_bitmap(player.getBitmap());
     al_clear_to_color(al_map_rgb(0, 255, 0));
@@ -161,28 +161,31 @@ void spawn(vector<Minion>& minions, Boss& boss);
             STOP = true;
          else if(ev.type == ALLEGRO_EVENT_TIMER)
         {
-            if(ev.type == ALLEGRO_EVENT_KEY_DOWN)
-             switch(ev.keyboard.keycode)
-            {
-                case ALLEGRO_KEY_ESCAPE: STOP = true;        break;
-                case ALLEGRO_KEY_UP:     actual_key = UP;    break;
-                case ALLEGRO_KEY_DOWN:   actual_key = DOWN;  break;
-                case ALLEGRO_KEY_LEFT:   actual_key = LEFT;  break;
-                case ALLEGRO_KEY_RIGHT:  actual_key = RIGHT; break;
-            }
-             else if(ev.type == ALLEGRO_EVENT_KEY_UP)
-                actual_key = still;
 
             //poly.update();
-             for(auto& it : minions)
+            //player routines
+             if(poly.hitsBorder(player.getData()))
+            { 
+                //if(!player.getSafe())
+                //    player.setPos(actual_key);
+                player.setSafe(true);
+            }
+             if((player.getSafe() && space) || !player.getSafe())
             {
-                 if(poly.getArea()*100/(w*h) <= 30)     { STOP = true;            break;            }
-                 if(!player.getLifes())                 { STOP = true;            break;            }
-                 if(!poly.insideBorder(it.getData()))   { it.setAlive(false);                       }
-                 if(it.getAlive())                      { it.update(poly.hitsBorder(it.getData())); }
+                player.move(actual_key);
             }
 
-            player.move(actual_key);
+             for(auto& it : minions)
+            {
+                //condizioni di uscita
+                if(poly.getArea()*100/(w*h) <= 30)     STOP = true;
+                if(!player.getLifes())                 STOP = true;
+                
+                //minion routines
+                if(!poly.insideBorder(it.getData()))   it.setAlive(false);
+                //if(poly.hitsTrace(it.getData()))       reset player status, life--
+                if(it.getAlive())                      it.update(poly.hitsBorder(it.getData()));
+            }
 
             spawn_time++;
             if((spawn_time<300 || spawn_time>420) && (spawn_time<2101 || spawn_time>2221))
@@ -196,14 +199,38 @@ void spawn(vector<Minion>& minions, Boss& boss);
 
             redraw = true;
         }
-         if(redraw && al_is_event_queue_empty(coda_eventi) )
+         else if(ev.type == ALLEGRO_EVENT_KEY_DOWN)
+         switch(ev.keyboard.keycode)
+        {
+            case ALLEGRO_KEY_UP:     if(actual_key != UP)    actual_key = UP;    break;
+            case ALLEGRO_KEY_DOWN:   if(actual_key != DOWN)  actual_key = DOWN;  break;
+            case ALLEGRO_KEY_LEFT:   if(actual_key != LEFT)  actual_key = LEFT;  break;
+            case ALLEGRO_KEY_RIGHT:  if(actual_key != RIGHT) actual_key = RIGHT; break;
+            case ALLEGRO_KEY_ESCAPE: STOP = true;        break;
+            case ALLEGRO_KEY_SPACE:  space = true;       break;
+            default:;
+        }
+         else if(ev.type == ALLEGRO_EVENT_KEY_UP)
+         switch(ev.keyboard.keycode)
+        {
+            case ALLEGRO_KEY_UP:     if(actual_key == UP)    actual_key = still; break;
+            case ALLEGRO_KEY_DOWN:   if(actual_key == DOWN)  actual_key = still; break;
+            case ALLEGRO_KEY_LEFT:   if(actual_key == LEFT)  actual_key = still; break;
+            case ALLEGRO_KEY_RIGHT:  if(actual_key == RIGHT) actual_key = still; break;
+            case ALLEGRO_KEY_SPACE:  space = false;      break;
+        }
+          if(redraw && al_is_event_queue_empty(coda_eventi) )
         {
             redraw = false;
 
             al_clear_to_color(al_map_rgb(255, 255, 255));
-            for(auto it : minions)
-             if(it.getAlive())
-                al_draw_bitmap(it.getBitmap(), it.getCord_x(), it.getCord_y(), 0);      //questo va nel print dei minion
+
+            poly.printTrace(al_get_backbuffer(display));
+            poly.printBorder(al_get_backbuffer(display));
+
+            for(auto& it : minions) 
+                if(it.getAlive()) 
+                    al_draw_bitmap(it.getBitmap(), it.getCord_x(), it.getCord_y(), 0);      //questo va nel print dei minion
 
             al_draw_bitmap(boss.getBitmap(), boss.getCord_x(), boss.getCord_y(), 0);        //questo va nel print del boss
             al_draw_bitmap(player.getBitmap(), player.getCord_x(), player.getCord_y(), 0);  //questo va nel print del boss
@@ -216,6 +243,7 @@ void spawn(vector<Minion>& minions, Boss& boss);
         al_destroy_bitmap(i.getBitmap());
 
     al_destroy_bitmap(boss.getBitmap());
+    al_destroy_bitmap(player.getBitmap());
 
     al_destroy_event_queue(coda_eventi);
 
