@@ -12,7 +12,7 @@ void spawn(vector<Minion>& minions, Boss& boss);
  int main(int argc, char** argv)
 {
     srand(time(0));
-    if(!al_install_primitives_addon()) return -1;
+    if(!al_init() || !al_install_keyboard() || !al_init_primitives_addon()) return -1;
    
     ALLEGRO_DISPLAY_MODE disp_data;
      for(unsigned i{}; i < al_get_num_display_modes(); ++i)
