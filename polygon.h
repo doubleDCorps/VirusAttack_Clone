@@ -6,6 +6,7 @@ Entity -> Player -> Enemy -> Boss -> Minion -> Polygon -> main
 #ifndef POLY_HPP_
 #define POLY_HPP_
 #include"Enemy.h"
+#include<allegro5/allegro_primitives.h>
 /*
     GameList è una lista di coppie di coordinate circolare e ordinata secondo il seguente criterio:
     per ogni coppia di elementi a1 e a2 consecutivi, la coppia precedente a0 e a1 sarà tale che

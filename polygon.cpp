@@ -101,24 +101,18 @@
 
      if(buffer!=nullptr)
     {
-        ALLEGRO_BITMAP* temp;
+        al_set_target_bitmap(buffer);
          for(auto it{ begin() }; it != end(); ++it)
         {
             if(it->first == successor(it)->first)
-                temp = al_create_bitmap(15, abs(it->second - successor(it)->second));
+                al_draw_line(it->first, min(it->second, successor(it)->second),
+                             it->first, max(it->second, successor(it)->second),
+                             al_map_rgb(0, 0, 0), 10);
             else
-                temp = al_create_bitmap(abs(it->first - successor(it)->first), 15);
-            
-            al_set_target_bitmap(temp);
-            al_clear_to_color(al_map_rgb(80, 80, 80));
-            al_set_target_backbuffer(al_get_current_display());    
-            al_draw_bitmap(temp, min(it->first, successor(it)->first), min(it->second, successor(it)->second), 0);
-
-            al_destroy_bitmap(temp);
-            temp = nullptr;
+                al_draw_line(min(it->first, successor(it)->first), it->second,
+                             max(it->first, successor(it)->first), it->second, 
+                             al_map_rgb(0, 0, 0), 10);
         }
-
-        al_set_target_backbuffer(al_get_current_display());
     }
 }
 
