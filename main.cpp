@@ -40,7 +40,7 @@ void spawn(vector<Minion>& minions, Boss& boss);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
- void enemy_init(vector<Minion>& minions, ALLEGRO_DISPLAY* display)
+ void entities_init(vector<Entity*>& entities, ALLEGRO_DISPLAY* display)
 {
     const int enemy_velocity{25};
 
@@ -51,8 +51,8 @@ void spawn(vector<Minion>& minions, Boss& boss);
         int int_dx{ rand()%(enemy_velocity-12)+2 };
         int int_dy{ enemy_velocity-int_dx };
 
-        for(auto& it : minions)
-             if(int_dx==it.getVelocity_x() && int_dy==it.getVelocity_y())
+        for(unsigned i{2};i<14;i++)
+             if(int_dx==entities[i].getVelocity_x() && int_dy==entities[i].getVelocity_y())
             {
                 presente = true;
                 break;
@@ -66,41 +66,47 @@ void spawn(vector<Minion>& minions, Boss& boss);
         }
     }
 
-     for(unsigned i{};i<12;i++)
+     for(unsigned i{2};i<14;i++)
     {
-         if(i <= 3)
+         if(i <= 5)
         {
             minions[i].setVelocity_x(float((minions[i].getVelocity_x())*-1.0)/10);
             minions[i].setVelocity_y(float(minions[i].getVelocity_y())/10);
         }
-         else if(i >= 4 && i <= 6)
+         else if(i >= 6 && i <= 8)
         {
             minions[i].setVelocity_x(float(minions[i].getVelocity_x())/10);
             minions[i].setVelocity_y(float(minions[i].getVelocity_y())/10);
         }
-         else if(i >= 7 && i <= 9)
+         else if(i >= 9 && i <= 11)
         {
             minions[i].setVelocity_x(float(minions[i].getVelocity_x())/10);
             minions[i].setVelocity_y(float((minions[i].getVelocity_y())*-1.0)/10);
         }
-         else if(i >= 10 && i <= 12)
+         else if(i >= 12 && i <= 14)
         {
             minions[i].setVelocity_x(float((minions[i].getVelocity_x())*-1.0)/10);
             minions[i].setVelocity_y(float((minions[i].getVelocity_y())*-1.0)/10);
         }
     }
 
-     for(auto& it : minions)
+    al_set_target_bitmap(entities[0].getBitmap()); //PLAYER_INIT
+    al_clear_to_color(al_map_rgb(0, 255, 0));
+
+    al_set_target_bitmap(entities[1].getBitmap()); //BOSS_INIT
+    al_clear_to_color(al_map_rgb(255, 0, 0));
+
+     for(unsigned i{2};i<14;i++)
     {
-        al_set_target_bitmap(it.getBitmap());
+        al_set_target_bitmap(entities[i].getBitmap());
         al_clear_to_color(al_map_rgb(0, 0, 0));
     }
 
     al_set_target_bitmap(al_get_backbuffer(display));
     al_clear_to_color(al_map_rgb(255, 255, 255));
 
-    for(auto& it : minions)
-        al_draw_bitmap(it.getBitmap(), it.getCord_x(), it.getCord_y(), 0);
+    for(unsigned i{2};i<14;i++)
+        al_draw_bitmap(entities[i].getBitmap(), entities[i].getCord_x(), entities[i].getCord_y(), 0);
 
     al_flip_display();
 }
@@ -113,21 +119,13 @@ void spawn(vector<Minion>& minions, Boss& boss);
      if(!coda_eventi) 
     { al_destroy_display(display); al_destroy_timer(timer); return; }
 
-    vector<Minion> minions(12, {float(800)/2 - 30/2, float(600)/2 - 30/2, 0, 0, 30+2*2, 30+2*2, al_create_bitmap(30,30), false});
+    vector<Entity*> entities;
+    entities.push_back(new Player{275, 25, 4, 30, 30, al_create_bitmap(30,30)});//PLAYER
+    entities.push_back(float(800)/2 - 30/2, float(600)/2 - 30/2, -0.3, -1.2, 30+2*2, 30+2*2, al_create_bitmap(30,30), true);//BOSS 
+    for(unsigned i=0;i<12;i++)
+        entities.push_back(0, 0, 0, 0, al_get_bitmap_width()+4*2, al_get_bitmap_height()+4*2, al_create_bitmap(30,30), false);//MINIONS
 
-    enemy_init(minions, display);
-
-    Boss boss(float(800)/2 - 30/2, float(600)/2 - 30/2, -0.3, -1.2, 30+2*2, 30+2*2, al_create_bitmap(30,30));
-    
-    al_set_target_bitmap(boss.getBitmap());
-    al_clear_to_color(al_map_rgb(255, 0, 0));
-    al_set_target_bitmap(al_get_backbuffer(display));
-    
-    Player player(275, 25, 4, 30, 30, al_create_bitmap(30,30));
-
-    al_set_target_bitmap(player.getBitmap());
-    al_clear_to_color(al_map_rgb(0, 255, 0));
-    al_set_target_bitmap(al_get_backbuffer(display));
+    entities_init(entities, display);
 
     perimeter p{ {25, 25}, {525, 25}, {525, 525}, {25, 525} };
 
