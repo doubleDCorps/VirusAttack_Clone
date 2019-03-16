@@ -21,7 +21,7 @@
         bool is_adj(int x, int y, int w=0, int h=0) const;
         AXIS hits(int x1, int y1, int w1=0, int h1=0, int vx=0, int vy=0) const;
         bool inside(int x, int y, int w=0, int h=0) const;
-        void print(ALLEGRO_BITMAP* buffer) const;
+        void print(ALLEGRO_BITMAP* buffer=nullptr) const;
 
     private:
         inline auto successor(perimeter::iterator it)                       { return ++it == end() ? begin() : it; }
@@ -47,10 +47,12 @@
 
         inline AXIS hitsBorder(const EntityData& D) const       { return border.hits(D.c[0], D.c[1], D.c[2], D.c[3], D.v[0], D.v[1]); }
         inline bool insideBorder(const HitboxData& D) const     { return border.inside(D.c[0], D.c[1], D.c[2], D.c[3]); }
-        inline void printBorder(ALLEGRO_BITMAP* buffer) const   { border.print(buffer); }  
+        inline void printBorder(ALLEGRO_BITMAP* buffer=nullptr) const   { border.print(buffer=nullptr); }
+
         inline AXIS hitsTrace(const EntityData& D) const        { return trace.hits(D.c[0], D.c[1], D.c[2], D.c[3], D.v[0], D.v[1]); }
         inline bool insideTrace(const HitboxData& D) const      { return trace.inside(D.c[0], D.c[1], D.c[2], D.c[3]); }
-        inline void printTrace(ALLEGRO_BITMAP* buffer) const    { trace.print(buffer); }
+        inline void printTrace(ALLEGRO_BITMAP* buffer=nullptr) const    { trace.print(buffer=nullptr); }
+        
         bool update();
         void clear() { trace.clear(); }
         int getArea() const;

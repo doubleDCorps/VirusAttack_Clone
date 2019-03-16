@@ -35,9 +35,10 @@ enum KEYS : int {still=0, UP=1, LEFT=2, DOWN=3, RIGHT=4};
     protected:
         ALLEGRO_BITMAP *image;
         EntityData data;
-    
+        unsigned lifes = 0;
+
     public:
-        Entity(float x=0, float y=0, float vx=0, float vy=0, float wh=0, float hh=0, ALLEGRO_BITMAP* p=nullptr):
+        Entity(float x=0, float y=0, float vx=0, float vy=0, ALLEGRO_BITMAP* p=nullptr):
             data(x, y, vx, vy, wh, hh), image(p) {}
 
         virtual ~Entity() {};
@@ -47,21 +48,19 @@ enum KEYS : int {still=0, UP=1, LEFT=2, DOWN=3, RIGHT=4};
         ALLEGRO_BITMAP *getBitmap()             { return image; }
         void setBitmap(ALLEGRO_BITMAP* p)       { image = p; }
 
+        bool isAlive() const { return lifes; }
+        
         const EntityData& getData() const       { return data; }
         
-        float getCord_x() const             { return data.c[0] + 2; }
-        float getCord_y() const             { return data.c[1] + 2; }
-        float getWidth_hitbox() const       { return data.c[2] - 4; }
-        float getHeight_hitbox() const      { return data.c[3] - 4; }
-        float getVelocity_x() const         { return data.v[0]; }
-        float getVelocity_y() const         { return data.v[1]; }
+        float getCord_x() const                 { return data.c[0]; }
+        float getCord_y() const                 { return data.c[1]; }
+        float getVelocity_x() const             { return data.v[0]; }
+        float getVelocity_y() const             { return data.v[1]; }
 
-        void setCord_x(float cx)            { data.c[0] = cx; }
-        void setCord_y(float cy)            { data.c[1] = cy; }
-        void setWidth_hitbox(float w)       { data.c[2] = w;  }
-        void setHeight_hitbox(float h)      { data.c[3] = h;  }
-        void setVelocity_x(float vx)        { data.v[0] = vx; }
-        void setVelocity_y(float vy)        { data.v[1] = vy; }
+        void setCord_x(float cx)                { data.c[0] = cx; }
+        void setCord_y(float cy)                { data.c[1] = cy; }
+        void setVelocity_x(float vx)            { data.v[0] = vx; }
+        void setVelocity_y(float vy)            { data.v[1] = vy; }
 };
 
 #endif

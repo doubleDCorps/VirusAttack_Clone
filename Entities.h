@@ -6,9 +6,10 @@
  class Enemy: public Entity
 {
     public:
-        using Entity::Entity;
-        virtual ~Enemy() {};
-        virtual void update(int argc, bool argf)
+        Player(float x=0, float y=0, float v=0, float wh=0, float hh=0, ALLEGRO_BITMAP* p=nullptr)
+            : Entity(x, y, v, v, wh, hh, p), lifes(1) {}
+        
+        virtual void update(int argc, bool argf);
         /* 
          void Enemy::update(AXIS v)
         {
@@ -23,16 +24,12 @@
 
  class Player: public Entity
 {
-    private:
-        unsigned lifes;
-        bool is_safe;
-        KEYS position;
-
     public:
-        Player(float x=0, float y=0, float v=0, float wh=0, float hh=0, ALLEGRO_BITMAP* p=nullptr, unsigned l=1, bool s=true, KEYS k=still)
-            : Entity(x, y, v, v, wh, hh, p), lifes(l), is_safe(s), position(k) {}
+        Player(float x=0, float y=0, float v=0, float wh=0, float hh=0, ALLEGRO_BITMAP* p=nullptr)
+            : Entity(x, y, v, v, wh, hh, p), lifes(4) {}
         
-        void move(KEYS k)
+        virtual void update(int argc, bool argf);
+        /*void move(KEYS k)
         {
              if((position != k && is_safe) || !is_safe)
             {
@@ -54,16 +51,7 @@
                 if(is_safe && k%2 == position%2 && k != position)
                     is_safe = false;
             }
-        }
-
-        unsigned getLifes() const { return lifes; }
-        void loseLife() { lifes==0 ? lifes : --lifes; }
-        
-        bool getSafe() const { return is_safe; }
-        void setSafe(bool s) { is_safe = s; }
-
-        KEYS getPos() const { return position; }
-        void setPos(KEYS k) { position = k; }
+        }*/
 };
 
 #endif
