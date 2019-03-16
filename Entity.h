@@ -50,7 +50,7 @@ bool hitbox(int x1a, int y1a, int x1b, int y1b, int x2a, int y2a, int x2b, int y
 
         const ALLEGRO_BITMAP *getBitmap() const { return image; }
         ALLEGRO_BITMAP *getBitmap()             { return image; }
-        void setBitmap(ALLEGRO_BITMAP* p)       { image = p; wh=al_get_bitmap_width(p)+4*2; hh=al_get_bitmap_height(p)+4*2;}
+        void setBitmap(ALLEGRO_BITMAP* p)       { image = p; data.c[2]=al_get_bitmap_width(p)+4*2; data.c[3]=al_get_bitmap_height(p)+4*2;}
 
         bool isAlive() const { return lifes; }
         

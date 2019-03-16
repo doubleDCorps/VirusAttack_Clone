@@ -3,9 +3,8 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void enemy_init(const vector<Minion>&, ALLEGRO_DISPLAY*);
+void enemy_init(const vector<Entity*>&, ALLEGRO_DISPLAY*);
 void level(ALLEGRO_DISPLAY*, ALLEGRO_TIMER*);
-void spawn(vector<Minion>& minions, Boss& boss);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -59,8 +58,8 @@ void spawn(vector<Minion>& minions, Boss& boss);
 
          if(!presente)
         {
-            minions[cont_minion].setVelocity_x(int_dx);
-            minions[cont_minion].setVelocity_y(int_dy);
+            entities[cont_minion].setVelocity_x(int_dx);
+            entities[cont_minion].setVelocity_y(int_dy);
             cont_minion++;
         }
     }
@@ -69,23 +68,23 @@ void spawn(vector<Minion>& minions, Boss& boss);
     {
          if(i <= 5)
         {
-            minions[i].setVelocity_x(float((minions[i].getVelocity_x())*-1.0)/10);
-            minions[i].setVelocity_y(float(minions[i].getVelocity_y())/10);
+            entities[i].setVelocity_x(float((entities[i].getVelocity_x())*-1.0)/10);
+            entities[i].setVelocity_y(float(entities[i].getVelocity_y())/10);
         }
          else if(i >= 6 && i <= 8)
         {
-            minions[i].setVelocity_x(float(minions[i].getVelocity_x())/10);
-            minions[i].setVelocity_y(float(minions[i].getVelocity_y())/10);
+            entities[i].setVelocity_x(float(entities[i].getVelocity_x())/10);
+            entities[i].setVelocity_y(float(entities[i].getVelocity_y())/10);
         }
          else if(i >= 9 && i <= 11)
         {
-            minions[i].setVelocity_x(float(minions[i].getVelocity_x())/10);
-            minions[i].setVelocity_y(float((minions[i].getVelocity_y())*-1.0)/10);
+            entities[i].setVelocity_x(float(entities[i].getVelocity_x())/10);
+            entities[i].setVelocity_y(float((entities[i].getVelocity_y())*-1.0)/10);
         }
          else if(i >= 12 && i <= 14)
         {
-            minions[i].setVelocity_x(float((minions[i].getVelocity_x())*-1.0)/10);
-            minions[i].setVelocity_y(float((minions[i].getVelocity_y())*-1.0)/10);
+            entities[i].setVelocity_x(float((entities[i].getVelocity_x())*-1.0)/10);
+            entities[i].setVelocity_y(float((entities[i].getVelocity_y())*-1.0)/10);
         }
     }
 
