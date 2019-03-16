@@ -135,6 +135,7 @@ void spawn(vector<Minion>& minions, Boss& boss);
     int h{ 500 };
     bool space {false};
     KEYS actual_key{still};
+    bool state_changed{false};
 
     al_register_event_source(coda_eventi, al_get_display_event_source(display));
     al_register_event_source(coda_eventi, al_get_timer_event_source(timer));
@@ -153,17 +154,14 @@ void spawn(vector<Minion>& minions, Boss& boss);
          else if(ev.type == ALLEGRO_EVENT_TIMER)
         {
             //condizioni di uscita
-            if(poly.getArea()*100/(w*h) <= 30)     STOP = true;
-            if(!entities[0]->isAlive())            STOP = true;
-            
+            STOP = poly.getArea()*100/(w*h) <= 30 || !entities[0]->isAlive();
             //player routines
             entities[0]->update( space ? key : 0, poly.hitsBorder(entities[0]->getData()) );
 
              for(unsigned i=1; i < entities.size(); ++i)
             {
                 if(i->isAlive())
-                    entityList[i]->update( collision( entityList[i]->getData() ),
-                                           state_changed ? position( entityList[i]->getData() ) : true);
+                    entityList[i]->update( collision( entityList[i]->getData() ), state_changed ? position( entityList[i]->getData() ) : true);
             }
             
 
@@ -177,6 +175,7 @@ void spawn(vector<Minion>& minions, Boss& boss);
                     spawn_time=360;
             }
 
+            //state_changed = poly.update();
             redraw = true;
         }
          else if(ev.type == ALLEGRO_EVENT_KEY_DOWN)
