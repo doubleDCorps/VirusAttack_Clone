@@ -42,7 +42,7 @@
 {
     public:
         GameArea(): border(), trace(), Boss(nullptr), Player(nullptr) {}
-        GameArea(const perimeter& b, const Entity* B=nullptr, const Entity* P=nullptr)
+        GameArea(const perimeter& b, const Entity* P=nullptr, const Entity* B=nullptr)
             : border(b), trace(), Boss(B), Player(P) {}     
 
         inline AXIS hitsBorder(const EntityData& D) const       { return border.hits(D.c[0], D.c[1], D.c[2], D.c[3], D.v[0], D.v[1]); }

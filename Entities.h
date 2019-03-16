@@ -9,6 +9,8 @@
         Enemy(float x=0, float y=0, float v=0, ALLEGRO_BITMAP* p=nullptr)
             : Entity(x, y, v, v, p, 1) {}
         
+        void setAlive(bool k) { lifes = k; }
+
         virtual void update(int argc, bool argf);
         /* 
          void Enemy::update(AXIS v)
@@ -24,11 +26,17 @@
 
  class Player: public Entity
 {
+    private:
+        bool safe = true;
+
     public:
         Player(float x=0, float y=0, float v=0, ALLEGRO_BITMAP* p=nullptr)
             : Entity(x, y, v, v, p, 4) {}
         
         virtual void update(int argc, bool argf);
+
+        bool isSafe() const { return safe; }
+        void setSafe(bool k){ safe = k; }
         /*void move(KEYS k)
         {
              if((position != k && is_safe) || !is_safe)
