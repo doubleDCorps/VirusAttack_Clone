@@ -1,4 +1,4 @@
-#include"polygon.h"
+#include"Level.h"
 #include<allegro5/allegro.h>
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -113,7 +113,7 @@ void spawn(vector<Minion>& minions, Boss& boss);
      if(!coda_eventi) 
     { al_destroy_display(display); al_destroy_timer(timer); return; }
 
-    vector<Minion> minions(12, {float(800)/2 - 30/2, float(600)/2 - 30/2, 0, 0, 30+2*2, 30+2*2, al_create_bitmap(30,30), false});
+    vector<Entity*> eL(13 + 1*1);
 
     enemy_init(minions, display);
 
@@ -139,7 +139,6 @@ void spawn(vector<Minion>& minions, Boss& boss);
     int h{ 500 };
     bool space {false};
     KEYS actual_key{still};
-    //pair<bool, bool> h{false, false};
 
     al_register_event_source(coda_eventi, al_get_display_event_source(display));
     al_register_event_source(coda_eventi, al_get_timer_event_source(timer));
@@ -157,10 +156,6 @@ void spawn(vector<Minion>& minions, Boss& boss);
             STOP = true;
          else if(ev.type == ALLEGRO_EVENT_TIMER)
         {
-
-            //h.second = h.first;
-            //h.first = poly.update();
-            
             //condizioni di uscita
             if(poly.getArea()*100/(w*h) <= 30)     STOP = true;
             if(!player.getLifes())                 STOP = true;
@@ -239,6 +234,9 @@ void spawn(vector<Minion>& minions, Boss& boss);
 
     for(auto& i : minions)
         al_destroy_bitmap(i.getBitmap());
+    
+    for(auto i : minions)
+        delete [] i;
 
     al_destroy_bitmap(boss.getBitmap());
     al_destroy_bitmap(player.getBitmap());

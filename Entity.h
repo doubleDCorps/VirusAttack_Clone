@@ -35,11 +35,11 @@ enum KEYS : int {still=0, UP=1, LEFT=2, DOWN=3, RIGHT=4};
     protected:
         ALLEGRO_BITMAP *image;
         EntityData data;
-        unsigned lifes = 0;
+        unsigned lifes;
 
     public:
-        Entity(float x=0, float y=0, float vx=0, float vy=0, ALLEGRO_BITMAP* p=nullptr):
-            data(x, y, vx, vy, wh, hh), image(p) {}
+        Entity(float x=0, float y=0, float vx=0, float vy=0, ALLEGRO_BITMAP* p=nullptr, unsigned l=0):
+            data(x, y, vx, vy, 0, 0), image(p), lifes(l) {}
 
         virtual ~Entity() {};
         virtual void update(int argc, bool argf) = 0;

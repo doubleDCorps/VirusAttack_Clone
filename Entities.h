@@ -1,13 +1,13 @@
 #ifndef ENTITIES_H_
 #define ENTITIES_H_
 
-#include "Player.h"
+#include "Entity.h"
 
  class Enemy: public Entity
 {
     public:
-        Player(float x=0, float y=0, float v=0, float wh=0, float hh=0, ALLEGRO_BITMAP* p=nullptr)
-            : Entity(x, y, v, v, wh, hh, p), lifes(1) {}
+        Enemy(float x=0, float y=0, float v=0, ALLEGRO_BITMAP* p=nullptr)
+            : Entity(x, y, v, v, p, 1) {}
         
         virtual void update(int argc, bool argf);
         /* 
@@ -25,8 +25,8 @@
  class Player: public Entity
 {
     public:
-        Player(float x=0, float y=0, float v=0, float wh=0, float hh=0, ALLEGRO_BITMAP* p=nullptr)
-            : Entity(x, y, v, v, wh, hh, p), lifes(4) {}
+        Player(float x=0, float y=0, float v=0, ALLEGRO_BITMAP* p=nullptr)
+            : Entity(x, y, v, v, p, 4) {}
         
         virtual void update(int argc, bool argf);
         /*void move(KEYS k)
