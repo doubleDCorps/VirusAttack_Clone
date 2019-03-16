@@ -5,23 +5,17 @@
 
  class Enemy : public Entity
 {
-    private:
-    protected:
-        ~Enemy() {};
-
     public:
         using Entity::Entity;
+        virtual ~Enemy() {};
         virtual void update(AXIS v);
 };
 
  class Boss : public Enemy
 {
-    protected:
     public:
         Boss(float x = 0, float y = 0, float vx = 0, float vy = 0, int wh = 0, int hh = 0, ALLEGRO_BITMAP* p = nullptr):
             Enemy(x, y, vx, vy, wh, hh, p) {}
-
-    //void spawn();
 };
 
  class Minion : public Enemy

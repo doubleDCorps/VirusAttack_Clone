@@ -37,21 +37,16 @@ enum KEYS : int {still = 0, UP = 1, LEFT = 2, DOWN = 3, RIGHT = 4};
 }
 
  struct HitboxData
-{
-    protected:
-        ~HitboxData() {};
-    public:
+{        
         float c[4];
         HitboxData(float a, float b, float d=0, float e=0): c{a, b, d, e} {}
-        pair<float, float> getCord(){ return {c[0], c[1]}; }
-        pair<float, float> getDim() { return {c[2], c[3]}; }
+        virtual ~HitboxData() {};
 };
 
  struct EntityData: public HitboxData
 {
     float v[2];
     EntityData(float a, float b, float c=0, float d=0, float e=0, float f=0): HitboxData(a, b, e, f), v{c, d} {}
-    pair<float, float> getVel() { return {v[0], v[1]}; }
 };
 
  class Entity
@@ -60,11 +55,12 @@ enum KEYS : int {still = 0, UP = 1, LEFT = 2, DOWN = 3, RIGHT = 4};
     protected:
         ALLEGRO_BITMAP *image;
         EntityData data;
-        ~Entity() {};
     
     public:
         Entity(float x = 0, float y = 0, float vx = 0, float vy = 0, float wh = 0, float hh = 0, ALLEGRO_BITMAP* p = nullptr):
             data(x, y, vx, vy, wh, hh), image(p) {}
+
+        virtual ~Entity() {};
 
         const ALLEGRO_BITMAP *getBitmap() const { return image; }
         ALLEGRO_BITMAP *getBitmap()             { return image; }

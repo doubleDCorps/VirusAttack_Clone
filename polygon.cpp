@@ -36,7 +36,7 @@
     velocità (ultimi due parametri) viene verificata per ogni coppia di punti nella lista
     (ciascuna rappresentante un segmento) se si verifica una collisione fra la hitbox e il
     segmento; se la collisione avviene, si restituisce una variabile che riconosce lungo quale
-    asse è avvenuto la collisione (X o Y), altrimenti lo stato "none" (euqivalente a 0).
+    asse è avvenuto la collisione (X o Y), altrimenti lo stato "none" (euqivalente a false).
 */
  AXIS GameList::hits(int x1, int y1, int w1, int h1, int vx, int vy) const
 {
@@ -44,13 +44,18 @@
 
      for(auto it{ begin() }; it != end(); ++it)
     {
+        // coordinate degli estremi del segmento
         const int& x2{ it->first }, x3{ successor(it)->first };
         const int& y2{ it->second }, y3{ successor(it)->second };
 
-        if(x2!=x3 && (vy>=0 && y2-y1 > -5 || vy<=0 && y2-y1 < 5) && hitbox(x1, y1, x1+w1, y1+h1, x2, y2, x3, y2+15) )
+        if(x2!=x3 &&                                                     // il segmento è orizzontale
+          (vy>=0 && y2-(2*y1+h1)/2 > -5 || vy<=0 && y2-(2*y1+h1)/2 < 5)  // la velocità e la distanza hanno segno concorde (con uno scarto di sicurezza)
+           && hitbox(x1, y1, x1+w1, y1+h1, x2, y2, x3, y2+15) )          // verifica se avviene una collisione fra le hitbox
             return Y;
         
-        if(y2!=y3 && (vx>=0 && x2-x1 > -5 || vx<=0 && x2-x1 < 5) && hitbox(x1, y1, x1+w1, y1+h1, x2, y2, x2+15, y3) )
+        if(y2!=y3 &&                                                     // il segmento è verticale
+          (vx>=0 && x2-(2*x1+w1)/2 > -5 || vx<=0 && x2-(2*x1+w1)/2 < 5)  // la velocità e la distanza hanno segno concorde (con uno scarto di sicurezza)
+           && hitbox(x1, y1, x1+w1, y1+h1, x2, y2, x2+15, y3) )          // verifica se avviene una collisione fra le hitbox
             return X;
     }
     

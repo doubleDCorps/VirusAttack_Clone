@@ -19,7 +19,7 @@
             data.c[1] += data.v[1];
         }
 
-        if(is_safe && k%2 == position%2)
+        if(is_safe && k%2 == position%2 && k != position)
             is_safe = false;
     }
 }
