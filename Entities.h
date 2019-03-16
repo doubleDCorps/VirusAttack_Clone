@@ -28,7 +28,8 @@
 {
     private:
         bool safe = true;
-
+        //bool[4] ?
+        
     public:
         Player(float x=0, float y=0, float v=0, ALLEGRO_BITMAP* p=nullptr)
             : Entity(x, y, v, v, p, 4) {}

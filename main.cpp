@@ -148,7 +148,7 @@ void spawn(vector<Minion>& minions, Boss& boss);
             {
                 if(entities[i]->isAlive())
                     entities[i]->update( poly.hitsBorder( entities[i]->getData() ), state_changed ? insideBorder( entities[i]->getData() ) : true);
-                //if entity i hits trace : reset() break;
+                //if entity i hits trace: reset(); break;
             }
             
             spawn_time++;
