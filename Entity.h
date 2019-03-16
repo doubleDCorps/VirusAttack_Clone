@@ -53,6 +53,7 @@ bool hitbox(int x1a, int y1a, int x1b, int y1b, int x2a, int y2a, int x2b, int y
         void setBitmap(ALLEGRO_BITMAP* p)       { image = p; data.c[2]=al_get_bitmap_width(p)+4*2; data.c[3]=al_get_bitmap_height(p)+4*2;}
 
         bool isAlive() const { return lifes; }
+        void setAlive(bool k) { lifes = k; }
         
         const EntityData& getData() const       { return data; }
         float getCord_x() const             { return data.c[0]; }
