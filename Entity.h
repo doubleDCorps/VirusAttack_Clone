@@ -38,32 +38,32 @@ bool hitbox(int x1a, int y1a, int x1b, int y1b, int x2a, int y2a, int x2b, int y
     protected:
         ALLEGRO_BITMAP *image;
         EntityData data;
-        unsigned lifes;
+
+    unsigned lifes;
 
     public:
-        Entity(float x=0, float y=0, float vx=0, float vy=0, ALLEGRO_BITMAP* p=nullptr, unsigned l=0):
-            data(x, y, vx, vy, 0, 0), image(p), lifes(l) {}
+        Entity(float x = 0, float y = 0, float vx = 0, float vy = 0, ALLEGRO_BITMAP* p = nullptr, unsigned l=0):
+            data(x, y, vx, vy,  al_get_bitmap_width(p)+8, al_get_bitmap_height(p)+8), image(p), lifes(l) {}
 
         virtual ~Entity() {};
-        virtual void update(int argc, bool argf) = 0;
+        virtual void update(int argc, bool argf) = 0;    
 
         const ALLEGRO_BITMAP *getBitmap() const { return image; }
         ALLEGRO_BITMAP *getBitmap()             { return image; }
-        void setBitmap(ALLEGRO_BITMAP* p)       { image = p; }
+        void setBitmap(ALLEGRO_BITMAP* p)       { image = p; wh=al_get_bitmap_width(p)+4*2; hh=al_get_bitmap_height(p)+4*2;}
 
         bool isAlive() const { return lifes; }
         
         const EntityData& getData() const       { return data; }
-        
-        float getCord_x() const                 { return data.c[0]; }
-        float getCord_y() const                 { return data.c[1]; }
-        float getVelocity_x() const             { return data.v[0]; }
-        float getVelocity_y() const             { return data.v[1]; }
+        float getCord_x() const             { return data.c[0]; }
+        float getCord_y() const             { return data.c[1]; }
+        float getVelocity_x() const         { return data.v[0]; }
+        float getVelocity_y() const         { return data.v[1]; }
 
-        void setCord_x(float cx)                { data.c[0] = cx; }
-        void setCord_y(float cy)                { data.c[1] = cy; }
-        void setVelocity_x(float vx)            { data.v[0] = vx; }
-        void setVelocity_y(float vy)            { data.v[1] = vy; }
+        void setCord_x(float cx)            { data.c[0] = cx; }
+        void setCord_y(float cy)            { data.c[1] = cy; }
+        void setVelocity_x(float vx)        { data.v[0] = vx; }
+        void setVelocity_y(float vy)        { data.v[1] = vy; }
 };
 
 #endif
