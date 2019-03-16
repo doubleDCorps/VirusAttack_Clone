@@ -8,8 +8,6 @@
     public:
         Enemy(float x=0, float y=0, float v=0, ALLEGRO_BITMAP* p=nullptr)
             : Entity(x, y, v, v, p, 1) {}
-        
-        void setAlive(bool k) { lifes = k; }
 
         virtual void update(int argc, bool argf);
         /* 

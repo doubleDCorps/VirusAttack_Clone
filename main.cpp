@@ -5,7 +5,7 @@
 
 void enemy_init(const vector<Minion>&, ALLEGRO_DISPLAY*);
 void level(ALLEGRO_DISPLAY*, ALLEGRO_TIMER*);
-void spawn(vector<Minion>& minions, Boss& boss);
+void spawn(vector<Entity*>&);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -171,7 +171,7 @@ void spawn(vector<Minion>& minions, Boss& boss);
                entities[1]->update( poly.hitsBorder( entities[1]->getData() ) );
              if(spawn_time==360 || spawn_time==2161)
             {
-                //spawn(entities);
+                spawn(entities);
                 if(spawn_time!=360)
                     spawn_time=360;
             }
@@ -221,7 +221,7 @@ void spawn(vector<Minion>& minions, Boss& boss);
         }
     }
 
-     for(auto i : minions)
+     for(auto i : entities)
     {
         al_destroy_bitmap(i->getBitmap());
         delete[] i;
@@ -233,11 +233,12 @@ void spawn(vector<Minion>& minions, Boss& boss);
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 //cambiare le variabili
-void spawn(vector<Minion>& minions, Boss& boss) {
-    for(unsigned i{}; i<minions.size(); i++)
-        if(minions[i].getAlive()==false) {
-            minions[i].setAlive(true);
-            minions[i].setCord_x(boss.getCord_x());
-            minions[i].setCord_y(boss.getCord_y());
-        }
+void spawn(vector<Entity*>& entities) {
+    for(unsigned i{2}; i<entities.size(); i++)
+     if(!entities[i]->isAlive())
+    {
+        entities[i]->setAlive(true);
+        entities[i]->setCord_x(entities[1]->getCord_x());
+        entities[i]->setCord_y(entities[1]->getCord_y());
+    }
 }
