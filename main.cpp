@@ -51,7 +51,7 @@ void spawn(vector<Entity*>&);
         int int_dy{ enemy_velocity-int_dx };
 
         for(unsigned i{2};i<14;i++)
-             if(int_dx==entities[i].getVelocity_x() && int_dy==entities[i].getVelocity_y())
+             if(int_dx==entities[i]->getVelocity_x() && int_dy==entities[i]->getVelocity_y())
             {
                 presente = true;
                 break;
@@ -59,8 +59,8 @@ void spawn(vector<Entity*>&);
 
          if(!presente)
         {
-            entities[cont_minion].setVelocity_x(int_dx);
-            entities[cont_minion].setVelocity_y(int_dy);
+            entities[cont_minion]->setVelocity_x(int_dx);
+            entities[cont_minion]->setVelocity_y(int_dy);
             cont_minion++;
         }
     }
@@ -69,35 +69,35 @@ void spawn(vector<Entity*>&);
     {
          if(i <= 5)
         {
-            entities[i].setVelocity_x(float((entities[i].getVelocity_x())*-1.0)/10);
-            entities[i].setVelocity_y(float(entities[i].getVelocity_y())/10);
+            entities[i]->setVelocity_x(float((entities[i]->getVelocity_x())*-1.0)/10);
+            entities[i]->setVelocity_y(float(entities[i]->getVelocity_y())/10);
         }
          else if(i >= 6 && i <= 8)
         {
-            entities[i].setVelocity_x(float(entities[i].getVelocity_x())/10);
-            entities[i].setVelocity_y(float(entities[i].getVelocity_y())/10);
+            entities[i]->setVelocity_x(float(entities[i]->getVelocity_x())/10);
+            entities[i]->setVelocity_y(float(entities[i]->getVelocity_y())/10);
         }
          else if(i >= 9 && i <= 11)
         {
-            entities[i].setVelocity_x(float(entities[i].getVelocity_x())/10);
-            entities[i].setVelocity_y(float((entities[i].getVelocity_y())*-1.0)/10);
+            entities[i]->setVelocity_x(float(entities[i]->getVelocity_x())/10);
+            entities[i]->setVelocity_y(float((entities[i]->getVelocity_y())*-1.0)/10);
         }
          else if(i >= 12 && i <= 14)
         {
-            entities[i].setVelocity_x(float((entities[i].getVelocity_x())*-1.0)/10);
-            entities[i].setVelocity_y(float((entities[i].getVelocity_y())*-1.0)/10);
+            entities[i]->setVelocity_x(float((entities[i]->getVelocity_x())*-1.0)/10);
+            entities[i]->setVelocity_y(float((entities[i]->getVelocity_y())*-1.0)/10);
         }
     }
 
-    al_set_target_bitmap(entities[0].getBitmap()); //PLAYER_INIT
+    al_set_target_bitmap(entities[0]->getBitmap()); //PLAYER_INIT
     al_clear_to_color(al_map_rgb(0, 255, 0));
 
-    al_set_target_bitmap(entities[1].getBitmap()); //BOSS_INIT
+    al_set_target_bitmap(entities[1]->getBitmap()); //BOSS_INIT
     al_clear_to_color(al_map_rgb(255, 0, 0));
 
      for(unsigned i{2};i<14;i++)
     {
-        al_set_target_bitmap(entities[i].getBitmap());
+        al_set_target_bitmap(entities[i]->getBitmap());
         al_clear_to_color(al_map_rgb(0, 0, 0));
     }
 
@@ -105,7 +105,7 @@ void spawn(vector<Entity*>&);
     al_clear_to_color(al_map_rgb(255, 255, 255));
 
     for(unsigned i{2};i<14;i++)
-        al_draw_bitmap(entities[i].getBitmap(), entities[i].getCord_x(), entities[i].getCord_y(), 0);
+        al_draw_bitmap(entities[i]->getBitmap(), entities[i]->getCord_x(), entities[i]->getCord_y(), 0);
 
     al_flip_display();
 }
@@ -119,16 +119,16 @@ void spawn(vector<Entity*>&);
     { al_destroy_display(display); al_destroy_timer(timer); return; }
 
     vector<Entity*> entities;
-    entities.push_back(new Player{275, 25, 4, 30, 30, al_create_bitmap(30,30)});//PLAYER
-    entities.push_back(float(800)/2 - 30/2, float(600)/2 - 30/2, -0.3, -1.2, 30+2*2, 30+2*2, al_create_bitmap(30,30), true);//BOSS 
+    entities.push_back(new Player{275, 25, 4, al_create_bitmap(30,30)});//PLAYER
+    entities.push_back(new Enemy{float(800)/2 - 30/2, float(600)/2 - 30/2, -0.3, -1.2, al_create_bitmap(30,30)});//BOSS 
     for(unsigned i=0;i<12;i++)
-        entities.push_back(0, 0, 0, 0, al_get_bitmap_width()+4*2, al_get_bitmap_height()+4*2, al_create_bitmap(30,30), false);//MINIONS
+        entities.push_back(new Enemy{0, 0, 0, 0, al_create_bitmap(30,30)});//MINIONS
 
     entities_init(entities, display);
 
     perimeter p{ {25, 25}, {525, 25}, {525, 525}, {25, 525} };
 
-    GameArea poly(p, entities[0], enties[1]);
+    GameArea poly(p, entities[0], entities[1]);
 
     bool redraw {true};
     bool STOP {false};
@@ -159,16 +159,16 @@ void spawn(vector<Entity*>&);
             //player routines
             entities[0]->update( space ? key : 0, poly.hitsBorder(entities[0]->getData()) );
 
-             for(unsigned i=1; i < entities.size(); ++i)
+             for(unsigned i=2; i < entities.size(); ++i)
             {
                 if(entities[i]->isAlive())
-                    entities[i]->update( poly.hitsBorder( entities[i]->getData() ), state_changed ? insideBorder( entities[i]->getData() ) : true);
+                    entities[i]->update( poly.hitsBorder( entities[i]->getData() ), state_changed ? poly.insideBorder( entities[i]->getData() ) : true);
                 //if entity i hits trace: reset(); break;
             }
             
             spawn_time++;
             if((spawn_time<300 || spawn_time>420) && (spawn_time<2101 || spawn_time>2221))
-               entities[1]->update( poly.hitsBorder( entities[1]->getData() ) );
+               entities[1]->update(poly.hitsBorder(entities[1]->getData()), state_changed ? poly.insideBorder(entities[1]->getData()) : true);
              if(spawn_time==360 || spawn_time==2161)
             {
                 spawn(entities);

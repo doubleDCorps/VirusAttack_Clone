@@ -6,8 +6,8 @@
  class Enemy: public Entity
 {
     public:
-        Enemy(float x=0, float y=0, float v=0, ALLEGRO_BITMAP* p=nullptr)
-            : Entity(x, y, v, v, p, 1) {}
+        Enemy(float x=0, float y=0, float vx=0, float vy=0, ALLEGRO_BITMAP* p=nullptr)
+            : Entity(x, y, vx, vy, p, 1) {}
 
         virtual void update(int argc, bool argf);
         /* 
