@@ -157,25 +157,15 @@ void spawn(vector<Minion>& minions, Boss& boss);
             if(!entities[0]->isAlive())            STOP = true;
             
             //player routines
-             if(poly.hitsBorder(entities[0]->getData()))
-            { 
-                entities[0]->setSafe(true);
-            }
-             if((!entities[0]->isSafe() && space) || entities[0]->isSafe())
-            {
-                //entities[0]->update(_,_);
-            }
+            entities[0]->update( space ? key : 0, poly.hitsBorder(entities[0]->getData()) );
 
              for(unsigned i=1; i < entities.size(); ++i)
             {
-                //minion routines
-                if( !poly.insideBorder( entities[i]->getData() ) )
-                    entities[i]->setAlive(false);
-                if( poly.hitsTrace( entities[i]->getData() ) )
-                    //reset player status, life--
-                if(entities[i]->isAlive())
-                    entities[i]->update( poly.hitsBorder( entities[i]->getData() ) );
+                if(i->isAlive())
+                    entityList[i]->update( collision( entityList[i]->getData() ),
+                                           state_changed ? position( entityList[i]->getData() ) : true);
             }
+            
 
             spawn_time++;
             if((spawn_time<300 || spawn_time>420) && (spawn_time<2101 || spawn_time>2221))
@@ -215,12 +205,15 @@ void spawn(vector<Minion>& minions, Boss& boss);
 
             al_clear_to_color(al_map_rgb(255, 255, 255));
 
+            //redo this prints
             for(auto& it : minions) 
                 if(it->isAlive()) 
-                    al_draw_bitmap(it->getBitmap(), it->getCord_x(), it->getCord_y(), 0);      //questo va nel print dei minion
+                    al_draw_bitmap(it->getBitmap(), it->getCord_x(), it->getCord_y(), 0);
 
-            al_draw_bitmap(entities[1]->getBitmap(), entities[1]->getCord_x(), entities[1]->getCord_y(), 0); //questo va nel print del boss
-            al_draw_bitmap(entities[0]->getBitmap(), entities[0]->getCord_x(), entities[0]->getCord_y(), 0); //questo va nel print del boss
+            al_draw_bitmap(entities[1]->getBitmap(), entities[1]->getCord_x(), entities[1]->getCord_y(), 0);
+            al_draw_bitmap(entities[0]->getBitmap(), entities[0]->getCord_x(), entities[0]->getCord_y(), 0);
+            
+            //ok
             poly.printTrace(al_get_backbuffer(display));
             poly.printBorder(al_get_backbuffer(display));
             
