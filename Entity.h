@@ -16,6 +16,9 @@ typedef list<pair<int, int> > perimeter;
 enum AXIS : int {none=0, X=1, Y=2};
 enum KEYS : int {still=0, UP=1, LEFT=2, DOWN=3, RIGHT=4};
 
+bool in_range(int first, int lower_bound, int upper_bound);
+bool hitbox(int x1a, int y1a, int x1b, int y1b, int x2a, int y2a, int x2b, int y2b);
+
  struct HitboxData
 {        
         float c[4];

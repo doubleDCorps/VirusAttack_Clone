@@ -12,8 +12,6 @@ void spawn(vector<Minion>& minions, Boss& boss);
  int main(int argc, char** argv)
 {
     srand(time(0));
-    if(!al_init())                     return -1;
-    if(!al_install_keyboard())         return -1;
     if(!al_install_primitives_addon()) return -1;
    
     ALLEGRO_DISPLAY_MODE disp_data;
@@ -115,18 +113,6 @@ void spawn(vector<Minion>& minions, Boss& boss);
      if(!coda_eventi) 
     { al_destroy_display(display); al_destroy_timer(timer); return; }
 
-    enemy_init(minions, display);
-
-    al_set_target_bitmap(boss.getBitmap());
-    al_clear_to_color(al_map_rgb(255, 0, 0));
-    al_set_target_bitmap(al_get_backbuffer(display));
-
-    al_set_target_bitmap(player.getBitmap());
-    al_clear_to_color(al_map_rgb(0, 255, 0));
-    al_set_target_bitmap(al_get_backbuffer(display));
-
-    perimeter p{ {25, 25}, {525, 25}, {525, 525}, {25, 525} };
-
     GameArea poly(p, entities[0], enties[1]);
 
     bool redraw {true};
@@ -134,16 +120,16 @@ void spawn(vector<Minion>& minions, Boss& boss);
     int w{ 500 };
     int h{ 500 };
     bool space {false};
-    KEYS actual_key{still};
+    KEYS key{still};
     bool state_changed{false};
+    int spawn_time{0};
+    bool first_spawn{true};
 
     al_register_event_source(coda_eventi, al_get_display_event_source(display));
     al_register_event_source(coda_eventi, al_get_timer_event_source(timer));
     al_register_event_source(coda_eventi, al_get_keyboard_event_source());
     al_start_timer(timer);
 
-    int spawn_time{0};
-    bool first_spawn{true};
      while(!STOP)
     {
         ALLEGRO_EVENT ev;
@@ -160,11 +146,11 @@ void spawn(vector<Minion>& minions, Boss& boss);
 
              for(unsigned i=1; i < entities.size(); ++i)
             {
-                if(i->isAlive())
-                    entityList[i]->update( collision( entityList[i]->getData() ), state_changed ? position( entityList[i]->getData() ) : true);
+                if(entities[i]->isAlive())
+                    entities[i]->update( poly.hitsBorder( entities[i]->getData() ), state_changed ? insideBorder( entities[i]->getData() ) : true);
+                //if entity i hits trace : reset() break;
             }
             
-
             spawn_time++;
             if((spawn_time<300 || spawn_time>420) && (spawn_time<2101 || spawn_time>2221))
                entities[1]->update( poly.hitsBorder( entities[1]->getData() ) );
@@ -181,10 +167,10 @@ void spawn(vector<Minion>& minions, Boss& boss);
          else if(ev.type == ALLEGRO_EVENT_KEY_DOWN)
          switch(ev.keyboard.keycode)
         {
-            case ALLEGRO_KEY_UP:     if(actual_key != UP)    actual_key = UP;    break;
-            case ALLEGRO_KEY_DOWN:   if(actual_key != DOWN)  actual_key = DOWN;  break;
-            case ALLEGRO_KEY_LEFT:   if(actual_key != LEFT)  actual_key = LEFT;  break;
-            case ALLEGRO_KEY_RIGHT:  if(actual_key != RIGHT) actual_key = RIGHT; break;
+            case ALLEGRO_KEY_UP:     if(key != UP)    key = UP;    break;
+            case ALLEGRO_KEY_DOWN:   if(key != DOWN)  key = DOWN;  break;
+            case ALLEGRO_KEY_LEFT:   if(key != LEFT)  key = LEFT;  break;
+            case ALLEGRO_KEY_RIGHT:  if(key != RIGHT) key = RIGHT; break;
             case ALLEGRO_KEY_ESCAPE: STOP = true;   break;
             case ALLEGRO_KEY_SPACE:  space = true;  break;
             default:;
@@ -192,10 +178,10 @@ void spawn(vector<Minion>& minions, Boss& boss);
          else if(ev.type == ALLEGRO_EVENT_KEY_UP)
          switch(ev.keyboard.keycode)
         {
-            case ALLEGRO_KEY_UP:     if(actual_key == UP)    actual_key = still; break;
-            case ALLEGRO_KEY_DOWN:   if(actual_key == DOWN)  actual_key = still; break;
-            case ALLEGRO_KEY_LEFT:   if(actual_key == LEFT)  actual_key = still; break;
-            case ALLEGRO_KEY_RIGHT:  if(actual_key == RIGHT) actual_key = still; break;
+            case ALLEGRO_KEY_UP:     if(key == UP)    key = still; break;
+            case ALLEGRO_KEY_DOWN:   if(key == DOWN)  key = still; break;
+            case ALLEGRO_KEY_LEFT:   if(key == LEFT)  key = still; break;
+            case ALLEGRO_KEY_RIGHT:  if(key == RIGHT) key = still; break;
             case ALLEGRO_KEY_SPACE:  space = false; break;
         }
           if(redraw && al_is_event_queue_empty(coda_eventi) )
@@ -205,13 +191,13 @@ void spawn(vector<Minion>& minions, Boss& boss);
             al_clear_to_color(al_map_rgb(255, 255, 255));
 
             //redo this prints
-            for(auto& it : minions) 
+            for(auto& it : entities) 
                 if(it->isAlive()) 
                     al_draw_bitmap(it->getBitmap(), it->getCord_x(), it->getCord_y(), 0);
 
             al_draw_bitmap(entities[1]->getBitmap(), entities[1]->getCord_x(), entities[1]->getCord_y(), 0);
             al_draw_bitmap(entities[0]->getBitmap(), entities[0]->getCord_x(), entities[0]->getCord_y(), 0);
-            
+            //
             //ok
             poly.printTrace(al_get_backbuffer(display));
             poly.printBorder(al_get_backbuffer(display));

@@ -115,9 +115,6 @@
         }
     }
 }
-
-
-
 /*
     Viene calcolata l'area utilizzando il seguente algoritmo:
     dato un poligono chiuso definito da una lista di coordinate (x, y) concatenate,
