@@ -68,21 +68,21 @@ enum KEYS : int {still=0, UP=1, LEFT=2, DOWN=3, RIGHT=4};
 
         const ALLEGRO_BITMAP *getBitmap() const { return image; }
         ALLEGRO_BITMAP *getBitmap()             { return image; }
-        void setBitmap(ALLEGRO_BITMAP* p)       { image = p; data.c[2]=al_get_bitmap_width(p)+4*2; data.c[3]=al_get_bitmap_height(p)+4*2;}
+        void setBitmap(ALLEGRO_BITMAP* p)       { image = p; data.c[2] = al_get_bitmap_width(p)+8; data.c[3] = al_get_bitmap_height(p)+8;}
 
         bool isAlive() const { return lifes; }
         void setAlive(bool k) { lifes = k; }
         
         const EntityData& getData() const       { return data; }
-        float getCord_x() const             { return data.c[0]; }
-        float getCord_y() const             { return data.c[1]; }
-        float getVelocity_x() const         { return data.v[0]; }
-        float getVelocity_y() const         { return data.v[1]; }
+        float getCord_x() const                 { return data.c[0]-4; }
+        float getCord_y() const                 { return data.c[1]-4; }
+        float getVelocity_x() const             { return data.v[0]; }
+        float getVelocity_y() const             { return data.v[1]; }
 
-        void setCord_x(float cx)            { data.c[0] = cx; }
-        void setCord_y(float cy)            { data.c[1] = cy; }
-        void setVelocity_x(float vx)        { data.v[0] = vx; }
-        void setVelocity_y(float vy)        { data.v[1] = vy; }
+        void setCord_x(float cx)                { data.c[0] = cx; }
+        void setCord_y(float cy)                { data.c[1] = cy; }
+        void setVelocity_x(float vx)            { data.v[0] = vx; }
+        void setVelocity_y(float vy)            { data.v[1] = vy; }
 };
 
 #endif
