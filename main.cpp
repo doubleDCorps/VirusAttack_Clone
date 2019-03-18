@@ -67,22 +67,22 @@ void spawn(vector<Entity*>&);
 
      for(unsigned i{2};i<14;i++)
     {
-         if(i <= 5)
+         if(i <= 4)
         {
             entities[i]->setVelocity_x(float((entities[i]->getVelocity_x())*-1.0)/10);
             entities[i]->setVelocity_y(float(entities[i]->getVelocity_y())/10);
         }
-         else if(i >= 6 && i <= 8)
+         else if(i >= 5 && i <= 7)
         {
             entities[i]->setVelocity_x(float(entities[i]->getVelocity_x())/10);
             entities[i]->setVelocity_y(float(entities[i]->getVelocity_y())/10);
         }
-         else if(i >= 9 && i <= 11)
+         else if(i >= 8 && i <= 10)
         {
             entities[i]->setVelocity_x(float(entities[i]->getVelocity_x())/10);
             entities[i]->setVelocity_y(float((entities[i]->getVelocity_y())*-1.0)/10);
         }
-         else if(i >= 12 && i <= 14)
+         else if(i >= 11 && i <= 13)
         {
             entities[i]->setVelocity_x(float((entities[i]->getVelocity_x())*-1.0)/10);
             entities[i]->setVelocity_y(float((entities[i]->getVelocity_y())*-1.0)/10);
@@ -226,9 +226,9 @@ void spawn(vector<Entity*>&);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-//cambiare le variabili
-void spawn(vector<Entity*>& entities) {
-    for(unsigned i{2}; i<entities.size(); i++)
+ void spawn(vector<Entity*>& entities)
+{   
+    for(unsigned i{2}; i < entities.size(); i++)
      if(!entities[i]->isAlive())
     {
         entities[i]->setAlive(true);
