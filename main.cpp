@@ -3,7 +3,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void enemy_init(const vector<Entity*>&, ALLEGRO_DISPLAY*);
+void enemy_init(vector<Entity*>&, ALLEGRO_DISPLAY*);
 void level(ALLEGRO_DISPLAY*, ALLEGRO_TIMER*);
 void spawn(vector<Entity*>&);
 
@@ -97,15 +97,13 @@ void spawn(vector<Entity*>&);
 
      for(unsigned i{2};i<14;i++)
     {
+        entities[i]->setAlive(false);
         al_set_target_bitmap(entities[i]->getBitmap());
         al_clear_to_color(al_map_rgb(0, 0, 0));
     }
 
     al_set_target_bitmap(al_get_backbuffer(display));
     al_clear_to_color(al_map_rgb(255, 255, 255));
-
-    for(unsigned i{2};i<14;i++)
-        al_draw_bitmap(entities[i]->getBitmap(), entities[i]->getCord_x(), entities[i]->getCord_y(), 0);
 
     al_flip_display();
 }
@@ -122,11 +120,11 @@ void spawn(vector<Entity*>&);
     entities.push_back(new Player{275, 25, 4, al_create_bitmap(30,30)});//PLAYER
     entities.push_back(new Enemy{float(800)/2 - 30/2, float(600)/2 - 30/2, -0.3, -1.2, al_create_bitmap(30,30)});//BOSS 
     for(unsigned i=0;i<12;i++)
-        entities.push_back(new Enemy{0, 0, 0, 0, al_create_bitmap(30,30)});//MINIONS
+        entities.push_back(new Enemy{float(800)/2 - 30/2, float(600)/2 - 30/2, 0, 0, al_create_bitmap(30,30)});//MINIONS
 
     entities_init(entities, display);
 
-    perimeter p{ {25, 25}, {525, 25}, {525, 525}, {25, 525} };
+    perimeter p{ {50, 25}, {550, 25}, {550, 525}, {50, 525} };
 
     Level poly(p, entities[0], entities[1]);
 
@@ -163,7 +161,6 @@ void spawn(vector<Entity*>&);
             {
                 if(entities[i]->isAlive())
                     entities[i]->update( poly.hitsBorder( entities[i]->getData() ), state_changed ? poly.insideBorder( entities[i]->getData() ) : true);
-                //if entity i hits trace: reset(); break;
             }
             
             spawn_time++;
@@ -209,9 +206,6 @@ void spawn(vector<Entity*>&);
             for(auto& it : entities) 
                 if(it->isAlive()) 
                     al_draw_bitmap(it->getBitmap(), it->getCord_x(), it->getCord_y(), 0);
-
-            al_draw_bitmap(entities[1]->getBitmap(), entities[1]->getCord_x(), entities[1]->getCord_y(), 0);
-            al_draw_bitmap(entities[0]->getBitmap(), entities[0]->getCord_x(), entities[0]->getCord_y(), 0);
             //
             //ok
             poly.printTrace(al_get_backbuffer(display));
@@ -221,7 +215,7 @@ void spawn(vector<Entity*>&);
         }
     }
 
-     for(auto i : entities)
+     for(auto& i : entities)
     {
         al_destroy_bitmap(i->getBitmap());
         delete[] i;
