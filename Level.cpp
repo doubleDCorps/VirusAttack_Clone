@@ -125,7 +125,7 @@
     alla figura descritta (positiva) o altrimenti (negatva).
     La somma viene poi dimezzata per ottenere il valore numerico corrispondente all'area del poligono.
 */
- int GameArea::getArea() const
+ int Level::getArea() const
 {
     if(border.empty()) return -1;
 
@@ -141,7 +141,7 @@
     se l'ultimo elemento della traccia è allineato con border, si aggiorna la lista border
     in base alla posizione del Boss.
 */
- bool GameArea::update()
+ bool Level::update()
 {
     if(trace.size() > 0)
      if(trace.push(Player->getCord_x(), Player->getCord_y()) && border.is_adj(trace.back().first, trace.back().second, 10, 10) )

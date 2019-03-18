@@ -9,11 +9,11 @@
     Inoltre GameList contiene un puntatore alla bitmap, utilizzata per rappresentare graficamente i segmenti
     composti da ogni coppia di elementi della lista.
 */
- class GameArea;
+ class Level;
 
  class GameList: private perimeter
 {
-    friend GameArea;
+    friend Level;
 
     public:
         GameList(const perimeter& p = {}) { for(auto& i : p) push(i.first, i.second); }
@@ -30,7 +30,7 @@
         inline auto successor(perimeter::const_reverse_iterator it) const   { return ++it == crend() ? crbegin() : it; }
 };
 /*
-    GameArea rappresenta l'area di gioco, formata da:
+    Level rappresenta l'area di gioco, formata da:
     -un poligono rappresentante il bordo dell'area di gioco (border);
     -una linea spezzata rappresentante il tracciato del giocatore (trace);
     -un puntatore costante al giocatore (Player);
@@ -38,11 +38,11 @@
     Essa gestisce tutte le routine riguardante la collisione col bordo, la posizione rispetto all'area di gioco
     (esterno/interno), l'aggiornamento dei bordi dell'area di gioco durante la partita, e il calcolo dell'area.
 */
- class GameArea
+ class Level
 {
     public:
-        GameArea(): border(), trace(), Boss(nullptr), Player(nullptr) {}
-        GameArea(const perimeter& b, const Entity* P=nullptr, const Entity* B=nullptr)
+        Level(): border(), trace(), Boss(nullptr), Player(nullptr) {}
+        Level(const perimeter& b, const Entity* P=nullptr, const Entity* B=nullptr)
             : border(b), trace(), Boss(B), Player(P) {}     
 
         inline AXIS hitsBorder(const EntityData& D) const        { return border.hits(D.c[0], D.c[1], D.c[2], D.c[3], D.v[0], D.v[1]); }

@@ -128,7 +128,7 @@ void spawn(vector<Entity*>&);
 
     perimeter p{ {25, 25}, {525, 25}, {525, 525}, {25, 525} };
 
-    GameArea poly(p, entities[0], entities[1]);
+    Level poly(p, entities[0], entities[1]);
 
     bool redraw {true};
     bool STOP {false};

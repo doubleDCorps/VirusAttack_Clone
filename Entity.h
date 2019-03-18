@@ -56,8 +56,7 @@ enum KEYS : int {still=0, UP=1, LEFT=2, DOWN=3, RIGHT=4};
     protected:
         ALLEGRO_BITMAP *image;
         EntityData data;
-
-    unsigned lifes;
+        unsigned lifes;
 
     public:
         Entity(float x = 0, float y = 0, float vx = 0, float vy = 0, ALLEGRO_BITMAP* p = nullptr, unsigned l=0):
@@ -68,7 +67,12 @@ enum KEYS : int {still=0, UP=1, LEFT=2, DOWN=3, RIGHT=4};
 
         const ALLEGRO_BITMAP *getBitmap() const { return image; }
         ALLEGRO_BITMAP *getBitmap()             { return image; }
-        void setBitmap(ALLEGRO_BITMAP* p)       { image = p; data.c[2] = al_get_bitmap_width(p)+8; data.c[3] = al_get_bitmap_height(p)+8;}
+         void setBitmap(ALLEGRO_BITMAP* p)       
+        {
+            image = p;
+            data.c[2] = al_get_bitmap_width(p)+8;
+            data.c[3] = al_get_bitmap_height(p)+8;
+        }
 
         bool isAlive() const { return lifes; }
         void setAlive(bool k) { lifes = k; }
