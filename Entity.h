@@ -36,7 +36,12 @@ enum KEYS : int {still=0, UP=1, LEFT=2, DOWN=3, RIGHT=4};
      && (in_range(y1a, min(y2a, y2b), max(y2a, y2b)) || in_range(y1b, min(y2a, y2b), max(y2a, y2b)) ||
          in_range(y2a, min(y1a, y1b), max(y1a, y1b)) || in_range(y2b, min(y1a, y1b), max(y1a, y1b)) );
 }
-
+/*
+    Due strutture dati elementari che definiscono i seguenti dati:
+        HitboxData: coordinata x, coordinata y, larghezza, altezza
+        EntityData: coordinata x, coordinata y, larghezza, altezza, velocità x, velocità y
+    Il polimorfismo viene sfruttato per rendere più lineari alcune chiamate a funzione nella classe Level.
+*/
  struct HitboxData
 {        
         float c[4];

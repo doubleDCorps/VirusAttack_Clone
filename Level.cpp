@@ -45,8 +45,8 @@
      for(auto it{ begin() }; it != end(); ++it)
     {
         // coordinate degli estremi del segmento
-        const int& x2{ it->first }, x3{ successor(it)->first };
-        const int& y2{ it->second }, y3{ successor(it)->second };
+        int x2{ it->first }, x3{ successor(it)->first };
+        int y2{ it->second }, y3{ successor(it)->second };
 
         if(x2!=x3 &&                                                     // il segmento è orizzontale
           (vy>=0 && y2-(2*y1+h1)/2 > -5 || vy<=0 && y2-(2*y1+h1)/2 < 5)  // la velocità e la distanza hanno segno concorde (con uno scarto di sicurezza)
@@ -131,7 +131,8 @@
 
     int area{};
     for(auto it{ border.begin() }; it!=border.end(); ++it)
-        area+=(it->first+border.successor(it)->first)*(border.successor(it)->second-it->second);
+        area += (it->first+border.successor(it)->first)*
+                (border.successor(it)->second-it->second);
     area/=2;
 
     return area;
