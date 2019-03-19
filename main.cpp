@@ -163,7 +163,8 @@ void spawn(vector<Entity*>&);
         {
             //condizioni di uscita
             STOP = (poly.getArea()*100/(w*h) <= 30) or (!entities[0]->isAlive());
-            STOP = !poly.insideBorder(entities[0]->getData());
+            //STOP = !poly.insideBorder(entities[0]->getData()); //SOLO TEMPORANEO
+
             //player routines
             entities[0]->update( space ? key : 0, poly.hitsBorder(entities[0]->getData()) );
 
@@ -193,7 +194,7 @@ void spawn(vector<Entity*>&);
                     spawn_time=360;
             }
 
-            //state_changed = poly.update();
+            //state_changed = poly.update(); //DA FIXARE
             redraw = true;
         }
          else if(ev.type == ALLEGRO_EVENT_KEY_DOWN)

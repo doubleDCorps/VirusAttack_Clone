@@ -10,6 +10,7 @@
 #include<vector>
 #include<list>
 #include<cstdlib>
+#include<cmath>
 using namespace std;
 
 typedef list<pair<int, int> > perimeter;
