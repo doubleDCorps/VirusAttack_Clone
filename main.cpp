@@ -50,8 +50,7 @@ void spawn(vector<Entity*>&);
 
  void defPerInit(ALLEGRO_DISPLAY_MODE d)
 {
-    int x = d.width/2  - 500/2;
-    int y = d.height/2 - 500/2;
+    int x { d.width/2  - 500/2 }, y { d.height/2 - 500/2 };
 
     defPerimeter = {
         {x      , y      },
@@ -148,7 +147,7 @@ void spawn(vector<Entity*>&);
     
     al_set_target_bitmap(al_get_backbuffer(display));
     al_clear_to_color(al_map_rgb(255, 255, 255));
-    
+
     Level poly(defPerimeter, entities[0], entities[1]);
 
     bool redraw {true};
