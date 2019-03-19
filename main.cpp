@@ -48,6 +48,7 @@ void spawn(vector<Entity*>&);
 {
     entities.push_back(new Player{275, 70, 4, al_create_bitmap(30,30)});                                        //PLAYER
     entities.push_back(new Enemy{float(800)/2-30/2, float(600)/2-30/2, -4.0, -4.0, al_create_bitmap(30,30)});   //BOSS 
+    
     for(unsigned i=0; i<12; ++i)
         entities.push_back(new Enemy{float(800)/2-30/2, float(600)/2-30/2, 0, 0, al_create_bitmap(30,30)});     //MINIONS
 
@@ -162,7 +163,7 @@ void spawn(vector<Entity*>&);
         {
             //condizioni di uscita
             STOP = (poly.getArea()*100/(w*h) <= 30) or (!entities[0]->isAlive());
-            
+            STOP = !poly.insideBorder(entities[0]->getData());
             //player routines
             entities[0]->update( space ? key : 0, poly.hitsBorder(entities[0]->getData()) );
 
@@ -192,7 +193,7 @@ void spawn(vector<Entity*>&);
                     spawn_time=360;
             }
 
-            state_changed = poly.update();
+            //state_changed = poly.update();
             redraw = true;
         }
          else if(ev.type == ALLEGRO_EVENT_KEY_DOWN)

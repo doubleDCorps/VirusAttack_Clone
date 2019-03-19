@@ -26,7 +26,7 @@
 */
  bool GameList::is_adj(int x, int y, int w, int h) const
 {
-    for(auto it{ begin() }; it!=end(); ++it)
+    for(auto it{ begin() }; it != end(); ++it)
      if(hitbox(x, y, x+w, y+h, it->first, it->second, successor(it)->first, successor(it)->second) )
         return true;
     return false;
@@ -48,14 +48,22 @@
         int x2{ it->first }, x3{ successor(it)->first };
         int y2{ it->second }, y3{ successor(it)->second };
 
-        if(x2 != x3 &&                                                   // il segmento è orizzontale
-          (vy>=0 && y2-(2*y1+h1)/2 > 0 || vy<=0 && y2-(2*y1+h1)/2 < 0)   // la velocità e la distanza hanno segno concorde (con uno scarto di sicurezza)
-           && hitbox(x1, y1, x1+w1, y1+h1, x2, y2, x3, y2+14) )          // verifica se avviene una collisione fra le hitbox
+        // il segmento è orizzontale
+        // la velocità e la distanza hanno segno concorde (con uno scarto di sicurezza)
+        // verifica se avviene una collisione fra le hitbox
+
+        if(x2 != x3 &&
+          (vy>=0 && y2-y1-h1/2 > 0 && hitbox(x1, y1, x1+w1, y1+h1, x2, y2, x3, y2+14))
+        ||(vy<=0 && y2-y1-h1/2 < 0 && hitbox(x1, y1, x1+w1, y1+h1, x2, y2, x3, y2-14)))
             return Y;
         
-        if(y2 != y3 &&                                                   // il segmento è verticale
-          (vx>=0 && x2-(2*x1+w1)/2 > 0 || vx<=0 && x2-(2*x1+w1)/2 < 0)   // la velocità e la distanza hanno segno concorde (con uno scarto di sicurezza)
-           && hitbox(x1, y1, x1+w1, y1+h1, x2, y2, x2+14, y3) )          // verifica se avviene una collisione fra le hitbox
+        // il segmento è verticale
+        // la velocità e la distanza hanno segno concorde (con uno scarto di sicurezza)
+        // verifica se avviene una collisione fra le hitbox
+
+        if(y2 != y3 &&                                                   
+          (vx>=0 && x2-x1-w1/2 > 0 && hitbox(x1, y1, x1+w1, y1+h1, x2, y2, x2+14, y3))
+        ||(vx<=0 && x2-x1-w1/2 < 0 && hitbox(x1, y1, x1+w1, y1+h1, x2, y2, x2-14, y3)))          
             return X;
     }
     
@@ -80,14 +88,14 @@
         int y1{ it->second };
         int y2{ successor(it)->second };
 
-         if(y2-y1 != 0 && hitbox(x, y, x+w, y+h, 0, min(y1, y2), it->first, max(y1, y2) ) )
+         if(y2-y1!=0 && hitbox(x, y, x+w, y+h, 0, min(y1, y2), it->first, max(y1, y2)) )
         {
             if(y2-y1 < 0) --cont;
             if(y2-y1 > 0) ++cont;
         }
     }
 
-    return cont <= 0 ? false : true;
+    return !hits(x, y, w, h, 0, 0) && cont <= 0 ? false : true;
 }
 /*
     Dato un bitmap da trattare come buffer temporaneo, viene targettato per il disegno
@@ -104,12 +112,12 @@
          for(auto it{ begin() }; it != end(); ++it)
         {
             if(it->first == successor(it)->first)
-                al_draw_line(it->first, min(it->second, successor(it)->second),
-                             it->first, max(it->second, successor(it)->second),
+                al_draw_line(it->first, min(it->second, successor(it)->second)-5,
+                             it->first, max(it->second, successor(it)->second)+5,
                              al_map_rgb(0, 0, 0), 10);
             else
-                al_draw_line(min(it->first, successor(it)->first), it->second,
-                             max(it->first, successor(it)->first), it->second, 
+                al_draw_line(min(it->first-5, successor(it)->first), it->second,
+                             max(it->first+5, successor(it)->first), it->second, 
                              al_map_rgb(0, 0, 0), 10);
         }
     }
@@ -147,10 +155,10 @@
      if(trace.push(Player->getData().c[0], Player->getData().c[1]) && border.is_adj(trace.back().first, trace.back().second, 10, 10) )
     {
         if(insideTrace(Boss->getData()) )
-            for(auto i : border)
+            for(auto& i : border)
              if(trace.inside(i.first, i.second))  trace.push(i.first, i.second);
         else
-            for(auto i : border)
+            for(auto& i : border)
              if(!trace.inside(i.first, i.second)) trace.push(i.first, i.second);
 
         border=trace;

@@ -85,8 +85,8 @@ enum KEYS : int {still=0, UP=1, LEFT=2, DOWN=3, RIGHT=4};
             }
         }
 
-        bool isAlive() const  { return lifes; }
-        void setAlive(bool k) { lifes = (k ? 1 : 0); } 
+        bool isAlive() const                    { return lifes; }
+        void setAlive(bool k)                   { lifes = (k ? 1 : 0); } 
         
         const EntityData& getData() const       { return data; }
         float getCord_x() const                 { return data.c[0]+2; }
