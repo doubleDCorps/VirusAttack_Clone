@@ -47,7 +47,7 @@ void spawn(vector<Entity*>&);
  void entities_init(vector<Entity*>& entities)
 {
     entities.push_back(new Player{275, 70, 4, al_create_bitmap(30,30)});                                        //PLAYER
-    entities.push_back(new Enemy{float(800)/2-30/2, float(600)/2-30/2, -0.2, -1.0, al_create_bitmap(30,30)});   //BOSS 
+    entities.push_back(new Enemy{float(800)/2-30/2, float(600)/2-30/2, -4.0, -4.0, al_create_bitmap(30,30)});   //BOSS 
     for(unsigned i=0; i<12; ++i)
         entities.push_back(new Enemy{float(800)/2-30/2, float(600)/2-30/2, 0, 0, al_create_bitmap(30,30)});     //MINIONS
 
@@ -238,7 +238,6 @@ void spawn(vector<Entity*>&);
 
      for(int i{}; i<entities.size(); ++i)
     {
-        cout << entities[i]->getVelocity_x() << ' ' << entities[i]->getVelocity_y() << endl;
         al_destroy_bitmap(entities[i]->getBitmap());
         delete entities[i];
     }
