@@ -53,8 +53,8 @@ void spawn(vector<Entity*>&);
 
     const int enemy_velocity{25};
 
-    int cont_minion=0;
-     while(cont_minion < 12)
+    int cont_minion=2;
+     while(cont_minion < 14)
     {
         bool presente{ false };
         int int_dx{ rand()%(enemy_velocity-12)+2 };
@@ -112,7 +112,6 @@ void spawn(vector<Entity*>&);
         al_clear_to_color(al_map_rgb(0, 0, 0));
     }
 
-    al_flip_display();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -239,6 +238,7 @@ void spawn(vector<Entity*>&);
 
      for(int i{}; i<entities.size(); ++i)
     {
+        cout << entities[i]->getVelocity_x() << ' ' << entities[i]->getVelocity_y() << endl;
         al_destroy_bitmap(entities[i]->getBitmap());
         delete entities[i];
     }
