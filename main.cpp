@@ -2,7 +2,9 @@
 #include<allegro5/allegro.h>
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+static perimeter defPerimeter;
 
+void defPerInit(ALLEGRO_DISPLAY_MODE);
 void enemy_init(vector<Entity*>&);
 void level(ALLEGRO_DISPLAY*, ALLEGRO_TIMER*);
 void spawn(vector<Entity*>&);
@@ -23,6 +25,8 @@ void spawn(vector<Entity*>&);
     }
     al_set_new_display_flags(ALLEGRO_WINDOWED);
     
+    defPerInit(disp_data);
+
     ALLEGRO_TIMER *timer = al_create_timer(1.0/disp_data.refresh_rate);
      if(!timer)
         return -1;
@@ -43,6 +47,19 @@ void spawn(vector<Entity*>&);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+ void defPerInit(ALLEGRO_DISPLAY_MODE d)
+{
+    int x = d.width/2  - 500/2;
+    int y = d.height/2 - 500/2;
+
+    defPerimeter = {
+        {x      , y      },
+        {x + 500, y      },
+        {x + 500, y + 500},
+        {x      , y + 500}
+    };
+}
 
  void entities_init(vector<Entity*>& entities)
 {
@@ -131,11 +148,8 @@ void spawn(vector<Entity*>&);
     
     al_set_target_bitmap(al_get_backbuffer(display));
     al_clear_to_color(al_map_rgb(255, 255, 255));
-
-    //si può implementare un inizializzazione parametrica, fissando le dimensioni a 500x500 e sfruttando ALLEGRO_DISPLAY_DATA?
-    perimeter p{ {50, 25}, {550, 25}, {550, 525}, {50, 525} };
-
-    Level poly(p, entities[0], entities[1]);
+    
+    Level poly(defPerimeter, entities[0], entities[1]);
 
     bool redraw {true};
     bool STOP {false};
@@ -162,7 +176,7 @@ void spawn(vector<Entity*>&);
          else if(ev.type == ALLEGRO_EVENT_TIMER)
         {
             //condizioni di uscita
-            STOP = (poly.getArea()*100/(w*h) <= 30) or (!entities[0]->isAlive());
+            STOP = (poly.getArea()/2500 <= 30) or (!entities[0]->isAlive());
             //STOP = !poly.insideBorder(entities[0]->getData()); //SOLO TEMPORANEO
 
             //player routines
