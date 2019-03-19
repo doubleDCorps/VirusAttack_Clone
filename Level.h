@@ -16,8 +16,8 @@
     friend Level;
 
     public:
-        GameList(const perimeter& p = {}) { for(auto& i : p) push(i.first, i.second); }
-        bool push(int x, int y);
+        GameList(const perimeter& p = {}) { for(auto& i : p) push(i); }
+        bool push(const PointData& P);
         bool is_adj(int x, int y, int w=0, int h=0) const;
         AXIS hits(int x1, int y1, int w1=0, int h1=0, int vx=0, int vy=0) const;
         bool inside(int x, int y, int w=0, int h=0) const;

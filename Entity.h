@@ -10,12 +10,13 @@
 #include<vector>
 #include<list>
 #include<cstdlib>
+#include<cmath>
 using namespace std;
 
-typedef list<pair<int, int> > perimeter;
+const float EPS = 0.05;
 enum AXIS : int {none=0, X=1, Y=2};
 enum KEYS : int {still=0, UP=1, LEFT=2, DOWN=3, RIGHT=4};
- 
+
  inline bool in_range(int first, int lower_bound, int upper_bound)
 { 
     return first >= lower_bound && first <= upper_bound;
@@ -42,11 +43,30 @@ enum KEYS : int {still=0, UP=1, LEFT=2, DOWN=3, RIGHT=4};
         EntityData: coordinata x, coordinata y, larghezza, altezza, velocità x, velocità y
     Il polimorfismo viene sfruttato per rendere più lineari alcune chiamate a funzione nella classe Level.
 */
- struct HitboxData
+ struct PointData
+{
+    float p[2];
+
+    PointData(float a, float b): p{a, b} {}
+
+    bool operator==(const PointData& P) const { return abs(p[0] - P.p[0]) < EPS && abs(p[1] - P.p[1]) < EPS; }
+    bool operator!=(const PointData& P) const { return !(*this == P); }
+
+    virtual ~PointData() {};
+}
+
+ struct HitboxData: public PointData
 {        
-    float c[4];
+    float c[2];
     
-    HitboxData(float a, float b, float d=0, float e=0): c{a, b, d, e} {}
+    HitboxData(float a, float b, float d=0, float e=0): PointData{a,b}, c{d, e} {}
+    
+    PointData getNW() const     { return {p[0]       , p[1]       }; }
+    PointData getNE() const     { return {p[0]+c[0]  , p[1]       }; }
+    PointData getSE() const     { return {p[0]+c[0]  , p[1]+c[1]  }; }
+    PointData getSW() const     { return {p[0]       , p[1]+c[1]  }; }
+    PointData getCenter() const { return {p[0]+c[0]/2, p[1]+c[1]/2}; }
+    
     virtual ~HitboxData() {};
 };
 
@@ -56,6 +76,8 @@ enum KEYS : int {still=0, UP=1, LEFT=2, DOWN=3, RIGHT=4};
     
     EntityData(float a, float b, float c=0, float d=0, float e=0, float f=0): HitboxData{a, b, e, f}, v{c, d} {}
 };
+
+typedef list<PointData > perimeter;
 
  class Entity
 {
@@ -70,8 +92,7 @@ enum KEYS : int {still=0, UP=1, LEFT=2, DOWN=3, RIGHT=4};
 
         virtual ~Entity() {};
 
-        virtual void update(int argc, bool argf) = 0;    
-        //virtual void move(int set) = 0;
+        virtual void update(int argc, bool argf) = 0;
 
         const ALLEGRO_BITMAP *getBitmap() const { return image; }
         ALLEGRO_BITMAP *getBitmap()             { return image; }

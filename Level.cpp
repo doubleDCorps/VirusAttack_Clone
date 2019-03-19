@@ -4,7 +4,7 @@
     Se il punto p rispetta le condizioni di ordinamento, viene aggiunto alla fine o all'inizio
     della lista e viene restituito true; altrimenti viene restituito false.
 */
- bool GameList::push(int x, int y)
+ bool GameList::push(const PointData& P)
 {
     if(empty())                                                                          push_back( {x, y} );
     else if(size() == 1 && (x == back().first || y == back().second) )                   push_back( {x, y} );

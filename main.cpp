@@ -130,8 +130,7 @@ void spawn(vector<Entity*>&);
     entities_init(entities);
     
     al_set_target_bitmap(al_get_backbuffer(display));
-    al_clear_to_color(al_map_rgb(255, 255, 255));
-
+    
     //si può implementare un inizializzazione parametrica, fissando le dimensioni a 500x500 e sfruttando ALLEGRO_DISPLAY_DATA?
     perimeter p{ {50, 25}, {550, 25}, {550, 525}, {50, 525} };
 
