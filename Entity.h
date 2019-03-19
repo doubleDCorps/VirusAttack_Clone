@@ -44,16 +44,17 @@ enum KEYS : int {still=0, UP=1, LEFT=2, DOWN=3, RIGHT=4};
 */
  struct HitboxData
 {        
-        float c[4];
-        HitboxData(float a, float b, float d=0, float e=0): c{a, b, d, e} {}
-    protected:
-        ~HitboxData() {};
+    float c[4];
+    
+    HitboxData(float a, float b, float d=0, float e=0): c{a, b, d, e} {}
+    virtual ~HitboxData() {};
 };
 
  struct EntityData: public HitboxData
 {
-        float v[2];
-        EntityData(float a, float b, float c=0, float d=0, float e=0, float f=0): HitboxData{a, b, e, f}, v{c, d} {}
+    float v[2];
+    
+    EntityData(float a, float b, float c=0, float d=0, float e=0, float f=0): HitboxData{a, b, e, f}, v{c, d} {}
 };
 
  class Entity
@@ -77,8 +78,11 @@ enum KEYS : int {still=0, UP=1, LEFT=2, DOWN=3, RIGHT=4};
          void setBitmap(ALLEGRO_BITMAP* p)       
         {
             image = p;
-            data.c[2] = al_get_bitmap_width(p)+4;
-            data.c[3] = al_get_bitmap_height(p)+4;
+             if(p!=nullptr)
+            {
+                data.c[2] = al_get_bitmap_width(p)+4;
+                data.c[3] = al_get_bitmap_height(p)+4;
+            }
         }
 
         bool isAlive() const  { return lifes; }
