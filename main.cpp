@@ -48,7 +48,7 @@ void spawn(vector<Entity*>&);
 {
     entities.push_back(new Player{275, 70, 4, al_create_bitmap(30,30)});                                        //PLAYER
     entities.push_back(new Enemy{float(800)/2-30/2, float(600)/2-30/2, -0.2, -1.0, al_create_bitmap(30,30)});   //BOSS 
-    for(unsigned i=0;i<12;i++)
+    for(unsigned i=0; i<12; ++i)
         entities.push_back(new Enemy{float(800)/2-30/2, float(600)/2-30/2, 0, 0, al_create_bitmap(30,30)});     //MINIONS
 
     const int enemy_velocity{25};
@@ -60,8 +60,8 @@ void spawn(vector<Entity*>&);
         int int_dx{ rand()%(enemy_velocity-12)+2 };
         int int_dy{ enemy_velocity-int_dx };
 
-        for(unsigned i{2};i<14;i++)
-         if(int_dx == entities[i]->getVelocity_x() and int_dy == entities[i]->getVelocity_y())
+        for(unsigned i{2}; i<14; ++i)
+         if(int_dx == entities[i]->getVelocity_x() and int_dy == entities[i]->getVelocity_y() )
         {
             presente = true;
             break;
@@ -75,7 +75,7 @@ void spawn(vector<Entity*>&);
         }
     }
 
-     for(unsigned i{2}; i<14;i++)
+     for(unsigned i{2}; i<14; ++i)
     {
          if(i <= 4)
         {
@@ -164,8 +164,7 @@ void spawn(vector<Entity*>&);
         {
             //condizioni di uscita
             STOP = (poly.getArea()*100/(w*h) <= 30) or (!entities[0]->isAlive());
-            //STOP = poly.insideBorder(entities[0]->getData());
-           
+            
             //player routines
             entities[0]->update( space ? key : 0, poly.hitsBorder(entities[0]->getData()) );
 
@@ -173,7 +172,7 @@ void spawn(vector<Entity*>&);
             for(unsigned i=2; i < entities.size(); ++i) //Pasta fresca
              if(entities[i]->isAlive())
             {
-                int param1{ poly.hitsBorder(entities[i]->getData()) };
+                int  param1{ poly.hitsBorder(entities[i]->getData()) };
                 bool param2{ state_changed ? poly.insideBorder(entities[i]->getData()) : true };
                 
                 entities[i]->update(param1, param2);
@@ -183,7 +182,7 @@ void spawn(vector<Entity*>&);
             spawn_time++;
              if((spawn_time<300 or spawn_time>420) and (spawn_time<2101 or spawn_time>2221))
             {
-                int param1{ poly.hitsBorder(entities[1]->getData()) };
+                int  param1{ poly.hitsBorder(entities[1]->getData()) };
                 bool param2{ state_changed ? poly.insideBorder(entities[1]->getData()) : true };
 
                 entities[1]->update(param1, param2);
@@ -201,12 +200,12 @@ void spawn(vector<Entity*>&);
          else if(ev.type == ALLEGRO_EVENT_KEY_DOWN)
          switch(ev.keyboard.keycode)
         {
-            case ALLEGRO_KEY_ESCAPE: STOP = true;   break;
+            case ALLEGRO_KEY_ESCAPE: STOP = true;                  break;
             case ALLEGRO_KEY_UP:     if(key != UP)    key = UP;    break;
             case ALLEGRO_KEY_DOWN:   if(key != DOWN)  key = DOWN;  break;
             case ALLEGRO_KEY_LEFT:   if(key != LEFT)  key = LEFT;  break;
             case ALLEGRO_KEY_RIGHT:  if(key != RIGHT) key = RIGHT; break;
-            case ALLEGRO_KEY_SPACE:  space = true;  break;
+            case ALLEGRO_KEY_SPACE:  space = true;                 break;
             default:;
         }
          else if(ev.type == ALLEGRO_EVENT_KEY_UP)
@@ -216,7 +215,7 @@ void spawn(vector<Entity*>&);
             case ALLEGRO_KEY_DOWN:   if(key == DOWN)  key = still; break;
             case ALLEGRO_KEY_LEFT:   if(key == LEFT)  key = still; break;
             case ALLEGRO_KEY_RIGHT:  if(key == RIGHT) key = still; break;
-            case ALLEGRO_KEY_SPACE:  space = false; break;
+            case ALLEGRO_KEY_SPACE:  space = false;                break;
         }
          
          if(redraw and al_is_event_queue_empty(coda_eventi) )
@@ -238,10 +237,10 @@ void spawn(vector<Entity*>&);
         }
     }
 
-     for(auto& i : entities)
+     for(int i{}; i<entities.size(); ++i)
     {
-        al_destroy_bitmap(i->getBitmap());
-        delete[] i;
+        al_destroy_bitmap(entities[i]->getBitmap());
+        delete entities[i];
     }
 
     al_destroy_event_queue(coda_eventi);

@@ -87,7 +87,7 @@
         }
     }
 
-    return cont <= 0 ? true : false;
+    return cont <= 0 ? false : true;
 }
 /*
     Dato un bitmap da trattare come buffer temporaneo, viene targettato per il disegno
