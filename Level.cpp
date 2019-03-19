@@ -80,15 +80,14 @@
         int y1{ it->second };
         int y2{ successor(it)->second };
 
-        if(y2-y1!=0)
-         if(hitbox(x, y, x+w, y+h, 0, min(y1, y2), it->first, max(y1, y2) ) )
+         if(y2-y1 != 0 && hitbox(x, y, x+w, y+h, 0, min(y1, y2), it->first, max(y1, y2) ) )
         {
             if(y2-y1 < 0) --cont;
             if(y2-y1 > 0) ++cont;
         }
     }
 
-    return cont <= 0 ? false : true;
+    return cont <= 0 ? true : false;
 }
 /*
     Dato un bitmap da trattare come buffer temporaneo, viene targettato per il disegno
@@ -147,7 +146,7 @@
     if(trace.size() > 0)
      if(trace.push(Player->getData().c[0], Player->getData().c[1]) && border.is_adj(trace.back().first, trace.back().second, 10, 10) )
     {
-        if(trace.inside(Boss->getData().c[0], Boss->getData().c[1]) )
+        if(insideTrace(Boss->getData()) )
             for(auto i : border)
              if(trace.inside(i.first, i.second))  trace.push(i.first, i.second);
         else

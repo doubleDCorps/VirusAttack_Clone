@@ -65,7 +65,7 @@ enum KEYS : int {still=0, UP=1, LEFT=2, DOWN=3, RIGHT=4};
 
     public:
         Entity(float x, float y, float vx, float vy, ALLEGRO_BITMAP* p, unsigned l):
-            data(x, y, vx, vy, al_get_bitmap_width(p)+8, al_get_bitmap_height(p)+8), image(p), lifes(l) {}
+            data(x, y, vx, vy, al_get_bitmap_width(p)+4, al_get_bitmap_height(p)+4), image(p), lifes(l) {}
 
         virtual ~Entity() {};
 
@@ -77,21 +77,21 @@ enum KEYS : int {still=0, UP=1, LEFT=2, DOWN=3, RIGHT=4};
          void setBitmap(ALLEGRO_BITMAP* p)       
         {
             image = p;
-            data.c[2] = al_get_bitmap_width(p)+8;
-            data.c[3] = al_get_bitmap_height(p)+8;
+            data.c[2] = al_get_bitmap_width(p)+4;
+            data.c[3] = al_get_bitmap_height(p)+4;
         }
 
         bool isAlive() const  { return lifes; }
-        void setAlive(bool k) { lifes = k ? 1 : 0; } 
+        void setAlive(bool k) { lifes = (k ? 1 : 0); } 
         
         const EntityData& getData() const       { return data; }
-        float getCord_x() const                 { return data.c[0]+4; }
-        float getCord_y() const                 { return data.c[1]+4; }
+        float getCord_x() const                 { return data.c[0]+2; }
+        float getCord_y() const                 { return data.c[1]+2; }
         float getVelocity_x() const             { return data.v[0]; }
         float getVelocity_y() const             { return data.v[1]; }
 
-        void setCord_x(float cx)                { data.c[0] = cx; }
-        void setCord_y(float cy)                { data.c[1] = cy; }
+        void setCord_x(float cx)                { data.c[0] = cx-2; }
+        void setCord_y(float cy)                { data.c[1] = cy-2; }
         void setVelocity_x(float vx)            { data.v[0] = vx; }
         void setVelocity_y(float vy)            { data.v[1] = vy; }
 };

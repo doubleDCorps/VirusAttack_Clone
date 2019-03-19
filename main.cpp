@@ -23,7 +23,7 @@ void spawn(vector<Entity*>&);
     }
     al_set_new_display_flags(ALLEGRO_WINDOWED);
     
-    ALLEGRO_TIMER *timer = al_create_timer(1.5/disp_data.refresh_rate);
+    ALLEGRO_TIMER *timer = al_create_timer(1.0/disp_data.refresh_rate);
      if(!timer)
         return -1;
     
@@ -46,8 +46,8 @@ void spawn(vector<Entity*>&);
 
  void entities_init(vector<Entity*>& entities)
 {
-    entities.push_back(new Player{275, 25, 4, al_create_bitmap(30,30)});                                        //PLAYER
-    entities.push_back(new Enemy{float(800)/2-30/2, float(600)/2-30/2, -0.3, -1.2, al_create_bitmap(30,30)});   //BOSS 
+    entities.push_back(new Player{275, 70, 4, al_create_bitmap(30,30)});                                        //PLAYER
+    entities.push_back(new Enemy{float(800)/2-30/2, float(600)/2-30/2, -0.2, -1.0, al_create_bitmap(30,30)});   //BOSS 
     for(unsigned i=0;i<12;i++)
         entities.push_back(new Enemy{float(800)/2-30/2, float(600)/2-30/2, 0, 0, al_create_bitmap(30,30)});     //MINIONS
 
@@ -90,7 +90,7 @@ void spawn(vector<Entity*>&);
          else if(i >= 8 and i <= 10)
         {
             entities[i]->setVelocity_x(float(entities[i]->getVelocity_x())/10);
-            entities[i]->setVelocity_y(float((entities[i]->getVelocity_y())*-1.0)/10);
+            entities[i]->setVelocity_y(float((entities[i]->getVelocity_y())*-1.0)/10); 
         }
          else if(i >= 11 and i <= 13)
         {
@@ -144,12 +144,12 @@ void spawn(vector<Entity*>&);
     int h{ 500 };
     bool space {false};
     KEYS key{still};
-    bool state_changed{false};
+    bool state_changed{true};
     int spawn_time{0};
     bool first_spawn{true};
 
     al_register_event_source(coda_eventi, al_get_display_event_source(display));
-    al_register_event_source(coda_eventi, al_get_timer_event_source(timer));
+    al_register_event_source(coda_eventi, al_get_timer_event_source(timer)); //Fusilli
     al_register_event_source(coda_eventi, al_get_keyboard_event_source());
     al_start_timer(timer);
 
@@ -163,20 +163,21 @@ void spawn(vector<Entity*>&);
          else if(ev.type == ALLEGRO_EVENT_TIMER)
         {
             //condizioni di uscita
-            STOP = poly.getArea()*100/(w*h) <= 30 or !entities[0]->isAlive();
-            
+            STOP = (poly.getArea()*100/(w*h) <= 30) or (!entities[0]->isAlive());
+            //STOP = poly.insideBorder(entities[0]->getData());
+           
             //player routines
             entities[0]->update( space ? key : 0, poly.hitsBorder(entities[0]->getData()) );
 
             //minions routines
-            for(unsigned i=2; i < entities.size(); ++i)
+            for(unsigned i=2; i < entities.size(); ++i) //Pasta fresca
              if(entities[i]->isAlive())
             {
                 int param1{ poly.hitsBorder(entities[i]->getData()) };
                 bool param2{ state_changed ? poly.insideBorder(entities[i]->getData()) : true };
                 
                 entities[i]->update(param1, param2);
-            }
+            } //Gnocchi
             
             //boss routines
             spawn_time++;
@@ -194,7 +195,7 @@ void spawn(vector<Entity*>&);
                     spawn_time=360;
             }
 
-            //state_changed = poly.update();
+            state_changed = poly.update();
             redraw = true;
         }
          else if(ev.type == ALLEGRO_EVENT_KEY_DOWN)
