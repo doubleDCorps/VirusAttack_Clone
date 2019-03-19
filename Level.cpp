@@ -3,20 +3,20 @@
 /*
     Se il punto p rispetta le condizioni di ordinamento, viene aggiunto alla fine o all'inizio
     della lista e viene restituito true; altrimenti viene restituito false.
-*/
+*///DA RIFARE SU POINTDATA BRANCH
  bool GameList::push(const PointData& P)
 {
-    if(empty())                                                                          push_back( {x, y} );
-    else if(size() == 1 && (x == back().first || y == back().second) )                   push_back( {x, y} );
-    else if(size() == 1 && (x == front().first || y == front().second) )                 push_front( {x, y} );
-    else if(size() >= 2 && x == back().first && back().second == (++rbegin())->second)   push_back( {x, y} );
-    else if(size() >= 2 && x == back().first && back().first == (++rbegin())->first)     back() = {x, y};
-    else if(size() >= 2 && y == back().second && back().first == (++rbegin())->first)    push_back( {x, y} );
-    else if(size() >= 2 && y == back().second && back().second == (++rbegin())->second)  back() = {x, y};
-    else if(size() >= 2 && x == front().first && front().second == (++begin())->second)  push_front( {x, y} );
-    else if(size() >= 2 && x == front().first && front().first == (++begin())->first)    front() = {x, y};
-    else if(size() >= 2 && y == front().second && front().first == (++begin())->first)   push_front( {x, y} );
-    else if(size() >= 2 && y == front().second && front().second == (++begin())->second) front() = {x, y};
+    if(empty())                                                                          push_back(P);
+    else if(size() == 1 && (x == back().first || y == back().second) )                   push_back(P);
+    else if(size() == 1 && (x == front().first || y == front().second) )                 push_front(P);
+    else if(size() >= 2 && x == back().first && back().second == (++rbegin())->second)   push_back(P);
+    else if(size() >= 2 && x == back().first && back().first == (++rbegin())->first)     back() = P;
+    else if(size() >= 2 && y == back().second && back().first == (++rbegin())->first)    push_back(P);
+    else if(size() >= 2 && y == back().second && back().second == (++rbegin())->second)  back() = P;
+    else if(size() >= 2 && x == front().first && front().second == (++begin())->second)  push_front(P);
+    else if(size() >= 2 && x == front().first && front().first == (++begin())->first)    front() = P;
+    else if(size() >= 2 && y == front().second && front().first == (++begin())->first)   push_front(P);
+    else if(size() >= 2 && y == front().second && front().second == (++begin())->second) front() = P;
     else        return false;
     return true;
 }

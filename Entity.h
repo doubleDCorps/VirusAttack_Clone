@@ -53,7 +53,7 @@ enum KEYS : int {still=0, UP=1, LEFT=2, DOWN=3, RIGHT=4};
     bool operator!=(const PointData& P) const { return !(*this == P); }
 
     virtual ~PointData() {};
-}
+};
 
  struct HitboxData: public PointData
 {        
