@@ -152,8 +152,6 @@ void spawn(vector<Entity*>&);
 
     bool redraw {true};
     bool STOP {false};
-    int w{ 500 };
-    int h{ 500 };
     bool space {false};
     KEYS key{still};
     bool state_changed{true};
