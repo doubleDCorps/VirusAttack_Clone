@@ -81,7 +81,7 @@ enum KEYS : int {still=0, UP=1, LEFT=2, DOWN=3, RIGHT=4};
             data.c[3] = al_get_bitmap_height(p)+8;
         }
 
-        bool isAlive() const { return lifes > 0 ? true : false; }
+        bool isAlive() const  { return lifes; }
         void setAlive(bool k) { lifes = k ? 1 : 0; } 
         
         const EntityData& getData() const       { return data; }

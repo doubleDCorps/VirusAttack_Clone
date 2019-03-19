@@ -9,13 +9,14 @@
     data.c[1] += data.v[1];
 }
 
+//forse si creano conflitti con l'implementazione delle collisioni?
  void Player::update(int argc, bool argf)
 {
     //if((position != k && is_safe) || !is_safe)
     {
          if(argc == LEFT || argc == RIGHT)
         {
-            if(argc == LEFT && data.v[0] > 0 || argc == RIGHT && data.v[0] < 0)   
+            if(argc == LEFT && data.v[0] > 0 || argc == RIGHT && data.v[0] < 0)
                 data.v[0] = -data.v[0];
 
             data.c[0] += data.v[0];

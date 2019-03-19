@@ -48,14 +48,14 @@
         int x2{ it->first }, x3{ successor(it)->first };
         int y2{ it->second }, y3{ successor(it)->second };
 
-        if(x2!=x3 &&                                                     // il segmento è orizzontale
-          (vy>=0 && y2-(2*y1+h1)/2 > -5 || vy<=0 && y2-(2*y1+h1)/2 < 5)  // la velocità e la distanza hanno segno concorde (con uno scarto di sicurezza)
-           && hitbox(x1, y1, x1+w1, y1+h1, x2, y2, x3, y2+15) )          // verifica se avviene una collisione fra le hitbox
+        if(x2 != x3 &&                                                   // il segmento è orizzontale
+          (vy>=0 && y2-(2*y1+h1)/2 > 0 || vy<=0 && y2-(2*y1+h1)/2 < 0)   // la velocità e la distanza hanno segno concorde (con uno scarto di sicurezza)
+           && hitbox(x1, y1, x1+w1, y1+h1, x2, y2, x3, y2+14) )          // verifica se avviene una collisione fra le hitbox
             return Y;
         
-        if(y2!=y3 &&                                                     // il segmento è verticale
-          (vx>=0 && x2-(2*x1+w1)/2 > -5 || vx<=0 && x2-(2*x1+w1)/2 < 5)  // la velocità e la distanza hanno segno concorde (con uno scarto di sicurezza)
-           && hitbox(x1, y1, x1+w1, y1+h1, x2, y2, x2+15, y3) )          // verifica se avviene una collisione fra le hitbox
+        if(y2 != y3 &&                                                   // il segmento è verticale
+          (vx>=0 && x2-(2*x1+w1)/2 > 0 || vx<=0 && x2-(2*x1+w1)/2 < 0)   // la velocità e la distanza hanno segno concorde (con uno scarto di sicurezza)
+           && hitbox(x1, y1, x1+w1, y1+h1, x2, y2, x2+14, y3) )          // verifica se avviene una collisione fra le hitbox
             return X;
     }
     
@@ -145,9 +145,9 @@
  bool Level::update()
 {
     if(trace.size() > 0)
-     if(trace.push(Player->getCord_x(), Player->getCord_y()) && border.is_adj(trace.back().first, trace.back().second, 10, 10) )
+     if(trace.push(Player->getData().c[0], Player->getData().c[1]) && border.is_adj(trace.back().first, trace.back().second, 10, 10) )
     {
-        if(trace.inside(Boss->getCord_x(), Boss->getCord_y()) )
+        if(trace.inside(Boss->getData().c[0], Boss->getData().c[1]) )
             for(auto i : border)
              if(trace.inside(i.first, i.second))  trace.push(i.first, i.second);
         else
@@ -159,7 +159,7 @@
         return true;
     }
     else
-        trace.push(Player->getCord_x(), Player->getCord_y());
+        trace.push(Player->getData().c[0], Player->getData().c[1]);
 
     return false;
 }

@@ -23,11 +23,16 @@ void spawn(vector<Entity*>&);
     }
     al_set_new_display_flags(ALLEGRO_WINDOWED);
     
-    ALLEGRO_TIMER *timer = al_create_timer(1.0/disp_data.refresh_rate);
-     if(!timer) return -1;
+    ALLEGRO_TIMER *timer = al_create_timer(1.5/disp_data.refresh_rate);
+     if(!timer)
+        return -1;
     
     ALLEGRO_DISPLAY *display = al_create_display(disp_data.width, disp_data.height);
-     if(!display) { al_destroy_timer(timer); return -1; }
+     if(!display)
+    { 
+        al_destroy_timer(timer);
+        return -1;
+    }
     
     level(display, timer);
 
@@ -41,15 +46,15 @@ void spawn(vector<Entity*>&);
 
  void entities_init(vector<Entity*>& entities)
 {
-    entities.push_back(new Player{275, 25, 4, al_create_bitmap(30,30)});                                            //PLAYER
-    entities.push_back(new Enemy{float(800)/2 - 30/2, float(600)/2 - 30/2, -0.3, -1.2, al_create_bitmap(30,30)});   //BOSS 
+    entities.push_back(new Player{275, 25, 4, al_create_bitmap(30,30)});                                        //PLAYER
+    entities.push_back(new Enemy{float(800)/2-30/2, float(600)/2-30/2, -0.3, -1.2, al_create_bitmap(30,30)});   //BOSS 
     for(unsigned i=0;i<12;i++)
-        entities.push_back(new Enemy{float(800)/2 - 30/2, float(600)/2 - 30/2, 0, 0, al_create_bitmap(30,30)});     //MINIONS
+        entities.push_back(new Enemy{float(800)/2-30/2, float(600)/2-30/2, 0, 0, al_create_bitmap(30,30)});     //MINIONS
 
     const int enemy_velocity{25};
 
     int cont_minion=0;
-     while(cont_minion<12)
+     while(cont_minion < 12)
     {
         bool presente{ false };
         int int_dx{ rand()%(enemy_velocity-12)+2 };
@@ -167,8 +172,8 @@ void spawn(vector<Entity*>&);
             for(unsigned i=2; i < entities.size(); ++i)
              if(entities[i]->isAlive())
             {
-                int param1{ poly.hitsBorder( entities[i]->getData() ) };
-                bool param2{ state_changed ? poly.insideBorder( entities[i]->getData() ) : true};
+                int param1{ poly.hitsBorder(entities[i]->getData()) };
+                bool param2{ state_changed ? poly.insideBorder(entities[i]->getData()) : true };
                 
                 entities[i]->update(param1, param2);
             }
@@ -220,8 +225,8 @@ void spawn(vector<Entity*>&);
             al_clear_to_color(al_map_rgb(255, 255, 255));
 
             //redo this prints
-            for(auto& it : entities) 
-                if(it->isAlive()) 
+            for(auto& it : entities)
+                if(it->isAlive())
                     al_draw_bitmap(it->getBitmap(), it->getCord_x(), it->getCord_y(), 0);
 
             //ok
