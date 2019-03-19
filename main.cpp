@@ -50,7 +50,7 @@ void spawn(vector<Entity*>&);
 
  void defPerInit(ALLEGRO_DISPLAY_MODE d)
 {
-    int x { d.width/2  - 500/2 }, y { d.height/2 - 500/2 };
+    int x{ d.width/2  - 500/2 }, y{ d.height/2 - 500/2 };
 
     defPerimeter = {
         {x      , y      },
@@ -219,7 +219,6 @@ void spawn(vector<Entity*>&);
             case ALLEGRO_KEY_LEFT:   if(key != LEFT)  key = LEFT;  break;
             case ALLEGRO_KEY_RIGHT:  if(key != RIGHT) key = RIGHT; break;
             case ALLEGRO_KEY_SPACE:  space = true;                 break;
-            default:;
         }
          else if(ev.type == ALLEGRO_EVENT_KEY_UP)
          switch(ev.keyboard.keycode)
