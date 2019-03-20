@@ -39,8 +39,8 @@ enum KEYS : int {still=0, UP=1, LEFT=2, DOWN=3, RIGHT=4};
 }
 /*
     Due strutture dati elementari che definiscono i seguenti dati:
-        HitboxData: coordinata x, coordinata y, larghezza, altezza
-        EntityData: coordinata x, coordinata y, larghezza, altezza, velocità x, velocità y
+        HitboxData: c[0] = coordinata x, c[1] = coordinata y, c[2] = larghezza, c[3] = altezza
+        EntityData: v[0] = velocità x, v[1] = velocità y
     Il polimorfismo viene sfruttato per rendere più lineari alcune chiamate a funzione nella classe Level.
 */
  struct HitboxData
