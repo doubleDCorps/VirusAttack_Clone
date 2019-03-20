@@ -155,8 +155,8 @@
  bool Level::update()
 {
      if(trace.size() > 1 && 
-        trace.push(Player->getData().getCenter_x(), Player->getData().getCenter_x()) &&
-        border.is_adj(trace.back().first, trace.back().second, 6, 6) )
+        trace.push(Player->getData().c[0], Player->getData().c[1]) &&
+        border.is_adj(trace.back().first, trace.back().second) )
     {
         if(insideTrace(Boss->getData()) )
             for(auto& i : border)
@@ -171,8 +171,8 @@
     }
      else if(!trace.empty() ||
              (trace.empty() && 
-              border.is_adj(Player->getData().getCenter_x(), Player->getData().getCenter_y(), 6, 6)))
-        trace.push( Player->getData().getCenter_x(), Player->getData().getCenter_y() );
+              border.is_adj(Player->getData().c[0], Player->getData().c[1])))
+        trace.push( Player->getData().c[0], Player->getData().c[1] );
 
     return false;
 }
