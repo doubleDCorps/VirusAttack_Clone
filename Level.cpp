@@ -4,7 +4,7 @@
     Se il punto p rispetta le condizioni di ordinamento, viene aggiunto alla fine o all'inizio
     della lista e viene restituito true; altrimenti viene restituito false.
 *///DA RIFARE SU POINTDATA BRANCH
- bool GameList::push(const PointData& P)
+ bool GameList::push(const PointData& P) //fixare i nomi delle variabili
 {
     if(empty())                                                                          push_back(P);
     else if(size() == 1 && (x == back().first || y == back().second) )                   push_back(P);
@@ -24,7 +24,7 @@
     Data una coppia di coordinate p, verifica se esiste una coppia di elementi della lista tali che il punto ricada nel
     segmento che li connette. 
 */
- bool GameList::is_adj(int x, int y, int w, int h) const
+ bool GameList::is_adj(const HitboxData& P) const //fixare i nomi delle variabili
 {
     for(auto it{ begin() }; it != end(); ++it)
      if(hitbox(x, y, x+w, y+h, it->first, it->second, successor(it)->first, successor(it)->second) )
@@ -38,7 +38,7 @@
     segmento; se la collisione avviene, si restituisce una variabile che riconosce lungo quale
     asse è avvenuto la collisione (X o Y), altrimenti lo stato "none" (euqivalente a false).
 */
- AXIS GameList::hits(int x1, int y1, int w1, int h1, int vx, int vy) const
+ AXIS GameList::hits(const EntityData& P) const //fixare i nomi delle variabili
 {
     if(empty()) return none;
 
@@ -77,7 +77,7 @@
     possiede segno "negativo" o "positivo", associando le aree positive a quelle interne al poligono
     e quelle negative alle aree esterne al poligono.
 */
- bool GameList::inside(int x, int y, int w, int h) const
+ bool GameList::inside(const HitboxData& P) const //fixare i nomi delle variabili
 {
     if(empty()) return true;
 
@@ -102,7 +102,7 @@
     e viene poi successivamente disegnato il poligono rappresentato dalla lista manipolando
     l'immagine che fa da "font" per l'intero bordo.
 */
- void GameList::print(ALLEGRO_BITMAP* buffer) const
+ void GameList::print(ALLEGRO_BITMAP* buffer) const //fixare i nomi delle variabili
 {
     if(empty()) return;
 
@@ -132,7 +132,7 @@
     alla figura descritta (positiva) o altrimenti (negatva).
     La somma viene poi dimezzata per ottenere il valore numerico corrispondente all'area del poligono.
 */
- int Level::getArea() const
+ int Level::getArea() const //fixare i nomi delle variabili
 {
     if(border.empty()) return -1;
 
@@ -149,7 +149,7 @@
     se l'ultimo elemento della traccia è allineato con border, si aggiorna la lista border
     in base alla posizione del Boss.
 */
- bool Level::update()
+ bool Level::update() //fixare i nomi delle variabili
 {
     if(trace.size() > 0)
      if(trace.push(Player->getData().c[0], Player->getData().c[1]) && border.is_adj(trace.back().first, trace.back().second, 10, 10) )

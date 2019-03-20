@@ -43,41 +43,61 @@ enum KEYS : int {still=0, UP=1, LEFT=2, DOWN=3, RIGHT=4};
         EntityData: coordinata x, coordinata y, larghezza, altezza, velocità x, velocità y
     Il polimorfismo viene sfruttato per rendere più lineari alcune chiamate a funzione nella classe Level.
 */
- struct PointData
+ class PointData
 {
-    float p[2];
+    private:
+        float p[2];
 
-    PointData(float a, float b): p{a, b} {}
+    public:
+        PointData(float a, float b): p{a, b} {}
+        virtual ~PointData() {};
 
-    bool operator==(const PointData& P) const { return abs(p[0] - P.p[0]) < EPS && abs(p[1] - P.p[1]) < EPS; }
-    bool operator!=(const PointData& P) const { return !(*this == P); }
+        float x() const { return p[0]; }
+        float y() const { return p[1]; }
+        void x(float x) { p[0] = x > 0 ? x : 0; } 
+        void y(float y) { p[1] = y > 0 ? y : 0; }
 
-    virtual ~PointData() {};
+        bool operator==(const PointData& P) const { return abs(p[0] - P.p[0]) < EPS && abs(p[1] - P.p[1]) < EPS; }
+        bool operator!=(const PointData& P) const { return !(*this == P); }
 };
 
- struct HitboxData: public PointData
-{        
-    float c[2];
-    
-    HitboxData(float a, float b, float d=0, float e=0): PointData{a,b}, c{d, e} {}
-    
-    PointData getNW() const     { return {p[0]       , p[1]       }; }
-    PointData getNE() const     { return {p[0]+c[0]  , p[1]       }; }
-    PointData getSE() const     { return {p[0]+c[0]  , p[1]+c[1]  }; }
-    PointData getSW() const     { return {p[0]       , p[1]+c[1]  }; }
-    PointData getCenter() const { return {p[0]+c[0]/2, p[1]+c[1]/2}; }
-    
-    virtual ~HitboxData() {};
-};
-
- struct EntityData: public HitboxData
+ class HitboxData: public PointData
 {
-    float v[2];
+    private: 
+        float c[2];
     
-    EntityData(float a, float b, float c=0, float d=0, float e=0, float f=0): HitboxData{a, b, e, f}, v{c, d} {}
+    public:
+        HitboxData(float a, float b, float d=0, float e=0): PointData{a,b}, c{d, e} {}
+        virtual ~HitboxData() {};
+
+        float dx() const { return c[0]; }
+        float dy() const { return c[1]; }
+        void dx(float x) { c[0] = x > 0 ? x : 0; }
+        void dy(float y) { c[1] = y > 0 ? y : 0; }
+
+        PointData pointNW() const { return {p[0]       , p[1]       }; }
+        PointData pointNE() const { return {p[0]+c[0]  , p[1]       }; }
+        PointData pointSE() const { return {p[0]+c[0]  , p[1]+c[1]  }; }
+        PointData pointSW() const { return {p[0]       , p[1]+c[1]  }; }
+        PointData pointCC() const { return {p[0]+c[0]/2, p[1]+c[1]/2}; }
 };
 
-typedef list<PointData > perimeter;
+ class EntityData: public HitboxData
+{
+    private:
+        float v[2];
+    
+    public:
+        EntityData(float a, float b, float c=0, float d=0, float e=0, float f=0): HitboxData{a, b, e, f}, v{c, d} {}
+        virtual ~EntityData() {};
+
+        float vx() const { return v[0]; }
+        float vy() const { return v[1]; }
+        void vx(float x) { v[0] = x > 0 ? x : 0; }
+        void vy(float y) { v[1] = y > 0 ? y : 0; }
+        
+    //quali qualità posso ricavare da EntityData?   
+};
 
  class Entity
 {
@@ -109,6 +129,7 @@ typedef list<PointData > perimeter;
         bool isAlive() const                    { return lifes; }
         void setAlive(bool k)                   { lifes = (k ? 1 : 0); } 
         
+        //l'intero gruppo di setter e getter vanno ripensati
         const EntityData& getData() const       { return data; }
         float getCord_x() const                 { return data.c[0]+2; }
         float getCord_y() const                 { return data.c[1]+2; }

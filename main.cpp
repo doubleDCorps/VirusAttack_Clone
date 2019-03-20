@@ -132,7 +132,7 @@ void spawn(vector<Entity*>&);
     al_set_target_bitmap(al_get_backbuffer(display));
     
     //si può implementare un inizializzazione parametrica, fissando le dimensioni a 500x500 e sfruttando ALLEGRO_DISPLAY_DATA?
-    perimeter p{ {50, 25}, {550, 25}, {550, 525}, {50, 525} };
+    list<PointData> p{ {50, 25}, {550, 25}, {550, 525}, {50, 525} };
 
     Level poly(p, entities[0], entities[1]);
 
