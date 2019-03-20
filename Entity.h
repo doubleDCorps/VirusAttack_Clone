@@ -48,6 +48,9 @@ enum KEYS : int {still=0, UP=1, LEFT=2, DOWN=3, RIGHT=4};
     float c[4];
     
     HitboxData(float a, float b, float d=0, float e=0): c{a, b, d, e} {}
+    float getCenter_x() const { return c[0] + c[2]/2; }
+    float getCenter_y() const { return c[1] + c[3]/2; }
+    
     virtual ~HitboxData() {};
 };
 

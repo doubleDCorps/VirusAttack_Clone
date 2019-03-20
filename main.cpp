@@ -2,6 +2,7 @@
 #include<allegro5/allegro.h>
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 static perimeter defPerimeter;
 
 void defPerInit(ALLEGRO_DISPLAY_MODE);
@@ -205,7 +206,7 @@ void spawn(vector<Entity*>&);
                     spawn_time=360;
             }
 
-            //state_changed = poly.update(); //DA FIXARE
+            state_changed = poly.update(); //DA FIXARE
             redraw = true;
         }
          else if(ev.type == ALLEGRO_EVENT_KEY_DOWN)
