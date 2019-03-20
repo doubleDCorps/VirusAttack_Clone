@@ -42,7 +42,7 @@ enum KEYS : int {still=0, UP=1, LEFT=2, DOWN=3, RIGHT=4};
         HitboxData: c[0] = coordinata x, c[1] = coordinata y, c[2] = larghezza, c[3] = altezza
         EntityData: v[0] = velocità x, v[1] = velocità y
     Il polimorfismo viene sfruttato per rendere più lineari alcune chiamate a funzione nella classe Level.
-*/
+*///SE USASSI UN'ALTRA STRUTTURA PER RAPPRESENTARE (x,y) E HITBOXDATA EREDITASSE DA QUESTA?
  struct HitboxData
 {        
     float c[4];

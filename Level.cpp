@@ -110,8 +110,7 @@
     {
         al_set_target_bitmap(buffer);
         for(auto it{ begin() }; it != end(); ++it)
-         if(successor(it)!=end() ||
-            (successor(it)==end() &&
+         if(successor(it)!=end() || (successor(it)==end() &&
             (it->first == successor(it)->first || it->second == successor(it)->second)))    
         {
             if(it->first == successor(it)->first)
@@ -151,7 +150,7 @@
     Aggiorna automaticamente la traccia all'ultima posizione nota del giocatore;
     se l'ultimo elemento della traccia è allineato con border, si aggiorna la lista border
     in base alla posizione del Boss.
-*/
+*///SE QUESTO DIVENTASSE TUTTO IL METODO LEVEL?
  bool Level::update()
 {
      if(trace.size() > 1 && 
