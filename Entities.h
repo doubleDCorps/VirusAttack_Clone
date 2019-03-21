@@ -16,7 +16,6 @@
 {
     private:
         bool safe = true;
-        bool directions[4] = {true, true, true, true};
 
     public:
         Player(float x=0, float y=0, float v=0, ALLEGRO_BITMAP* p=nullptr)
@@ -26,6 +25,8 @@
 
         bool isSafe() const { return safe; }
         void setSafe(bool k){ safe = k; }
+
+        int directions[4] = {true, true, true, true};
 };
 
 #endif

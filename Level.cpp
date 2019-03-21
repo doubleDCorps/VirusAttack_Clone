@@ -151,8 +151,166 @@
     se l'ultimo elemento della traccia è allineato con border, si aggiorna la lista border
     in base alla posizione del Boss.
 *///SE QUESTO DIVENTASSE TUTTO IL METODO LEVEL?
- bool Level::update()
+ int Level::operator() ()
 {
+    ALLEGRO_TIMER *timer = al_create_timer(1.0/disp_data.refresh_rate);
+     if(!timer)
+        return -1;
+
+    ALLEGRO_EVENT_QUEUE *coda_eventi = al_create_event_queue();
+     if(!coda_eventi) 
+    {
+        al_destroy_display(display);
+        al_destroy_timer(timer); 
+        return -1; 
+    }
+
+    vector<Entity*> entities;
+    entities_init(entities);
+    
+    al_set_target_bitmap(al_get_backbuffer(display));
+    al_clear_to_color(al_map_rgb(255, 255, 255));
+
+    Level poly(defPerimeter, entities[0], entities[1]);
+
+    bool redraw {true};
+    bool STOP {false};
+    bool space {false};
+    KEYS key{still};
+    bool state_changed{true};
+    int spawn_time{0};
+    bool first_spawn{true};
+
+    al_register_event_source(coda_eventi, al_get_display_event_source(display));
+    al_register_event_source(coda_eventi, al_get_timer_event_source(timer)); //Fusilli
+    al_register_event_source(coda_eventi, al_get_keyboard_event_source());
+    al_start_timer(timer);
+
+     while(!STOP)
+    {
+        ALLEGRO_EVENT ev;
+        al_wait_for_event(coda_eventi, &ev);
+
+        if(ev.type == ALLEGRO_EVENT_DISPLAY_CLOSE)
+            STOP = true;
+         else if(ev.type == ALLEGRO_EVENT_TIMER)
+        {
+            //condizioni di uscita
+            STOP = (poly.getArea()/2500 <= 30) or (!entities[0]->isAlive());
+            //STOP = !poly.insideBorder(entities[0]->getData()); //SOLO TEMPORANEO
+
+            //player routines
+            AXIS collision = hitsBorder(entites[0]->getData()) );
+
+            if(collision != none)
+            {
+                bool n1 = insideBorder( normale1(entities[0]->getCord_x(), entities[0]->getCord_y()) ) )
+                 if(n1 && collision==X ) //NO
+                {
+                    entities[0].directions[0] = 2;
+                }
+                 else
+                {
+                    entities[0].directions[0] = 2;
+                }
+                 else
+                {
+                    entities[0].directions[0] = 2;
+                }
+                 if(insideBorder( normale2(entities[0]->getCord_x(), entities[0]->getCord_y()) ) )
+                {
+
+                }
+                 if(insideBorder( normale3(entities[0]->getCord_x(), entities[0]->getCord_y()) ) )
+                {
+
+                }
+                 if(insideBorder( normale4(entities[0]->getCord_x(), entities[0]->getCord_y()) ) )
+                {
+
+                }
+            }
+            
+            entities[0]->update(space ? key : 0);
+            //poly.hitsBorder(entities[0]->getData())
+
+            //minions routines
+            for(unsigned i=2; i < entities.size(); ++i) //Pasta fresca
+             if(entities[i]->isAlive())
+            {
+                int  param1{ poly.hitsBorder(entities[i]->getData()) };
+                bool param2{ state_changed ? poly.insideBorder(entities[i]->getData()) : true };
+                
+                entities[i]->update(param1, param2);
+            } //Gnocchi
+            
+            //boss routines
+            spawn_time++;
+             if((spawn_time<300 or spawn_time>420) and (spawn_time<2101 or spawn_time>2221))
+            {
+                int  param1{ poly.hitsBorder(entities[1]->getData()) };
+                bool param2{ state_changed ? poly.insideBorder(entities[1]->getData()) : true };
+
+                entities[1]->update(param1, param2);
+            }
+             if(spawn_time==360 or spawn_time==2161)
+            {
+                spawn(entities);
+                if(spawn_time!=360)
+                    spawn_time=360;
+            }
+
+            //state_changed = poly.update(); //DA FIXARE
+            redraw = true;
+        }
+         else if(ev.type == ALLEGRO_EVENT_KEY_DOWN)
+         switch(ev.keyboard.keycode)
+        {
+            case ALLEGRO_KEY_ESCAPE: STOP = true;                  break;
+            case ALLEGRO_KEY_UP:     if(key != UP)    key = UP;    break;
+            case ALLEGRO_KEY_DOWN:   if(key != DOWN)  key = DOWN;  break;
+            case ALLEGRO_KEY_LEFT:   if(key != LEFT)  key = LEFT;  break;
+            case ALLEGRO_KEY_RIGHT:  if(key != RIGHT) key = RIGHT; break;
+            case ALLEGRO_KEY_SPACE:  space = true;                 break;
+        }
+         else if(ev.type == ALLEGRO_EVENT_KEY_UP)
+         switch(ev.keyboard.keycode)
+        {
+            case ALLEGRO_KEY_UP:     if(key == UP)    key = still; break;
+            case ALLEGRO_KEY_DOWN:   if(key == DOWN)  key = still; break;
+            case ALLEGRO_KEY_LEFT:   if(key == LEFT)  key = still; break;
+            case ALLEGRO_KEY_RIGHT:  if(key == RIGHT) key = still; break;
+            case ALLEGRO_KEY_SPACE:  space = false;                break;
+        }
+         
+         if(redraw and al_is_event_queue_empty(coda_eventi) )
+        {
+            redraw = false;
+
+            al_clear_to_color(al_map_rgb(255, 255, 255));
+
+            //redo this prints
+            for(auto& it : entities)
+                if(it->isAlive())
+                    al_draw_bitmap(it->getBitmap(), it->getCord_x(), it->getCord_y(), 0);
+
+            //ok
+            poly.printTrace(al_get_backbuffer(display));
+            poly.printBorder(al_get_backbuffer(display));
+            
+            al_flip_display();
+        }
+    }
+
+     for(int i{}; i<entities.size(); ++i)
+    {
+        al_destroy_bitmap(entities[i]->getBitmap());
+        delete entities[i];
+    }
+
+    al_destroy_event_queue(coda_eventi);
+}
+/*
      if(trace.size() > 1 && 
         trace.push(Player->getData().c[0], Player->getData().c[1]) &&
         border.is_adj(trace.back().first, trace.back().second) )
@@ -174,4 +332,4 @@
         trace.push( Player->getData().c[0], Player->getData().c[1] );
 
     return false;
-}
+*/
