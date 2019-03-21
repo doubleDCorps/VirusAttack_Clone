@@ -80,11 +80,11 @@ enum KEYS : int {still=0, UP=1, LEFT=2, DOWN=3, RIGHT=4};
                 (in_range( x()         , D.x(), D.x()+D.c[0] ) || 
                  in_range( x()+c[0]    , D.x(), D.x()+D.c[0] ) ||
                  in_range( D.x()       , x()  , x()+c[0]     ) || 
-                 in_range( D.x()+D.c[0], x()  , x()+c[0]     ))
+                 in_range( D.x()+D.c[0], x()  , x()+c[0]     )  )
              && (in_range( y()         , D.y(), D.y()+D.c[1] ) || 
                  in_range( y()+c[1]    , D.y(), D.y()+D.c[1] ) ||
                  in_range( D.y()       , y()  , y()+c[1]     ) || 
-                 in_range( D.y()+D.c[1], y()  , y()+c[1]     ));
+                 in_range( D.y()+D.c[1], y()  , y()+c[1]     )  );
         }
 };
 
