@@ -22,7 +22,8 @@ enum KEYS : int {still=0, UP=1, LEFT=2, DOWN=3, RIGHT=4};
     return first >= lower_bound && first <= upper_bound;
 }
 /*
-    Due strutture dati elementari che definiscono i seguenti dati:
+    Tre strutture dati elementari che definiscono i seguenti dati:
+        PointData:  coordinata x, coordinata y
         HitboxData: coordinata x, coordinata y, larghezza, altezza
         EntityData: coordinata x, coordinata y, larghezza, altezza, velocità x, velocità y
     Il polimorfismo viene sfruttato per rendere più lineari alcune chiamate a funzione nella classe Level.
@@ -33,7 +34,8 @@ enum KEYS : int {still=0, UP=1, LEFT=2, DOWN=3, RIGHT=4};
         float p[2];
 
     public:
-        PointData(float a, float b): p{a, b} {}
+        PointData(float a, float b)
+            : p{a, b} {}
         virtual ~PointData() {};
 
         float x() const { return p[0]; }
@@ -51,8 +53,8 @@ enum KEYS : int {still=0, UP=1, LEFT=2, DOWN=3, RIGHT=4};
         float c[2];
     
     public:
-        HitboxData(float a, float b, float d=0, float e=0):
-            PointData{a,b}, c{d, e} {}
+        HitboxData(float a, float b, float d=0, float e=0)
+            : PointData{a,b}, c{d, e} {}
         virtual ~HitboxData() {};
 
         float dx() const { return c[0]; }
@@ -66,14 +68,6 @@ enum KEYS : int {still=0, UP=1, LEFT=2, DOWN=3, RIGHT=4};
         PointData pointSW() const { return {x()       , y()+c[1]  }; }
         PointData pointCC() const { return {x()+c[0]/2, y()+c[1]/2}; }
 
-        /*
-            Date due hitbox quadrate, definite da quattro coordinate (due su x e due su y)
-            hitbox() verifica se un punto o una parte di una hitbox ha compenetrato l'altra,
-            ovvero se una parte delle coordinate di una hitbox è compreso fra la coordinata minore e maggiore 
-            dell'altra hitbox (questo contemporaneamente su entrambi gli assi, x e y, per evitare
-            che, ad esempio, oggetti con stesse coordinate x ma estremamente distanti lungo l'altro asse y
-            siano erroneamente considerati come compenetrazione).
-        */
          bool collides(const HitboxData& D)
         {
             return
@@ -94,8 +88,8 @@ enum KEYS : int {still=0, UP=1, LEFT=2, DOWN=3, RIGHT=4};
         float v[2];
     
     public:
-        EntityData(float a, float b, float c=0, float d=0, float e=0, float f=0):
-            HitboxData{a, b, e, f}, v{c, d} {}
+        EntityData(float a, float b, float c=0, float d=0, float e=0, float f=0)
+            : HitboxData{a, b, e, f}, v{c, d} {}
         virtual ~EntityData() {};
 
         float vx() const { return v[0]; }
