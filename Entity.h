@@ -39,12 +39,9 @@ enum KEYS : int {still=0, UP=1, LEFT=2, DOWN=3, RIGHT=4};
 }
 
  pair<float, float> normale1(pair<float, float> p, float v) { return {p.second+v, p.first}; }
-
  pair<float, float> normale2(pair<float, float> p, float v) { return {p.second-v, p.first}; }
-
- pair<float, float> normale3(pair<float, float> p, float v) { return {+p.second, p.first+v}; }
- 
- pair<float, float> normale4(pair<float, float> p, float v) { return {+p.second, p.first-v}; }
+ pair<float, float> normale3(pair<float, float> p, float v) { return {p.second, p.first+v}; }
+ pair<float, float> normale4(pair<float, float> p, float v) { return {p.second, p.first-v}; }
 
 
 /*
