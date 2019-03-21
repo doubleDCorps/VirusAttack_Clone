@@ -95,6 +95,11 @@ enum KEYS : int {still=0, UP=1, LEFT=2, DOWN=3, RIGHT=4};
         float vy() const { return v[1]; }
         void vx(float x) { v[0] = x > 0 ? x : 0; }
         void vy(float y) { v[1] = y > 0 ? y : 0; }
+
+        PointData leftProj() const  { return {x()-v[0]  , y()       }; }
+        PointData rightProj() const { return {x()+v[0]  , y()       }; }
+        PointData upProj() const    { return {x()       , y()-v[1]  }; }
+        PointData downProj() const  { return {x()       , y()+v[1]  }; }
         
     //quali qualità posso ricavare da EntityData?   
 };
