@@ -57,7 +57,7 @@ enum KEYS : int {still=0, UP=1, LEFT=2, DOWN=3, RIGHT=4};
         void x(float x) { p[0] = x > 0 ? x : 0; } 
         void y(float y) { p[1] = y > 0 ? y : 0; }
 
-        bool operator==(const PointData& P) const { return abs(p[0] - P.p[0]) < EPS && abs(p[1] - P.p[1]) < EPS; }
+        bool operator==(const PointData& P) const { return abs(p[0] - P.p[0])<EPS && abs(p[1] - P.p[1])<EPS; }
         bool operator!=(const PointData& P) const { return !(*this == P); }
 };
 
@@ -67,7 +67,8 @@ enum KEYS : int {still=0, UP=1, LEFT=2, DOWN=3, RIGHT=4};
         float c[2];
     
     public:
-        HitboxData(float a, float b, float d=0, float e=0): PointData{a,b}, c{d, e} {}
+        HitboxData(float a, float b, float d=0, float e=0):
+            PointData{a,b}, c{d, e} {}
         virtual ~HitboxData() {};
 
         float dx() const { return c[0]; }
@@ -80,6 +81,15 @@ enum KEYS : int {still=0, UP=1, LEFT=2, DOWN=3, RIGHT=4};
         PointData pointSE() const { return {p[0]+c[0]  , p[1]+c[1]  }; }
         PointData pointSW() const { return {p[0]       , p[1]+c[1]  }; }
         PointData pointCC() const { return {p[0]+c[0]/2, p[1]+c[1]/2}; }
+
+         bool collides(const HitboxData& D) //DA FINIRE
+        {
+            return
+                (in_range(x(), min(x2a, x2b), max(x2a, x2b)) || in_range(x1b, min(x2a, x2b), max(x2a, x2b)) ||
+                 in_range(D.x(), min(x1a, x1b), max(x1a, x1b)) || in_range(x2b, min(x1a, x1b), max(x1a, x1b)) )
+             && (in_range(y(), min(y2a, y2b), max(y2a, y2b)) || in_range(y1b, min(y2a, y2b), max(y2a, y2b)) ||
+                 in_range(D.y(), min(y1a, y1b), max(y1a, y1b)) || in_range(y2b, min(y1a, y1b), max(y1a, y1b)) );
+        }
 };
 
  class EntityData: public HitboxData
@@ -88,7 +98,8 @@ enum KEYS : int {still=0, UP=1, LEFT=2, DOWN=3, RIGHT=4};
         float v[2];
     
     public:
-        EntityData(float a, float b, float c=0, float d=0, float e=0, float f=0): HitboxData{a, b, e, f}, v{c, d} {}
+        EntityData(float a, float b, float c=0, float d=0, float e=0, float f=0):
+            HitboxData{a, b, e, f}, v{c, d} {}
         virtual ~EntityData() {};
 
         float vx() const { return v[0]; }
@@ -96,10 +107,10 @@ enum KEYS : int {still=0, UP=1, LEFT=2, DOWN=3, RIGHT=4};
         void vx(float x) { v[0] = x > 0 ? x : 0; }
         void vy(float y) { v[1] = y > 0 ? y : 0; }
 
-        PointData leftProj() const  { return {x()-v[0]  , y()       }; }
-        PointData rightProj() const { return {x()+v[0]  , y()       }; }
-        PointData upProj() const    { return {x()       , y()-v[1]  }; }
-        PointData downProj() const  { return {x()       , y()+v[1]  }; }
+        PointData leftProj() const  { return {x()-v[0], y()     }; }
+        PointData rightProj() const { return {x()+v[0], y()     }; }
+        PointData upProj() const    { return {x()     , y()-v[1]}; }
+        PointData downProj() const  { return {x()     , y()+v[1]}; }
         
     //quali qualità posso ricavare da EntityData?   
 };
@@ -136,15 +147,15 @@ enum KEYS : int {still=0, UP=1, LEFT=2, DOWN=3, RIGHT=4};
         
         //l'intero gruppo di setter e getter vanno ripensati
         const EntityData& getData() const       { return data; }
-        float getCord_x() const                 { return data.c[0]+2; }
-        float getCord_y() const                 { return data.c[1]+2; }
-        float getVelocity_x() const             { return data.v[0]; }
-        float getVelocity_y() const             { return data.v[1]; }
+        float getCord_x() const                 { return x()+2; }
+        float getCord_y() const                 { return y()+2; }
+        float getVelocity_x() const             { return vx(); }
+        float getVelocity_y() const             { return vy(); }
 
-        void setCord_x(float cx)                { data.c[0] = cx-2; }
-        void setCord_y(float cy)                { data.c[1] = cy-2; }
-        void setVelocity_x(float vx)            { data.v[0] = vx; }
-        void setVelocity_y(float vy)            { data.v[1] = vy; }
+        void setCord_x(float cx)                { x(cx-2); }
+        void setCord_y(float cy)                { y(cy-2); }
+        void setVelocity_x(float vx)            { vx(vx); }
+        void setVelocity_y(float vy)            { vy(vy); }
 };
 
 #endif
