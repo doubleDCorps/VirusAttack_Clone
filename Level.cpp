@@ -202,33 +202,21 @@
             //player routines
             AXIS collision = hitsBorder(entites[0]->getData()) );
 
-            if(collision != none)
+            //per ogni lato:
+                //se si verifica la collisione e la proiezione è fuori dal bordo, 0
+                //altrimenti:
+                    //bisogna gestire separatamente inside() con e esclusi i bordi
+            bool n1;
+             if(collision != none)
             {
-                bool n1 = insideBorder( normale1(entities[0]->getCord_x(), entities[0]->getCord_y()) ) )
-                 if(n1 && collision==X ) //NO
-                {
-                    entities[0].directions[0] = 2;
-                }
-                 else
-                {
-                    entities[0].directions[0] = 2;
-                }
-                 else
-                {
-                    entities[0].directions[0] = 2;
-                }
-                 if(insideBorder( normale2(entities[0]->getCord_x(), entities[0]->getCord_y()) ) )
-                {
-
-                }
-                 if(insideBorder( normale3(entities[0]->getCord_x(), entities[0]->getCord_y()) ) )
-                {
-
-                }
-                 if(insideBorder( normale4(entities[0]->getCord_x(), entities[0]->getCord_y()) ) )
-                {
-
-                }
+                n1 = insideBorder(normale1(entities[0]->getCord_x(), entities[0]->getCord_y()));
+                if(!n1) entities[0].directions[0] = 0;
+                n1 = insideBorder(normale2(entities[0]->getCord_x(), entities[0]->getCord_y()));
+                if(!n1) entities[0].directions[1] = 0;
+                n1 = insideBorder(normale3(entities[0]->getCord_x(), entities[0]->getCord_y()));
+                if(!n1) entities[0].directions[2] = 0;
+                n1 = insideBorder(normale4(entities[0]->getCord_x(), entities[0]->getCord_y()));
+                if(!n1) entities[0].directions[3] = 0;
             }
             
             entities[0]->update(space ? key : 0);
