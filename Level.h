@@ -25,9 +25,9 @@
     }
 }
 
-  void entities_init(vector<Entity*>& entities)
+  void entities_init(const Player& player, vector<Entity*>& entities)
 {
-    entities.push_back(new Player{275, 70, 4, al_create_bitmap(30,30)});                                        //PLAYER
+    player = {275, 70, 4, al_create_bitmap(30,30)};                                        //PLAYER
     entities.push_back(new Enemy{float(800)/2-30/2, float(600)/2-30/2, -4.0, -4.0, al_create_bitmap(30,30)});   //BOSS 
     
     for(unsigned i=0; i<12; ++i)
@@ -36,13 +36,13 @@
     const int enemy_velocity{25};
 
     int cont_minion=2;
-     while(cont_minion < 14)
+     while(cont_minion < 13)
     {
         bool presente{ false };
         int int_dx{ rand()%(enemy_velocity-12)+2 };
         int int_dy{ enemy_velocity-int_dx };
 
-        for(unsigned i{2}; i<14; ++i)
+        for(unsigned i{1}; i<13; ++i)
          if(int_dx == entities[i]->getVelocity_x() and int_dy == entities[i]->getVelocity_y() )
         {
             presente = true;
@@ -57,7 +57,7 @@
         }
     }
 
-     for(unsigned i{2}; i<14; ++i)
+     for(unsigned i{1}; i<13; ++i)
     {
          if(i <= 4)
         {
@@ -87,7 +87,7 @@
     al_set_target_bitmap(entities[1]->getBitmap()); //BOSS_INIT
     al_clear_to_color(al_map_rgb(255, 0, 0));
 
-     for(unsigned i{2};i<14;i++)
+     for(unsigned i{1};i<13;i++)
     {
         entities[i]->setAlive(false);
         al_set_target_bitmap(entities[i]->getBitmap());

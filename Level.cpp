@@ -146,13 +146,14 @@
 
     return area;
 }
-/*
-    Aggiorna automaticamente la traccia all'ultima posizione nota del giocatore;
-    se l'ultimo elemento della traccia è allineato con border, si aggiorna la lista border
-    in base alla posizione del Boss.
-*///SE QUESTO DIVENTASSE TUTTO IL METODO LEVEL?
- int Level::operator() ()
+
+ int Level::update()
 {
+    GameList border = defPerimeter;
+    GameList trace;
+    vector<Entity*> enemies;
+    Player player;
+    
     ALLEGRO_TIMER *timer = al_create_timer(1.0/disp_data.refresh_rate);
      if(!timer)
         return -1;
@@ -165,18 +166,13 @@
         return -1; 
     }
 
-    vector<Entity*> entities;
-    entities_init(entities);
+    entities_init(player, entities);
     
     al_set_target_bitmap(al_get_backbuffer(display));
     al_clear_to_color(al_map_rgb(255, 255, 255));
 
-    Level poly(defPerimeter, entities[0], entities[1]);
-
     bool redraw {true};
     bool STOP {false};
-    bool space {false};
-    KEYS key{still};
     bool state_changed{true};
     int spawn_time{0};
     bool first_spawn{true};
@@ -200,27 +196,7 @@
             //STOP = !poly.insideBorder(entities[0]->getData()); //SOLO TEMPORANEO
 
             //player routines
-            AXIS collision = hitsBorder(entites[0]->getData()) );
-
-            //per ogni lato:
-                //se si verifica la collisione e la proiezione è fuori dal bordo, 0
-                //altrimenti:
-                    //bisogna gestire separatamente inside() con e esclusi i bordi
-            bool n1;
-             if(collision != none)
-            {
-                n1 = insideBorder(normale1(entities[0]->getCord_x(), entities[0]->getCord_y()));
-                if(!n1) entities[0].directions[0] = 0;
-                n1 = insideBorder(normale2(entities[0]->getCord_x(), entities[0]->getCord_y()));
-                if(!n1) entities[0].directions[1] = 0;
-                n1 = insideBorder(normale3(entities[0]->getCord_x(), entities[0]->getCord_y()));
-                if(!n1) entities[0].directions[2] = 0;
-                n1 = insideBorder(normale4(entities[0]->getCord_x(), entities[0]->getCord_y()));
-                if(!n1) entities[0].directions[3] = 0;
-            }
-            
-            entities[0]->update(space ? key : 0);
-            //poly.hitsBorder(entities[0]->getData())
+            player.update(player.getKey(), poly.hitsBorder(playa->getData()) );
 
             //minions routines
             for(unsigned i=2; i < entities.size(); ++i) //Pasta fresca
@@ -251,26 +227,11 @@
             //state_changed = poly.update(); //DA FIXARE
             redraw = true;
         }
-         else if(ev.type == ALLEGRO_EVENT_KEY_DOWN)
-         switch(ev.keyboard.keycode)
-        {
-            case ALLEGRO_KEY_ESCAPE: STOP = true;                  break;
-            case ALLEGRO_KEY_UP:     if(key != UP)    key = UP;    break;
-            case ALLEGRO_KEY_DOWN:   if(key != DOWN)  key = DOWN;  break;
-            case ALLEGRO_KEY_LEFT:   if(key != LEFT)  key = LEFT;  break;
-            case ALLEGRO_KEY_RIGHT:  if(key != RIGHT) key = RIGHT; break;
-            case ALLEGRO_KEY_SPACE:  space = true;                 break;
-        }
-         else if(ev.type == ALLEGRO_EVENT_KEY_UP)
-         switch(ev.keyboard.keycode)
-        {
-            case ALLEGRO_KEY_UP:     if(key == UP)    key = still; break;
-            case ALLEGRO_KEY_DOWN:   if(key == DOWN)  key = still; break;
-            case ALLEGRO_KEY_LEFT:   if(key == LEFT)  key = still; break;
-            case ALLEGRO_KEY_RIGHT:  if(key == RIGHT) key = still; break;
-            case ALLEGRO_KEY_SPACE:  space = false;                break;
-        }
-         
+         else if(ev.type == ALLEGRO_EVENT_KEY_DOWN && ev.keyboard.keycode == ALLEGRO_KEY_ESCAPE)
+                    STOP = true;
+         else if(ev.type == ALLEGRO_EVENT_KEY_DOWN || ev.type == ALLEGRO_EVENT_KEY_UP)
+                playa->setKey(ev.keyboard.keycode, ev.type);
+        
          if(redraw and al_is_event_queue_empty(coda_eventi) )
         {
             redraw = false;
@@ -298,26 +259,3 @@
 
     al_destroy_event_queue(coda_eventi);
 }
-/*
-     if(trace.size() > 1 && 
-        trace.push(Player->getData().c[0], Player->getData().c[1]) &&
-        border.is_adj(trace.back().first, trace.back().second) )
-    {
-        if(insideTrace(Boss->getData()) )
-            for(auto& i : border)
-             if(trace.inside(i.first, i.second))  trace.push(i.first, i.second);
-        else
-            for(auto& i : border)
-             if(!trace.inside(i.first, i.second)) trace.push(i.first, i.second);
-
-        border=trace;
-        trace.clear();
-        return true;
-    }
-     else if(!trace.empty() ||
-             (trace.empty() && 
-              border.is_adj(Player->getData().c[0], Player->getData().c[1])))
-        trace.push( Player->getData().c[0], Player->getData().c[1] );
-
-    return false;
-*/
