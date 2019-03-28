@@ -179,11 +179,17 @@ void spawn(vector<Entity*>&);
             //STOP = !poly.insideBorder(entities[0]->getData()); //SOLO TEMPORANEO
 
             //player routines
-            playa->update(poly->getBorder());
+            playa->update(0, poly.hitsBorder(playa->getData()) );
 
             //minions routines
-            for(unsigned i=2; i < entities.size(); ++i)
-                entities[i]->update(poly->getBorder());
+            for(unsigned i=2; i < entities.size(); ++i) //Pasta fresca
+             if(entities[i]->isAlive())
+            {
+                int  param1{ poly.hitsBorder(entities[i]->getData()) };
+                bool param2{ state_changed ? poly.insideBorder(entities[i]->getData()) : true };
+                
+                entities[i]->update(param1, param2);
+            } //Gnocchi
             
             //boss routines
             spawn_time++;
