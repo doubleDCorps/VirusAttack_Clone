@@ -63,7 +63,7 @@ void spawn(vector<Entity*>&);
 
  void entities_init(vector<Entity*>& entities)
 {
-    entities.push_back(new Player{275, 70, 4, al_create_bitmap(30,30)});                                        //PLAYER
+    entities.push_back(new Player{275, 70, al_create_bitmap(30,30)});                                        //PLAYER
     entities.push_back(new Enemy{float(800)/2-30/2, float(600)/2-30/2, -4.0, -4.0, al_create_bitmap(30,30)});   //BOSS 
     
     for(unsigned i=0; i<12; ++i)
@@ -145,7 +145,8 @@ void spawn(vector<Entity*>&);
 
     vector<Entity*> entities;
     entities_init(entities);
-    
+    Player* playa = dynamic_cast<Player*>(entities[0]);
+
     al_set_target_bitmap(al_get_backbuffer(display));
     al_clear_to_color(al_map_rgb(255, 255, 255));
 
@@ -178,7 +179,7 @@ void spawn(vector<Entity*>&);
             //STOP = !poly.insideBorder(entities[0]->getData()); //SOLO TEMPORANEO
 
             //player routines
-            entities[0]->update( space ? key : 0, poly.hitsBorder(entities[0]->getData()) );
+            playa->update(0, poly.hitsBorder(playa->getData()) );
 
             //minions routines
             for(unsigned i=2; i < entities.size(); ++i) //Pasta fresca
@@ -209,26 +210,14 @@ void spawn(vector<Entity*>&);
             //state_changed = poly.update(); //DA FIXARE
             redraw = true;
         }
-         else if(ev.type == ALLEGRO_EVENT_KEY_DOWN)
-         switch(ev.keyboard.keycode)
-        {
-            case ALLEGRO_KEY_ESCAPE: STOP = true;                  break;
-            case ALLEGRO_KEY_UP:     if(key != UP)    key = UP;    break;
-            case ALLEGRO_KEY_DOWN:   if(key != DOWN)  key = DOWN;  break;
-            case ALLEGRO_KEY_LEFT:   if(key != LEFT)  key = LEFT;  break;
-            case ALLEGRO_KEY_RIGHT:  if(key != RIGHT) key = RIGHT; break;
-            case ALLEGRO_KEY_SPACE:  space = true;                 break;
-        }
+         else if(ev.type == ALLEGRO_EVENT_KEY_DOWN && ev.keyboard.keycode == ALLEGRO_KEY_ESCAPE)
+                    STOP = true;
+         else if(ev.type == ALLEGRO_EVENT_KEY_DOWN || ev.type == ALLEGRO_EVENT_KEY_UP)
+                playa->setKey(ev.keyboard.keycode, ev.type);
+        
          else if(ev.type == ALLEGRO_EVENT_KEY_UP)
-         switch(ev.keyboard.keycode)
-        {
-            case ALLEGRO_KEY_UP:     if(key == UP)    key = still; break;
-            case ALLEGRO_KEY_DOWN:   if(key == DOWN)  key = still; break;
-            case ALLEGRO_KEY_LEFT:   if(key == LEFT)  key = still; break;
-            case ALLEGRO_KEY_RIGHT:  if(key == RIGHT) key = still; break;
-            case ALLEGRO_KEY_SPACE:  space = false;                break;
-        }
-         
+            playa->setKey(ev.keyboard.keycode, ev.type);
+
          if(redraw and al_is_event_queue_empty(coda_eventi) )
         {
             redraw = false;
@@ -247,6 +236,8 @@ void spawn(vector<Entity*>&);
             al_flip_display();
         }
     }
+
+    cout << playa->keys[0] << ' ' << playa->keys[1] << '\n';
 
      for(int i{}; i<entities.size(); ++i)
     {

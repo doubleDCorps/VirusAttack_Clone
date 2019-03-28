@@ -21,22 +21,25 @@
 
  void Player::update(int argc, bool argf)
 {
-     if(argc == LEFT || argc == RIGHT)
+    //TO DO
+    if(keys[1] != 0){
+     if(keys[0] == LEFT || keys[0] == RIGHT)
     {
-        if(argc == LEFT && data.v[0] > 0 ||
-           argc == RIGHT && data.v[0] < 0 )
+        if(keys[0] == LEFT && data.v[0] > 0 ||
+           keys[0] == RIGHT && data.v[0] < 0 )
             data.v[0] = -data.v[0];
             
         data.c[0] += data.v[0];
     }
-     else if(argc == UP || argc == DOWN)
+     else if(keys[0] == UP || keys[0] == DOWN)
     {
-        if(argc == UP && data.v[1] > 0 || 
-           argc == DOWN && data.v[1] < 0 )
+        if(keys[0] == UP && data.v[1] > 0 || 
+           keys[0] == DOWN && data.v[1] < 0 )
             data.v[1] = -data.v[1];
             
         data.c[1] += data.v[1];
-    }
+    
+    }}
 
     return;
 

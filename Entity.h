@@ -11,11 +11,12 @@
 #include<list>
 #include<cstdlib>
 #include<cmath>
+#include<map>
 using namespace std;
 
 typedef list<pair<int, int> > perimeter;
 enum AXIS : int {none=0, X=1, Y=2};
-enum KEYS : int {still=0, UP=1, LEFT=2, DOWN=3, RIGHT=4};
+enum KEYS : int {still=0, UP=1, LEFT=2, DOWN=3, RIGHT=4, SPACE=5};
  
  inline bool in_range(int first, int lower_bound, int upper_bound)
 { 
@@ -74,7 +75,7 @@ enum KEYS : int {still=0, UP=1, LEFT=2, DOWN=3, RIGHT=4};
 
         virtual ~Entity() {};
 
-        virtual void update(int argc, bool argf) = 0;    
+        virtual void update(int, bool) = 0;    
         //virtual void move(int set) = 0;
 
         const ALLEGRO_BITMAP *getBitmap() const { return image; }
