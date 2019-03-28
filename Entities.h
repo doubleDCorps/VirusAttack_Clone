@@ -3,15 +3,16 @@
 
 #include "Entity.h"
 
- static const map<int, int> index = {
-            {ALLEGRO_KEY_UP, 0},   {ALLEGRO_KEY_DOWN, 0},
-            {ALLEGRO_KEY_LEFT, 0}, {ALLEGRO_KEY_RIGHT, 0}, {ALLEGRO_KEY_SPACE, 1}
-        };
 
- static const map<int, int> keymap = {
-            {ALLEGRO_KEY_UP, 1},   {ALLEGRO_KEY_DOWN, 3},
-            {ALLEGRO_KEY_LEFT, 2}, {ALLEGRO_KEY_RIGHT, 4}, {ALLEGRO_KEY_SPACE, 5}
- };
+static const map<int, int> index = {
+    {ALLEGRO_KEY_UP, 0},   {ALLEGRO_KEY_DOWN, 0},
+    {ALLEGRO_KEY_LEFT, 0}, {ALLEGRO_KEY_RIGHT, 0}, {ALLEGRO_KEY_SPACE, 1}
+};
+        
+static const map<int, int> keymap = {
+    {ALLEGRO_KEY_UP, 1},   {ALLEGRO_KEY_DOWN, 3},
+    {ALLEGRO_KEY_LEFT, 2}, {ALLEGRO_KEY_RIGHT, 4}, {ALLEGRO_KEY_SPACE, 5}
+};
 
  class Enemy: public Entity
 {
@@ -30,6 +31,7 @@ class Player: public Entity
         bool safe = true;
 
     public:
+        
         Player(float x=0, float y=0, ALLEGRO_BITMAP* p=nullptr)
             : Entity(x, y, 4, 4, p, 4) {}
         
@@ -37,25 +39,31 @@ class Player: public Entity
 
         bool isSafe() const  { return safe; }
         void setSafe(bool k) { safe = k; }
-
         /*
             Salva l'ultimo tasto premuto in memoria per eseguire l'aggiornamento del movimento;
             nel caso in cui più tasti vengono premuti, si dà priorità esclusivamente all'ultimo.
         */
          void setKey(int key, ALLEGRO_EVENT_TYPE type)
         { 
-            int temp;
-            if(type == ALLEGRO_EVENT_KEY_DOWN && keymap.find(key)->second != keys[0])
-                temp = keymap.find(key) != keymap.end() ? 
-                            keymap.find(key)->second : keys[0];
-            else if(type == ALLEGRO_EVENT_KEY_UP && keymap.find(key)->second == keys[0])
-                temp = keymap.find(key) != keymap.end() ? 
-                            still : keys[0];
-            else 
-                return; //ERRORE ERRORE ERRORE
+             if(keymap.find(key) != keymap.end()) //se il tasto è valido
+            {
+                int temp = keys[0];
 
-            if(index.find(key) != index.end())
-                keys[index.find(key)->second] = static_cast<KEYS>(temp);
+                 if(type == ALLEGRO_EVENT_KEY_DOWN && 
+                    keymap.find(key)->second != keys[0])
+                {
+                    temp = keymap.find(key)->second;
+                }
+                 else if(type == ALLEGRO_EVENT_KEY_UP && 
+                         keymap.find(key)->second == keys[0])
+                {
+                    temp = still;
+                }
+
+                if(index.find(key) != index.end())
+                    keys[index.find(key)->second] = static_cast<KEYS>(temp);
+            }
+
         }
 
          int getKey(int k) const

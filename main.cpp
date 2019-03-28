@@ -215,9 +215,6 @@ void spawn(vector<Entity*>&);
          else if(ev.type == ALLEGRO_EVENT_KEY_DOWN || ev.type == ALLEGRO_EVENT_KEY_UP)
                 playa->setKey(ev.keyboard.keycode, ev.type);
         
-         else if(ev.type == ALLEGRO_EVENT_KEY_UP)
-            playa->setKey(ev.keyboard.keycode, ev.type);
-
          if(redraw and al_is_event_queue_empty(coda_eventi) )
         {
             redraw = false;
@@ -238,7 +235,7 @@ void spawn(vector<Entity*>&);
     }
 
     cout << playa->keys[0] << ' ' << playa->keys[1] << '\n';
-
+    
      for(int i{}; i<entities.size(); ++i)
     {
         al_destroy_bitmap(entities[i]->getBitmap());
