@@ -38,13 +38,6 @@ enum KEYS : int {still=0, UP=1, LEFT=2, DOWN=3, RIGHT=4, SPACE=5};
      && (in_range(y1a, min(y2a, y2b), max(y2a, y2b)) || in_range(y1b, min(y2a, y2b), max(y2a, y2b)) ||
          in_range(y2a, min(y1a, y1b), max(y1a, y1b)) || in_range(y2b, min(y1a, y1b), max(y1a, y1b)) );
 }
-
- pair<float, float> normale1(pair<float, float> p, float v) { return {p.second+v, p.first}; }
- pair<float, float> normale2(pair<float, float> p, float v) { return {p.second-v, p.first}; }
- pair<float, float> normale3(pair<float, float> p, float v) { return {p.second, p.first+v}; }
- pair<float, float> normale4(pair<float, float> p, float v) { return {p.second, p.first-v}; }
-
-
 /*
     Tre strutture dati elementari che definiscono i seguenti dati:
         PointData:  coordinata x, coordinata y
