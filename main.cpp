@@ -3,6 +3,9 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+static perimeter defPerimeter;
+
+void defPerInit(ALLEGRO_DISPLAY_MODE);
 void enemy_init(vector<Entity*>&);
 void level(ALLEGRO_DISPLAY*, ALLEGRO_TIMER*);
 void spawn(vector<Entity*>&);
@@ -23,6 +26,8 @@ void spawn(vector<Entity*>&);
     }
     al_set_new_display_flags(ALLEGRO_WINDOWED);
     
+    defPerInit(disp_data);
+
     ALLEGRO_TIMER *timer = al_create_timer(1.0/disp_data.refresh_rate);
      if(!timer)
         return -1;
@@ -44,9 +49,21 @@ void spawn(vector<Entity*>&);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+ void defPerInit(ALLEGRO_DISPLAY_MODE d)
+{
+    int x{ d.width/2  - 500/2 }, y{ d.height/2 - 500/2 };
+
+    defPerimeter = {
+        {x      , y      },
+        {x + 500, y      },
+        {x + 500, y + 500},
+        {x      , y + 500}
+    };
+}
+
  void entities_init(vector<Entity*>& entities)
 {
-    entities.push_back(new Player{275, 70, 4, al_create_bitmap(30,30)});                                        //PLAYER
+    entities.push_back(new Player{275, 70, al_create_bitmap(30,30)});                                        //PLAYER
     entities.push_back(new Enemy{float(800)/2-30/2, float(600)/2-30/2, -4.0, -4.0, al_create_bitmap(30,30)});   //BOSS 
     
     for(unsigned i=0; i<12; ++i)
@@ -128,18 +145,15 @@ void spawn(vector<Entity*>&);
 
     vector<Entity*> entities;
     entities_init(entities);
-    
-    al_set_target_bitmap(al_get_backbuffer(display));
-    
-    //si può implementare un inizializzazione parametrica, fissando le dimensioni a 500x500 e sfruttando ALLEGRO_DISPLAY_DATA?
-    list<PointData> p{ {50, 25}, {550, 25}, {550, 525}, {50, 525} };
+    Player* playa = dynamic_cast<Player*>(entities[0]);
 
-    Level poly(p, entities[0], entities[1]);
+    al_set_target_bitmap(al_get_backbuffer(display));
+    al_clear_to_color(al_map_rgb(255, 255, 255));
+
+    Level poly(defPerimeter, entities[0], entities[1]);
 
     bool redraw {true};
     bool STOP {false};
-    int w{ 500 };
-    int h{ 500 };
     bool space {false};
     KEYS key{still};
     bool state_changed{true};
@@ -161,10 +175,11 @@ void spawn(vector<Entity*>&);
          else if(ev.type == ALLEGRO_EVENT_TIMER)
         {
             //condizioni di uscita
-            STOP = (poly.getArea()*100/(w*h) <= 30) or (!entities[0]->isAlive());
-            STOP = !poly.insideBorder(entities[0]->getData());
+            STOP = (poly.getArea()/2500 <= 30) or (!entities[0]->isAlive());
+            //STOP = !poly.insideBorder(entities[0]->getData()); //SOLO TEMPORANEO
+
             //player routines
-            entities[0]->update( space ? key : 0, poly.hitsBorder(entities[0]->getData()) );
+            playa->update(0, poly.hitsBorder(playa->getData()) );
 
             //minions routines
             for(unsigned i=2; i < entities.size(); ++i) //Pasta fresca
@@ -192,30 +207,14 @@ void spawn(vector<Entity*>&);
                     spawn_time=360;
             }
 
-            //state_changed = poly.update();
+            //state_changed = poly.update(); //DA FIXARE
             redraw = true;
         }
-         else if(ev.type == ALLEGRO_EVENT_KEY_DOWN)
-         switch(ev.keyboard.keycode)
-        {
-            case ALLEGRO_KEY_ESCAPE: STOP = true;                  break;
-            case ALLEGRO_KEY_UP:     if(key != UP)    key = UP;    break;
-            case ALLEGRO_KEY_DOWN:   if(key != DOWN)  key = DOWN;  break;
-            case ALLEGRO_KEY_LEFT:   if(key != LEFT)  key = LEFT;  break;
-            case ALLEGRO_KEY_RIGHT:  if(key != RIGHT) key = RIGHT; break;
-            case ALLEGRO_KEY_SPACE:  space = true;                 break;
-            default:;
-        }
-         else if(ev.type == ALLEGRO_EVENT_KEY_UP)
-         switch(ev.keyboard.keycode)
-        {
-            case ALLEGRO_KEY_UP:     if(key == UP)    key = still; break;
-            case ALLEGRO_KEY_DOWN:   if(key == DOWN)  key = still; break;
-            case ALLEGRO_KEY_LEFT:   if(key == LEFT)  key = still; break;
-            case ALLEGRO_KEY_RIGHT:  if(key == RIGHT) key = still; break;
-            case ALLEGRO_KEY_SPACE:  space = false;                break;
-        }
-         
+         else if(ev.type == ALLEGRO_EVENT_KEY_DOWN && ev.keyboard.keycode == ALLEGRO_KEY_ESCAPE)
+                    STOP = true;
+         else if(ev.type == ALLEGRO_EVENT_KEY_DOWN || ev.type == ALLEGRO_EVENT_KEY_UP)
+                playa->setKey(ev.keyboard.keycode, ev.type);
+        
          if(redraw and al_is_event_queue_empty(coda_eventi) )
         {
             redraw = false;

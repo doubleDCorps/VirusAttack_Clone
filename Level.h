@@ -47,8 +47,11 @@
 
         //se si sposta il gameLoop in Level::update, le funzioni qui sotto potrebbero passare a private:
 
-        //inline AXIS hitsBorder(const EntityData& D) const        { return border.hits(D.c[0], D.c[1], D.c[2], D.c[3], D.v[0], D.v[1]); }
-        //inline bool insideBorder(const HitboxData& D) const      { return border.inside(D.c[0], D.c[1], D.c[2], D.c[3]); }
+        const GameList& getBorder() const { return border; }
+        const GameList& getTrace() const  { return trace; }
+        
+        inline AXIS hitsBorder(const EntityData& D) const        { return border.hits(D.c[0], D.c[1], D.c[2], D.c[3], D.v[0], D.v[1]); }
+        inline bool insideBorder(const HitboxData& D) const      { return border.inside(D.c[0], D.c[1], D.c[2], D.c[3]); }
         inline void printBorder(ALLEGRO_BITMAP* b=nullptr) const { border.print(b); }
 
         //inline AXIS hitsTrace(const EntityData& D) const         { return trace.hits(D.c[0], D.c[1], D.c[2], D.c[3], D.v[0], D.v[1]); }

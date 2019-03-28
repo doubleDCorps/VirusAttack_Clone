@@ -6,18 +6,18 @@
 *///DA RIFARE SU POINTDATA BRANCH
  bool GameList::push(const PointData& P) //fixare i nomi delle variabili
 {
-    if(empty())                                                                          push_back(P);
-    else if(size() == 1 && (x == back().first || y == back().second) )                   push_back(P);
-    else if(size() == 1 && (x == front().first || y == front().second) )                 push_front(P);
-    else if(size() >= 2 && x == back().first && back().second == (++rbegin())->second)   push_back(P);
-    else if(size() >= 2 && x == back().first && back().first == (++rbegin())->first)     back() = P;
-    else if(size() >= 2 && y == back().second && back().first == (++rbegin())->first)    push_back(P);
-    else if(size() >= 2 && y == back().second && back().second == (++rbegin())->second)  back() = P;
-    else if(size() >= 2 && x == front().first && front().second == (++begin())->second)  push_front(P);
-    else if(size() >= 2 && x == front().first && front().first == (++begin())->first)    front() = P;
-    else if(size() >= 2 && y == front().second && front().first == (++begin())->first)   push_front(P);
-    else if(size() >= 2 && y == front().second && front().second == (++begin())->second) front() = P;
-    else        return false;
+    if(empty())                                                                          push_back( {x, y} );
+    else if(size() == 1 && (x == back().first || y == back().second) )                   push_back( {x, y} );  //senza questo crasha
+    //else if(size() == 1 && (x == front().first || y == front().second) )                 push_front( {x, y} );
+    else if(size() >= 2 && x == back().first && back().second == (++rbegin())->second)   push_back( {x, y} );  //senza questo crasha
+    else if(size() >= 2 && x == back().first && back().first == (++rbegin())->first)     back() = {x, y};      //chissu cujunija
+    else if(size() >= 2 && y == back().second && back().first == (++rbegin())->first)    push_back( {x, y} );  //chissu cujunija
+    else if(size() >= 2 && y == back().second && back().second == (++rbegin())->second)  back() = {x, y};      //chissu cujunija
+    //else if(size() >= 2 && x == front().first && front().second == (++begin())->second)  push_front( {x, y} );
+    //else if(size() >= 2 && x == front().first && front().first == (++begin())->first)    front() = {x, y};
+    //else if(size() >= 2 && y == front().second && front().first == (++begin())->first)   push_front( {x, y} );
+    //else if(size() >= 2 && y == front().second && front().second == (++begin())->second) front() = {x, y};
+    //else        return false;
     return true;
 }
 /*
@@ -109,7 +109,9 @@
      if(buffer!=nullptr)
     {
         al_set_target_bitmap(buffer);
-         for(auto it{ begin() }; it != end(); ++it)
+        for(auto it{ begin() }; it != end(); ++it)
+         if(successor(it)!=end() || (successor(it)==end() &&
+            (it->first == successor(it)->first || it->second == successor(it)->second)))    
         {
             if(it->first == successor(it)->first)
                 al_draw_line(it->first, min(it->second, successor(it)->second)-5,
@@ -151,8 +153,9 @@
 */
  bool Level::update() //fixare i nomi delle variabili
 {
-    if(trace.size() > 0)
-     if(trace.push(Player->getData().c[0], Player->getData().c[1]) && border.is_adj(trace.back().first, trace.back().second, 10, 10) )
+     if(trace.size() > 1 && 
+        trace.push(Player->getData().c[0], Player->getData().c[1]) &&
+        border.is_adj(trace.back().first, trace.back().second) )
     {
         if(insideTrace(Boss->getData()) )
             for(auto& i : border)
@@ -165,8 +168,10 @@
         trace.clear();
         return true;
     }
-    else
-        trace.push(Player->getData().c[0], Player->getData().c[1]);
+     else if(!trace.empty() ||
+             (trace.empty() && 
+              border.is_adj(Player->getData().c[0], Player->getData().c[1])))
+        trace.push( Player->getData().c[0], Player->getData().c[1] );
 
     return false;
 }
