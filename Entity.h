@@ -124,6 +124,8 @@ enum KEYS : int {still=0, UP=1, LEFT=2, DOWN=3, RIGHT=4, SPACE=5};
     //quali qualità posso ricavare da EntityData?   
 };
 
+class GameList;
+
  class Entity
 {
     protected:
@@ -137,7 +139,8 @@ enum KEYS : int {still=0, UP=1, LEFT=2, DOWN=3, RIGHT=4, SPACE=5};
 
         virtual ~Entity() {};
 
-        virtual void update(int argc, bool argf) = 0;
+        virtual void update(const GameList&) = 0;    
+        //virtual void move(int set) = 0;
 
         const ALLEGRO_BITMAP *getBitmap() const { return image; }
         ALLEGRO_BITMAP *getBitmap()             { return image; }
