@@ -196,7 +196,7 @@
             //STOP = !poly.insideBorder(entities[0]->getData()); //SOLO TEMPORANEO
 
             //player routines
-            player.update(player.getKey(), hitsBorder(playa->getData()) );
+            player.update(getBorder());
 
             //minions routines
             for(unsigned i=2; i < entities.size(); ++i) //Pasta fresca
@@ -205,7 +205,7 @@
                 int  param1{ hitsBorder(entities[i]->getData()) };
                 bool param2{ state_changed ? insideBorder(entities[i]->getData()) : true };
                 
-                entities[i]->update(param1, param2);
+                entities[i]->update(getBorder());
             } //Gnocchi
             
             //boss routines
