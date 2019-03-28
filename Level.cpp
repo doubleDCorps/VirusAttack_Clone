@@ -147,7 +147,7 @@
     return area;
 }
 
- int Level::update()
+ void Level::loop()
 {
     GameList border = defPerimeter;
     GameList trace;
@@ -192,18 +192,18 @@
          else if(ev.type == ALLEGRO_EVENT_TIMER)
         {
             //condizioni di uscita
-            STOP = (poly.getArea()/2500 <= 30) or (!entities[0]->isAlive());
+            STOP = (getArea()/2500 <= 30) or (!entities[0]->isAlive());
             //STOP = !poly.insideBorder(entities[0]->getData()); //SOLO TEMPORANEO
 
             //player routines
-            player.update(player.getKey(), poly.hitsBorder(playa->getData()) );
+            player.update(player.getKey(), hitsBorder(playa->getData()) );
 
             //minions routines
             for(unsigned i=2; i < entities.size(); ++i) //Pasta fresca
              if(entities[i]->isAlive())
             {
-                int  param1{ poly.hitsBorder(entities[i]->getData()) };
-                bool param2{ state_changed ? poly.insideBorder(entities[i]->getData()) : true };
+                int  param1{ hitsBorder(entities[i]->getData()) };
+                bool param2{ state_changed ? insideBorder(entities[i]->getData()) : true };
                 
                 entities[i]->update(param1, param2);
             } //Gnocchi
@@ -212,8 +212,8 @@
             spawn_time++;
              if((spawn_time<300 or spawn_time>420) and (spawn_time<2101 or spawn_time>2221))
             {
-                int  param1{ poly.hitsBorder(entities[1]->getData()) };
-                bool param2{ state_changed ? poly.insideBorder(entities[1]->getData()) : true };
+                int  param1{ hitsBorder(entities[1]->getData()) };
+                bool param2{ state_changed ? insideBorder(entities[1]->getData()) : true };
 
                 entities[1]->update(param1, param2);
             }
@@ -224,7 +224,7 @@
                     spawn_time=360;
             }
 
-            //state_changed = poly.update(); //DA FIXARE
+            //state_changed = update(); //DA FIXARE
             redraw = true;
         }
          else if(ev.type == ALLEGRO_EVENT_KEY_DOWN && ev.keyboard.keycode == ALLEGRO_KEY_ESCAPE)
@@ -244,8 +244,8 @@
                     al_draw_bitmap(it->getBitmap(), it->getCord_x(), it->getCord_y(), 0);
 
             //ok
-            poly.printTrace(al_get_backbuffer(display));
-            poly.printBorder(al_get_backbuffer(display));
+            printTrace(al_get_backbuffer(display));
+            printBorder(al_get_backbuffer(display));
             
             al_flip_display();
         }

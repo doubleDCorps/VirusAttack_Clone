@@ -2,11 +2,11 @@
 #define POLY_HPP_
 #include"Entities.h"
 
- void defPerInit(ALLEGRO_DISPLAY_MODE d)
+ initializer_list<perimeter> defPerInit(ALLEGRO_DISPLAY_MODE d)
 {
     int x{ d.width/2  - 500/2 }, y{ d.height/2 - 500/2 };
 
-    defPerimeter = {
+    return {
         {x      , y      },
         {x + 500, y      },
         {x + 500, y + 500},
@@ -135,9 +135,12 @@
  class Level
 {
     public:
-        Level(): border(), trace(), Boss(nullptr), Player(nullptr) {}
-        Level(const perimeter& b, const Entity* P=nullptr, const Entity* B=nullptr)
-            : border(b), trace(), Boss(B), Player(P) {}     
+        Level(unsigned diff, ALLEGRO_DISPLAY_MODE mod): difficulty(diff), defPerimeter(defPerInit(mod))
+        { 
+            /*inizializza numBosses*/
+        }
+        //Level(): border(), trace(), Boss(nullptr), Player(nullptr) {}
+        //Level(const perimeter& b, const Entity* P=nullptr, const Entity* B=nullptr): border(b), trace(), Boss(B), Player(P) {}     
 
         //se si sposta il gameLoop in Level::update, le funzioni qui sotto potrebbero passare a private:
 
@@ -154,16 +157,15 @@
         
         //
 
-        bool update();
+        void loop();
         void clear() { trace.clear(); }
         int getArea() const;
     
     private:
-        GameList border;
-        GameList trace;
-        const Entity* Boss;
-        const Entity* Player;
+        unsigned difficulty;
         static perimeter defPerimeter;
+        unsigned numBosses;
+        //
 };
 
 #endif
