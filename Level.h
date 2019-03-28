@@ -16,11 +16,16 @@
     friend Level;
 
     public:
-        GameList(const list<PointData>& p = {}) { for(auto& i : p) push(i); }
-        bool push(const PointData& );
-        bool is_adj(const HitboxData& ) const;
-        AXIS hits(const EntityData& ) const;
-        bool inside(const HitboxData& ) const;
+        GameList(const list<PointData>& p = {}) { for(auto& i : p) push(i.first, i.second); }
+        
+        bool pushPoint(const PointData&);
+        bool onEdge(const HitboxData&) const;
+        bool inArea(const HitboxData&) const;
+
+        AXIS collides(const EntityData&) const;     //implementata utilizzando onEdge()
+        bool o_inside(const HitboxData&) const;     //implementata utilizzando onEdge() e inArea()
+        bool c_inside(const HitboxData&) const;     //implementata utilizzando onEdge() e inArea()
+
         void print(ALLEGRO_BITMAP* buffer=nullptr) const;
 
     private:

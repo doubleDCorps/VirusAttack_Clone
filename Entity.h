@@ -47,7 +47,7 @@ enum KEYS : int {still=0, UP=1, LEFT=2, DOWN=3, RIGHT=4, SPACE=5};
 */
  class PointData
 {
-    private:
+    protected:
         float p[2];
 
     public:
@@ -62,11 +62,12 @@ enum KEYS : int {still=0, UP=1, LEFT=2, DOWN=3, RIGHT=4, SPACE=5};
 
         bool operator==(const PointData& P) const { return abs(p[0] - P.p[0])<EPS && abs(p[1] - P.p[1])<EPS; }
         bool operator!=(const PointData& P) const { return !(*this == P); }
+        bool collinear(const PointData& P) const  { return abs(p[0] - P.p[0])<EPS || abs(p[1] - P.p[1])<EPS; }
 };
 
  class HitboxData: public PointData
 {
-    private: 
+    protected: 
         float c[2];
     
     public:
@@ -79,24 +80,25 @@ enum KEYS : int {still=0, UP=1, LEFT=2, DOWN=3, RIGHT=4, SPACE=5};
         void dx(float x) { c[0] = x > 0 ? x : 0; }
         void dy(float y) { c[1] = y > 0 ? y : 0; }
 
-        PointData pointNW() const { return {x()       , y()       }; }
-        PointData pointNE() const { return {x()+c[0]  , y()       }; }
-        PointData pointSE() const { return {x()+c[0]  , y()+c[1]  }; }
-        PointData pointSW() const { return {x()       , y()+c[1]  }; }
-        PointData pointCC() const { return {x()+c[0]/2, y()+c[1]/2}; }
-
-         bool collides(const HitboxData& D)
+        PointData pointNW() const { return {p[0]       , p[1]       }; }
+        PointData pointNE() const { return {p[0]+c[0]  , p[1]       }; }
+        PointData pointSE() const { return {p[0]+c[0]  , p[1]+c[1]  }; }
+        PointData pointSW() const { return {p[0]       , p[1]+c[1]  }; }
+        PointData pointCC() const { return {p[0]+c[0]/2, p[1]+c[1]/2}; }
+        /*
+         bool collision(const HitboxData& D)
         {
             return
-                (in_range( x()         , D.x(), D.x()+D.c[0] ) || 
-                 in_range( x()+c[0]    , D.x(), D.x()+D.c[0] ) ||
-                 in_range( D.x()       , x()  , x()+c[0]     ) || 
-                 in_range( D.x()+D.c[0], x()  , x()+c[0]     )  )
-             && (in_range( y()         , D.y(), D.y()+D.c[1] ) || 
-                 in_range( y()+c[1]    , D.y(), D.y()+D.c[1] ) ||
-                 in_range( D.y()       , y()  , y()+c[1]     ) || 
-                 in_range( D.y()+D.c[1], y()  , y()+c[1]     )  );
+                (in_range( p[0]         , D.p[0], D.p[0]+D.c[0] ) || 
+                 in_range( p[0]+c[0]    , D.p[0], D.p[0]+D.c[0] ) ||
+                 in_range( D.p[0]       , p[0]  , p[0]+c[0]     ) || 
+                 in_range( D.p[0]+D.c[0], p[0]  , p[0]+c[0]     )  )
+             && (in_range( p[1]         , D.p[1], D.p[1]+D.c[1] ) || 
+                 in_range( p[1]+c[1]    , D.p[1], D.p[1]+D.c[1] ) ||
+                 in_range( D.p[0]       , p[1]  , p[1]+c[1]     ) || 
+                 in_range( D.p[1]+D.c[1], p[1]  , p[1]+c[1]     )  );
         }
+        */
 };
 
  class EntityData: public HitboxData
@@ -114,10 +116,10 @@ enum KEYS : int {still=0, UP=1, LEFT=2, DOWN=3, RIGHT=4, SPACE=5};
         void vx(float x) { v[0] = x > 0 ? x : 0; }
         void vy(float y) { v[1] = y > 0 ? y : 0; }
 
-        PointData leftProj() const  { return {x()-v[0], y()     }; }
-        PointData rightProj() const { return {x()+v[0], y()     }; }
-        PointData upProj() const    { return {x()     , y()-v[1]}; }
-        PointData downProj() const  { return {x()     , y()+v[1]}; }
+        PointData projL() const { return {p[0]-v[0], p[1]     }; }
+        PointData projR() const { return {p[0]+v[0], p[1]     }; }
+        PointData projU() const { return {p[0]     , p[1]-v[1]}; }
+        PointData projD() const { return {p[0]     , p[1]+v[1]}; }
         
     //quali qualità posso ricavare da EntityData?   
 };
