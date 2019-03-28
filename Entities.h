@@ -71,7 +71,7 @@ class Player: public Entity
             if(index.find(k) != index.end()) 
                 return keys[index.find(k)->second];
 
-            return -1; //ERRORE ERRORE ERRORE
+            return -1;
         }
 };
 

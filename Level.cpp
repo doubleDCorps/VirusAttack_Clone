@@ -146,32 +146,116 @@
 
     return area;
 }
-/*
-    Aggiorna automaticamente la traccia all'ultima posizione nota del giocatore;
-    se l'ultimo elemento della traccia è allineato con border, si aggiorna la lista border
-    in base alla posizione del Boss.
-*/
- bool Level::update() //fixare i nomi delle variabili
+
+ void Level::loop()
 {
-     if(trace.size() > 1 && 
-        trace.push(Player->getData().c[0], Player->getData().c[1]) &&
-        border.is_adj(trace.back().first, trace.back().second) )
+    GameList border = defPerimeter;
+    GameList trace;
+    vector<Entity*> enemies;
+    Player player;
+    
+    ALLEGRO_TIMER *timer = al_create_timer(1.0/disp_data.refresh_rate);
+     if(!timer)
+        return -1;
+
+    ALLEGRO_EVENT_QUEUE *coda_eventi = al_create_event_queue();
+     if(!coda_eventi) 
     {
-        if(insideTrace(Boss->getData()) )
-            for(auto& i : border)
-             if(trace.inside(i.first, i.second))  trace.push(i.first, i.second);
-        else
-            for(auto& i : border)
-             if(!trace.inside(i.first, i.second)) trace.push(i.first, i.second);
-
-        border=trace;
-        trace.clear();
-        return true;
+        al_destroy_display(display);
+        al_destroy_timer(timer); 
+        return -1; 
     }
-     else if(!trace.empty() ||
-             (trace.empty() && 
-              border.is_adj(Player->getData().c[0], Player->getData().c[1])))
-        trace.push( Player->getData().c[0], Player->getData().c[1] );
 
-    return false;
+    entities_init(player, entities);
+    
+    al_set_target_bitmap(al_get_backbuffer(display));
+    al_clear_to_color(al_map_rgb(255, 255, 255));
+
+    bool redraw {true};
+    bool STOP {false};
+    bool state_changed{true};
+    bool first_spawn{true};
+    int spawn_time{0};
+
+    al_register_event_source(coda_eventi, al_get_display_event_source(display));
+    al_register_event_source(coda_eventi, al_get_timer_event_source(timer)); //Fusilli
+    al_register_event_source(coda_eventi, al_get_keyboard_event_source());
+    al_start_timer(timer);
+
+     while(!STOP)
+    {
+        ALLEGRO_EVENT ev;
+        al_wait_for_event(coda_eventi, &ev);
+
+        if(ev.type == ALLEGRO_EVENT_DISPLAY_CLOSE)
+            STOP = true;
+         else if(ev.type == ALLEGRO_EVENT_TIMER)
+        {
+            //condizioni di uscita
+            STOP = (getArea()/2500 <= 30) or (!entities[0]->isAlive());
+            //STOP = !poly.insideBorder(entities[0]->getData()); //SOLO TEMPORANEO
+
+            //player routines
+            player.update(player.getKey(), hitsBorder(playa->getData()) );
+
+            //minions routines
+            for(unsigned i=2; i < entities.size(); ++i) //Pasta fresca
+             if(entities[i]->isAlive())
+            {
+                int  param1{ hitsBorder(entities[i]->getData()) };
+                bool param2{ state_changed ? insideBorder(entities[i]->getData()) : true };
+                
+                entities[i]->update(param1, param2);
+            } //Gnocchi
+            
+            //boss routines
+            spawn_time++;
+             if((spawn_time<300 or spawn_time>420) and (spawn_time<2101 or spawn_time>2221))
+            {
+                int  param1{ hitsBorder(entities[1]->getData()) };
+                bool param2{ state_changed ? insideBorder(entities[1]->getData()) : true };
+
+                entities[1]->update(param1, param2);
+            }
+             if(spawn_time==360 or spawn_time==2161)
+            {
+                spawn(entities);
+                if(spawn_time!=360)
+                    spawn_time=360;
+            }
+
+            //state_changed = update(); //DA FIXARE
+            redraw = true;
+        }
+         else if(ev.type == ALLEGRO_EVENT_KEY_DOWN && ev.keyboard.keycode == ALLEGRO_KEY_ESCAPE)
+                    STOP = true;
+         else if(ev.type == ALLEGRO_EVENT_KEY_DOWN || ev.type == ALLEGRO_EVENT_KEY_UP)
+                playa->setKey(ev.keyboard.keycode, ev.type);
+        
+         if(redraw and al_is_event_queue_empty(coda_eventi) )
+        {
+            redraw = false;
+
+            al_clear_to_color(al_map_rgb(255, 255, 255));
+
+            //redo this prints
+            for(auto& it : entities)
+                if(it->isAlive())
+                    al_draw_bitmap(it->getBitmap(), it->getCord_x(), it->getCord_y(), 0);
+
+            //ok
+            printTrace(al_get_backbuffer(display));
+            printBorder(al_get_backbuffer(display));
+            
+            al_flip_display();
+        }
+    }
+
+     for(int i{}; i<entities.size(); ++i)
+    {
+        al_destroy_bitmap(entities[i]->getBitmap());
+        delete entities[i];
+    }
+
+    al_destroy_event_queue(coda_eventi);
 }
