@@ -174,8 +174,8 @@
     bool redraw {true};
     bool STOP {false};
     bool state_changed{true};
-    int spawn_time{0};
     bool first_spawn{true};
+    int spawn_time{0};
 
     al_register_event_source(coda_eventi, al_get_display_event_source(display));
     al_register_event_source(coda_eventi, al_get_timer_event_source(timer)); //Fusilli
