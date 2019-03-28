@@ -234,8 +234,6 @@ void spawn(vector<Entity*>&);
         }
     }
 
-    cout << playa->keys[0] << ' ' << playa->keys[1] << '\n';
-    
      for(int i{}; i<entities.size(); ++i)
     {
         al_destroy_bitmap(entities[i]->getBitmap());
