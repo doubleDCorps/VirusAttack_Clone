@@ -24,9 +24,7 @@
         return -1;
     }
     
-    Level level(1, disp_data);
-
-    level.loop();
+    level(display, timer);
 
     al_destroy_display(display);
     al_destroy_timer(timer);
