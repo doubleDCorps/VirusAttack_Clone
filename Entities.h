@@ -26,10 +26,10 @@ class Player: public Entity
 {
     private:
         int directions[4] = {1, 1, 1, 1};
+        KEYS keys[2] = {still, still};
         bool safe = true;
 
     public:
-        KEYS keys[2] = {still, still};
         Player(float x=0, float y=0, ALLEGRO_BITMAP* p=nullptr)
             : Entity(x, y, 4, 4, p, 4) {}
         
@@ -38,13 +38,19 @@ class Player: public Entity
         bool isSafe() const  { return safe; }
         void setSafe(bool k) { safe = k; }
 
+        /*
+            Salva l'ultimo tasto premuto in memoria per eseguire l'aggiornamento del movimento;
+            nel caso in cui più tasti vengono premuti, si dà priorità esclusivamente all'ultimo.
+        */
          void setKey(int key, ALLEGRO_EVENT_TYPE type)
         { 
             int temp;
-            if(type == ALLEGRO_EVENT_KEY_DOWN)
-                temp = keymap.find(key) != keymap.end() ? keymap.find(key)->second : keys[0];
-            else if(type == ALLEGRO_EVENT_KEY_UP)
-                temp = keymap.find(key) != keymap.end() ? still : keys[0];
+            if(type == ALLEGRO_EVENT_KEY_DOWN && keymap.find(key)->second != keys[0])
+                temp = keymap.find(key) != keymap.end() ? 
+                            keymap.find(key)->second : keys[0];
+            else if(type == ALLEGRO_EVENT_KEY_UP && keymap.find(key)->second == keys[0])
+                temp = keymap.find(key) != keymap.end() ? 
+                            still : keys[0];
             else 
                 return; //ERRORE ERRORE ERRORE
 
