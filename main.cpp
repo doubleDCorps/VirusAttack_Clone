@@ -3,6 +3,9 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+static perimeter defPerimeter;
+
+void defPerInit(ALLEGRO_DISPLAY_MODE);
 void enemy_init(vector<Entity*>&);
 void level(ALLEGRO_DISPLAY*, ALLEGRO_TIMER*);
 void spawn(vector<Entity*>&);
@@ -24,6 +27,8 @@ void push_reverse_way(int&, vector<pair<int, int>>&, int&);
     }
     al_set_new_display_flags(ALLEGRO_WINDOWED);
     
+    defPerInit(disp_data);
+
     ALLEGRO_TIMER *timer = al_create_timer(1.0/disp_data.refresh_rate);
      if(!timer)
         return -1;
@@ -45,10 +50,23 @@ void push_reverse_way(int&, vector<pair<int, int>>&, int&);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+ void defPerInit(ALLEGRO_DISPLAY_MODE d)
+{
+    int x{ d.width/2  - 500/2 }, y{ d.height/2 - 500/2 };
+
+    defPerimeter = {
+        {x      , y      },
+        {x + 500, y      },
+        {x + 500, y + 500},
+        {x      , y + 500}
+    };
+}
+
  void entities_init(vector<Entity*>& entities)
 {
-    entities.push_back(new Player{275, 70, 4, al_create_bitmap(30,30)});                                        //PLAYER
-    entities.push_back(new Enemy{float(800)/2-30/2, float(600)/2-30/2, -0.2, -1.0, al_create_bitmap(30,30)});   //BOSS 
+    entities.push_back(new Player{275, 70, al_create_bitmap(30,30)});                                        //PLAYER
+    entities.push_back(new Enemy{float(800)/2-30/2, float(600)/2-30/2, -4.0, -4.0, al_create_bitmap(30,30)});   //BOSS 
+    
     for(unsigned i=0; i<12; ++i)
         entities.push_back(new Enemy{float(800)/2-30/2, float(600)/2-30/2, 0, 0, al_create_bitmap(30,30)});     //MINIONS
 
@@ -128,19 +146,15 @@ void push_reverse_way(int&, vector<pair<int, int>>&, int&);
 
     vector<Entity*> entities;
     entities_init(entities);
-    
+    Player* playa = dynamic_cast<Player*>(entities[0]);
+
     al_set_target_bitmap(al_get_backbuffer(display));
     al_clear_to_color(al_map_rgb(255, 255, 255));
 
-    //si può implementare un inizializzazione parametrica, fissando le dimensioni a 500x500 e sfruttando ALLEGRO_DISPLAY_DATA?
-    perimeter p{ {50, 25}, {550, 25}, {550, 525}, {50, 525} };
-
-    Level poly(p, entities[0], entities[1]);
+    Level poly(defPerimeter, entities[0], entities[1]);
 
     bool redraw {true};
     bool STOP {false};
-    int w{ 500 };
-    int h{ 500 };
     bool space {false};
     KEYS key{still};
     bool state_changed{true};
@@ -166,10 +180,11 @@ void push_reverse_way(int&, vector<pair<int, int>>&, int&);
          else if(ev.type == ALLEGRO_EVENT_TIMER)
         {
             //condizioni di uscita
-            STOP = (poly.getArea()*100/(w*h) <= 30) or (!entities[0]->isAlive());
-            
+            STOP = (poly.getArea()/2500 <= 30) or (!entities[0]->isAlive());
+            //STOP = !poly.insideBorder(entities[0]->getData()); //SOLO TEMPORANEO
+
             //player routines
-            entities[0]->update( space ? key : 0, poly.hitsBorder(entities[0]->getData()) );
+            playa->update(0, poly.hitsBorder(playa->getData()) );
 
             //minions routines
             for(unsigned i=2; i < entities.size(); ++i)
@@ -197,7 +212,7 @@ void push_reverse_way(int&, vector<pair<int, int>>&, int&);
                     spawn_time=360;
             }
 
-            state_changed = poly.update();
+            //state_changed = poly.update(); //DA FIXARE
             redraw = true;
 
 

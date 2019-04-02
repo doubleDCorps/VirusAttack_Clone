@@ -3,30 +3,30 @@
 /*
     Se il punto p rispetta le condizioni di ordinamento, viene aggiunto alla fine o all'inizio
     della lista e viene restituito true; altrimenti viene restituito false.
-*/
- bool GameList::push(int x, int y)
+*///DA RIFARE SU POINTDATA BRANCH
+ bool GameList::push(const PointData& P) //fixare i nomi delle variabili
 {
     if(empty())                                                                          push_back( {x, y} );
-    else if(size() == 1 && (x == back().first || y == back().second) )                   push_back( {x, y} );
-    else if(size() == 1 && (x == front().first || y == front().second) )                 push_front( {x, y} );
-    else if(size() >= 2 && x == back().first && back().second == (++rbegin())->second)   push_back( {x, y} );
-    else if(size() >= 2 && x == back().first && back().first == (++rbegin())->first)     back() = {x, y};
-    else if(size() >= 2 && y == back().second && back().first == (++rbegin())->first)    push_back( {x, y} );
-    else if(size() >= 2 && y == back().second && back().second == (++rbegin())->second)  back() = {x, y};
-    else if(size() >= 2 && x == front().first && front().second == (++begin())->second)  push_front( {x, y} );
-    else if(size() >= 2 && x == front().first && front().first == (++begin())->first)    front() = {x, y};
-    else if(size() >= 2 && y == front().second && front().first == (++begin())->first)   push_front( {x, y} );
-    else if(size() >= 2 && y == front().second && front().second == (++begin())->second) front() = {x, y};
-    else        return false;
+    else if(size() == 1 && (x == back().first || y == back().second) )                   push_back( {x, y} );  //senza questo crasha
+    //else if(size() == 1 && (x == front().first || y == front().second) )                 push_front( {x, y} );
+    else if(size() >= 2 && x == back().first && back().second == (++rbegin())->second)   push_back( {x, y} );  //senza questo crasha
+    else if(size() >= 2 && x == back().first && back().first == (++rbegin())->first)     back() = {x, y};      //chissu cujunija
+    else if(size() >= 2 && y == back().second && back().first == (++rbegin())->first)    push_back( {x, y} );  //chissu cujunija
+    else if(size() >= 2 && y == back().second && back().second == (++rbegin())->second)  back() = {x, y};      //chissu cujunija
+    //else if(size() >= 2 && x == front().first && front().second == (++begin())->second)  push_front( {x, y} );
+    //else if(size() >= 2 && x == front().first && front().first == (++begin())->first)    front() = {x, y};
+    //else if(size() >= 2 && y == front().second && front().first == (++begin())->first)   push_front( {x, y} );
+    //else if(size() >= 2 && y == front().second && front().second == (++begin())->second) front() = {x, y};
+    //else        return false;
     return true;
 }
 /*
     Data una coppia di coordinate p, verifica se esiste una coppia di elementi della lista tali che il punto ricada nel
     segmento che li connette. 
 */
- bool GameList::is_adj(int x, int y, int w, int h) const
+ bool GameList::is_adj(const HitboxData& P) const //fixare i nomi delle variabili
 {
-    for(auto it{ begin() }; it!=end(); ++it)
+    for(auto it{ begin() }; it != end(); ++it)
      if(hitbox(x, y, x+w, y+h, it->first, it->second, successor(it)->first, successor(it)->second) )
         return true;
     return false;
@@ -38,7 +38,7 @@
     segmento; se la collisione avviene, si restituisce una variabile che riconosce lungo quale
     asse è avvenuto la collisione (X o Y), altrimenti lo stato "none" (euqivalente a false).
 */
- AXIS GameList::hits(int x1, int y1, int w1, int h1, int vx, int vy) const
+ AXIS GameList::hits(const EntityData& P) const //fixare i nomi delle variabili
 {
     if(empty()) return none;
 
@@ -48,14 +48,22 @@
         int x2{ it->first }, x3{ successor(it)->first };
         int y2{ it->second }, y3{ successor(it)->second };
 
-        if(x2 != x3 &&                                                   // il segmento è orizzontale
-          (vy>=0 && y2-(2*y1+h1)/2 > 0 || vy<=0 && y2-(2*y1+h1)/2 < 0)   // la velocità e la distanza hanno segno concorde (con uno scarto di sicurezza)
-           && hitbox(x1, y1, x1+w1, y1+h1, x2, y2, x3, y2+14) )          // verifica se avviene una collisione fra le hitbox
+        // il segmento è orizzontale
+        // la velocità e la distanza hanno segno concorde (con uno scarto di sicurezza)
+        // verifica se avviene una collisione fra le hitbox
+
+        if(x2 != x3 &&
+          (vy>=0 && y2-y1-h1/2 > 0 && hitbox(x1, y1, x1+w1, y1+h1, x2, y2, x3, y2+14))
+        ||(vy<=0 && y2-y1-h1/2 < 0 && hitbox(x1, y1, x1+w1, y1+h1, x2, y2, x3, y2-14)))
             return Y;
         
-        if(y2 != y3 &&                                                   // il segmento è verticale
-          (vx>=0 && x2-(2*x1+w1)/2 > 0 || vx<=0 && x2-(2*x1+w1)/2 < 0)   // la velocità e la distanza hanno segno concorde (con uno scarto di sicurezza)
-           && hitbox(x1, y1, x1+w1, y1+h1, x2, y2, x2+14, y3) )          // verifica se avviene una collisione fra le hitbox
+        // il segmento è verticale
+        // la velocità e la distanza hanno segno concorde (con uno scarto di sicurezza)
+        // verifica se avviene una collisione fra le hitbox
+
+        if(y2 != y3 &&                                                   
+          (vx>=0 && x2-x1-w1/2 > 0 && hitbox(x1, y1, x1+w1, y1+h1, x2, y2, x2+14, y3))
+        ||(vx<=0 && x2-x1-w1/2 < 0 && hitbox(x1, y1, x1+w1, y1+h1, x2, y2, x2-14, y3)))          
             return X;
     }
     
@@ -69,7 +77,7 @@
     possiede segno "negativo" o "positivo", associando le aree positive a quelle interne al poligono
     e quelle negative alle aree esterne al poligono.
 */
- bool GameList::inside(int x, int y, int w, int h) const
+ bool GameList::inside(const HitboxData& P) const //fixare i nomi delle variabili
 {
     if(empty()) return true;
 
@@ -80,28 +88,30 @@
         int y1{ it->second };
         int y2{ successor(it)->second };
 
-         if(y2-y1 != 0 && hitbox(x, y, x+w, y+h, 0, min(y1, y2), it->first, max(y1, y2) ) )
+         if(y2-y1!=0 && hitbox(x, y, x+w, y+h, 0, min(y1, y2), it->first, max(y1, y2)) )
         {
             if(y2-y1 < 0) --cont;
             if(y2-y1 > 0) ++cont;
         }
     }
 
-    return cont <= 0 ? false : true;
+    return !hits(x, y, w, h, 0, 0) && cont <= 0 ? false : true;
 }
 /*
     Dato un bitmap da trattare come buffer temporaneo, viene targettato per il disegno
     e viene poi successivamente disegnato il poligono rappresentato dalla lista manipolando
     l'immagine che fa da "font" per l'intero bordo.
 */
- void GameList::print(ALLEGRO_BITMAP* buffer) const
+ void GameList::print(ALLEGRO_BITMAP* buffer) const //fixare i nomi delle variabili
 {
     if(empty()) return;
 
      if(buffer!=nullptr)
     {
         al_set_target_bitmap(buffer);
-         for(auto it{ begin() }; it != end(); ++it)
+        for(auto it{ begin() }; it != end(); ++it)
+         if(successor(it)!=end() || (successor(it)==end() &&
+            (it->first == successor(it)->first || it->second == successor(it)->second)))    
         {
             if(it->first == successor(it)->first)
                 al_draw_line(it->first, min(it->second, successor(it)->second)-5,
@@ -124,7 +134,7 @@
     alla figura descritta (positiva) o altrimenti (negatva).
     La somma viene poi dimezzata per ottenere il valore numerico corrispondente all'area del poligono.
 */
- int Level::getArea() const
+ int Level::getArea() const //fixare i nomi delle variabili
 {
     if(border.empty()) return -1;
 
@@ -141,24 +151,27 @@
     se l'ultimo elemento della traccia è allineato con border, si aggiorna la lista border
     in base alla posizione del Boss.
 */
- bool Level::update()
+ bool Level::update() //fixare i nomi delle variabili
 {
-    if(trace.size() > 0)
-     if(trace.push(Player->getData().c[0], Player->getData().c[1]) && border.is_adj(trace.back().first, trace.back().second, 10, 10) )
+     if(trace.size() > 1 && 
+        trace.push(Player->getData().c[0], Player->getData().c[1]) &&
+        border.is_adj(trace.back().first, trace.back().second) )
     {
         if(insideTrace(Boss->getData()) )
-            for(auto i : border)
+            for(auto& i : border)
              if(trace.inside(i.first, i.second))  trace.push(i.first, i.second);
         else
-            for(auto i : border)
+            for(auto& i : border)
              if(!trace.inside(i.first, i.second)) trace.push(i.first, i.second);
 
         border=trace;
         trace.clear();
         return true;
     }
-    else
-        trace.push(Player->getData().c[0], Player->getData().c[1]);
+     else if(!trace.empty() ||
+             (trace.empty() && 
+              border.is_adj(Player->getData().c[0], Player->getData().c[1])))
+        trace.push( Player->getData().c[0], Player->getData().c[1] );
 
     return false;
 }

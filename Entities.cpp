@@ -18,30 +18,43 @@
         setAlive(false);
 }
 
-//forse si creano conflitti con l'implementazione delle collisioni?
+
  void Player::update(int argc, bool argf)
 {
-    //if((position != k && is_safe) || !is_safe)
+    //TO DO
+    if(keys[1] != 0){
+     if(keys[0] == LEFT || keys[0] == RIGHT)
     {
-         if(argc == LEFT || argc == RIGHT)
-        {
-            if(argc == LEFT && data.v[0] > 0 ||
-               argc == RIGHT && data.v[0] < 0 )
-                data.v[0] = -data.v[0];
+        if(keys[0] == LEFT && data.v[0] > 0 ||
+           keys[0] == RIGHT && data.v[0] < 0 )
+            data.v[0] = -data.v[0];
             
-            data.c[0] += data.v[0];
-        }
-         else if(argc == UP || argc == DOWN)
-        {
-            if(argc == UP && data.v[1] > 0 || 
-               argc == DOWN && data.v[1] < 0 )
-                data.v[1] = -data.v[1];
-            
-            data.c[1] += data.v[1];
-        }
-
-        //if(is_safe && k%2 == position%2 && k != position)
-        //    is_safe = false;
+        data.c[0] += data.v[0];
     }
- 
+     else if(keys[0] == UP || keys[0] == DOWN)
+    {
+        if(keys[0] == UP && data.v[1] > 0 || 
+           keys[0] == DOWN && data.v[1] < 0 )
+            data.v[1] = -data.v[1];
+            
+        data.c[1] += data.v[1];
+    
+    }}
+
+    return;
+
+     if(argc != still)
+    {
+         if(argf) //se è avvenuta una collisione nella precedente direzione del player
+        {
+            //KEYS k = peek_in_PilaDiGena();
+            //directions[ k ] = false;
+            //directions[ k > 2 ? k - 2 : k + 2 ] = true;
+        }
+         else if(directions[argc])
+        {
+            data.v[ argc%2 ] *= pow(-1, (argc-1)/2 + 1);
+            data.c[ argc%2 ] += data.v[ argc%2 ];
+        }
+    }
 }
