@@ -6,6 +6,7 @@
 void enemy_init(vector<Entity*>&);
 void level(ALLEGRO_DISPLAY*, ALLEGRO_TIMER*);
 void spawn(vector<Entity*>&);
+void push_reverse_way(int&, vector<pair<int, int>>&, int&);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -145,9 +146,13 @@ void spawn(vector<Entity*>&);
     bool state_changed{true};
     int spawn_time{0};
     bool first_spawn{true};
+    int reverse_cont{0};
+    int pressed_key{0};
+    vector<pair<int, int>>reverse_way;
+    bool first_reverse_step{true};
 
     al_register_event_source(coda_eventi, al_get_display_event_source(display));
-    al_register_event_source(coda_eventi, al_get_timer_event_source(timer)); //Fusilli
+    al_register_event_source(coda_eventi, al_get_timer_event_source(timer));
     al_register_event_source(coda_eventi, al_get_keyboard_event_source());
     al_start_timer(timer);
 
@@ -167,15 +172,15 @@ void spawn(vector<Entity*>&);
             entities[0]->update( space ? key : 0, poly.hitsBorder(entities[0]->getData()) );
 
             //minions routines
-            for(unsigned i=2; i < entities.size(); ++i) //Pasta fresca
+            for(unsigned i=2; i < entities.size(); ++i)
              if(entities[i]->isAlive())
             {
                 int  param1{ poly.hitsBorder(entities[i]->getData()) };
                 bool param2{ state_changed ? poly.insideBorder(entities[i]->getData()) : true };
                 
                 entities[i]->update(param1, param2);
-            } //Gnocchi
-            
+            }
+
             //boss routines
             spawn_time++;
              if((spawn_time<300 or spawn_time>420) and (spawn_time<2101 or spawn_time>2221))
@@ -194,7 +199,63 @@ void spawn(vector<Entity*>&);
 
             state_changed = poly.update();
             redraw = true;
-        }
+
+
+            if(space) {
+                if((key == UP || key == DOWN || key == LEFT || key == RIGHT) && first_reverse_step) {
+                    first_reverse_step=false;
+                    pressed_key=key;
+                    }
+
+                if(key == UP && !first_reverse_step && pressed_key == UP)
+                    reverse_cont++;
+                else if(key == UP && !first_reverse_step && pressed_key != UP) {
+                    push_reverse_way(reverse_cont, reverse_way, pressed_key);
+                    pressed_key = UP;
+                    reverse_cont++;
+                    }
+                
+                if(key == DOWN && !first_reverse_step && pressed_key == DOWN)
+                    reverse_cont++;
+                else if(key == DOWN && !first_reverse_step && pressed_key != DOWN) {
+                    push_reverse_way(reverse_cont, reverse_way, pressed_key);
+                    pressed_key = DOWN;
+                    reverse_cont++;
+                    }
+
+                if(key == LEFT && !first_reverse_step && pressed_key == LEFT)
+                    reverse_cont++;
+                else if(key == LEFT && !first_reverse_step && pressed_key != LEFT) {
+                    push_reverse_way(reverse_cont, reverse_way, pressed_key);
+                    pressed_key = LEFT;
+                    reverse_cont++;
+                    }
+
+                if(key == RIGHT && !first_reverse_step && pressed_key == RIGHT)
+                    reverse_cont++;
+                else if(key == RIGHT && !first_reverse_step && pressed_key != RIGHT) {
+                    push_reverse_way(reverse_cont, reverse_way, pressed_key);
+                    pressed_key = RIGHT;
+                    reverse_cont++;
+                    }
+                }
+            else {
+                push_reverse_way(reverse_cont, reverse_way, pressed_key);
+                first_reverse_step=true;
+
+                if(reverse_way.size()!=0) { //ALGORITMO CAMMINO INVERSO
+                    if(reverse_way[reverse_way.size()-1].first>0)
+                        entities[0]->update(reverse_way[reverse_way.size()-1].second, true);
+
+                    reverse_way[reverse_way.size()-1].first--;
+                    if(reverse_way[reverse_way.size()-1].first==0) 
+                        reverse_way.pop_back();
+                    }
+                }
+
+        } //FINE ALLEGRO_EVENT_TIMER
+
+
          else if(ev.type == ALLEGRO_EVENT_KEY_DOWN)
          switch(ev.keyboard.keycode)
         {
@@ -215,7 +276,7 @@ void spawn(vector<Entity*>&);
             case ALLEGRO_KEY_RIGHT:  if(key == RIGHT) key = still; break;
             case ALLEGRO_KEY_SPACE:  space = false;                break;
         }
-         
+        
          if(redraw and al_is_event_queue_empty(coda_eventi) )
         {
             redraw = false;
@@ -237,7 +298,6 @@ void spawn(vector<Entity*>&);
 
      for(int i{}; i<entities.size(); ++i)
     {
-        cout << entities[i]->getVelocity_x() << ' ' << entities[i]->getVelocity_y() << endl;
         al_destroy_bitmap(entities[i]->getBitmap());
         delete entities[i];
     }
@@ -256,4 +316,19 @@ void spawn(vector<Entity*>&);
         entities[i]->setCord_x(entities[1]->getCord_x());
         entities[i]->setCord_y(entities[1]->getCord_y());
     }
+}
+
+void push_reverse_way(int &reverse_cont, vector<pair<int, int>> &reverse_way, int &pressed_key) {
+    if(reverse_cont!=0) {
+        if(pressed_key==1) //UP
+            reverse_way.push_back({reverse_cont, 3});
+        else if(pressed_key==2) //LEFT
+            reverse_way.push_back({reverse_cont, 4});
+        else if(pressed_key==3) //DOWN
+            reverse_way.push_back({reverse_cont, 1});
+        else if(pressed_key==4) //RIGHT
+            reverse_way.push_back({reverse_cont, 2});
+
+        reverse_cont=0;
+        }
 }

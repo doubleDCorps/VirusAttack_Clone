@@ -104,12 +104,12 @@
          for(auto it{ begin() }; it != end(); ++it)
         {
             if(it->first == successor(it)->first)
-                al_draw_line(it->first, min(it->second, successor(it)->second),
-                             it->first, max(it->second, successor(it)->second),
+                al_draw_line(it->first, min(it->second, successor(it)->second)-5,
+                             it->first, max(it->second, successor(it)->second)+5,
                              al_map_rgb(0, 0, 0), 10);
             else
-                al_draw_line(min(it->first, successor(it)->first), it->second,
-                             max(it->first, successor(it)->first), it->second, 
+                al_draw_line(min(it->first, successor(it)->first)-5, it->second,
+                             max(it->first, successor(it)->first)+5, it->second, 
                              al_map_rgb(0, 0, 0), 10);
         }
     }
