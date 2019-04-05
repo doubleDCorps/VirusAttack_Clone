@@ -143,22 +143,25 @@
 */
  bool Level::update()
 {
-    if(trace.size() > 0)
-     if(trace.push(Player->getData().c[0], Player->getData().c[1]) && border.is_adj(trace.back().first, trace.back().second, 10, 10) )
+     if(trace.size() > 1 && 
+        trace.push(Player->getData().c[0], Player->getData().c[1]) &&
+        border.is_adj(trace.back().first, trace.back().second) )
     {
         if(insideTrace(Boss->getData()) )
-            for(auto i : border)
+            for(auto& i : border)
              if(trace.inside(i.first, i.second))  trace.push(i.first, i.second);
         else
-            for(auto i : border)
+            for(auto& i : border)
              if(!trace.inside(i.first, i.second)) trace.push(i.first, i.second);
 
         border=trace;
         trace.clear();
         return true;
     }
-    else
-        trace.push(Player->getData().c[0], Player->getData().c[1]);
-
+     else if(!trace.empty() ||
+             (trace.empty() && 
+              border.is_adj(Player->getData().c[0], Player->getData().c[1])))
+        trace.push( Player->getData().c[0], Player->getData().c[1] );
+        
     return false;
 }
