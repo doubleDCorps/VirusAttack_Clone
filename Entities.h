@@ -3,30 +3,22 @@
 
 #include "Entity.h"
 
-
-static const map<int, int> index = {
-    {ALLEGRO_KEY_UP, 0},   {ALLEGRO_KEY_DOWN, 0},
-    {ALLEGRO_KEY_LEFT, 0}, {ALLEGRO_KEY_RIGHT, 0}, {ALLEGRO_KEY_SPACE, 1}
-};
-        
-static const map<int, int> keymap = {
-    {ALLEGRO_KEY_UP, 1},   {ALLEGRO_KEY_DOWN, 3},
-    {ALLEGRO_KEY_LEFT, 2}, {ALLEGRO_KEY_RIGHT, 4}, {ALLEGRO_KEY_SPACE, 5}
-};
-
  class Enemy: public Entity
 {
     public:
         Enemy(float x=0, float y=0, float vx=0, float vy=0, ALLEGRO_BITMAP* p=nullptr)
             : Entity(x, y, vx, vy, p, 1) {}
 
-        virtual void update(int, bool) override;
+        virtual void update(const GameList&) override;
 };
 
 class Player: public Entity
 {
     private:
-        int directions[4] = {1, 1, 1, 1};
+        inline static const map<int, int> index  {{ALLEGRO_KEY_UP, 0}, {ALLEGRO_KEY_DOWN, 0}, {ALLEGRO_KEY_LEFT, 0}, {ALLEGRO_KEY_RIGHT, 0}, {ALLEGRO_KEY_SPACE, 1}};
+        inline static const map<int, int> keymap {{ALLEGRO_KEY_UP, 1}, {ALLEGRO_KEY_DOWN, 3}, {ALLEGRO_KEY_LEFT, 2}, {ALLEGRO_KEY_RIGHT, 4}, {ALLEGRO_KEY_SPACE, 5}};
+
+        int directions[4] = {2, 2, 2, 2};
         KEYS keys[2] = {still, still};
         bool safe = true;
 
@@ -35,7 +27,7 @@ class Player: public Entity
         Player(float x=0, float y=0, ALLEGRO_BITMAP* p=nullptr)
             : Entity(x, y, 4, 4, p, 4) {}
         
-        virtual void update(int, bool) override;
+        virtual void update(const GameList&) override;
 
         bool isSafe() const  { return safe; }
         void setSafe(bool k) { safe = k; }
@@ -47,15 +39,16 @@ class Player: public Entity
         { 
              if(keymap.find(key) != keymap.end()) //se il tasto è valido
             {
-                int temp = keys[0];
+                int actual, temp;
+                if(key == ALLEGRO_KEY_SPACE) actual = temp = keys[1];
+                else                         actual = temp = keys[0];
+                
 
-                 if(type == ALLEGRO_EVENT_KEY_DOWN && 
-                    keymap.find(key)->second != keys[0])
+                 if(type == ALLEGRO_EVENT_KEY_DOWN and keymap.find(key)->second != actual)
                 {
                     temp = keymap.find(key)->second;
                 }
-                 else if(type == ALLEGRO_EVENT_KEY_UP && 
-                         keymap.find(key)->second == keys[0])
+                 else if(type == ALLEGRO_EVENT_KEY_UP and keymap.find(key)->second == actual)
                 {
                     temp = still;
                 }
