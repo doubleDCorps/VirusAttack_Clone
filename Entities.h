@@ -3,6 +3,8 @@
 
 #include "Entity.h"
 
+void push_reverse_way(int&, vector<pair<int, int>>&, int);
+
  class Enemy: public Entity
 {
     public:
@@ -18,11 +20,16 @@
         inline static const map<int, int> index  {{ALLEGRO_KEY_UP, 0}, {ALLEGRO_KEY_DOWN, 0}, {ALLEGRO_KEY_LEFT, 0}, {ALLEGRO_KEY_RIGHT, 0}, {ALLEGRO_KEY_SPACE, 1}};
         inline static const map<int, int> keymap {{ALLEGRO_KEY_UP, 1}, {ALLEGRO_KEY_DOWN, 3}, {ALLEGRO_KEY_LEFT, 2}, {ALLEGRO_KEY_RIGHT, 4}, {ALLEGRO_KEY_SPACE, 5}};
 
+        vector<pair<int, int>>reverse_way;
+        
+        int reverse_cont{0};
+        int pressed_key{0};
+        bool first_reverse_step{true};
+        
         int directions[4] = {2, 2, 2, 2};
         KEYS keys[2] = {still, still};
         bool safe = true;
-        bool directions[4] = {true, true, true, true};
-
+        
     public:
         Player(float x=0, float y=0, float v=0, ALLEGRO_BITMAP* p=nullptr)
             : Entity(x, y, v, v, p, 4) {}
