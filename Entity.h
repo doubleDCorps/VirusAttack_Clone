@@ -33,7 +33,7 @@ enum DIRS : unsigned {NW=0, NE=1, SE=2, SW=3};
         EntityData: coordinata x, coordinata y, larghezza, altezza, velocità x, velocità y
     Il polimorfismo viene sfruttato per rendere più lineari alcune chiamate a funzione nella classe Level.
 */
- struct HitboxData
+ struct PointData
 {
     protected:
         constexpr static float EPS{0.1};

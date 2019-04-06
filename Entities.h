@@ -34,6 +34,41 @@
 
         bool isSafe() const { return safe; }
         void setSafe(bool k){ safe = k; }
+        /*
+            Salva l'ultimo tasto premuto in memoria per eseguire l'aggiornamento del movimento;
+            nel caso in cui più tasti vengono premuti, si dà priorità esclusivamente all'ultimo.
+        */
+         void setKey(int key, ALLEGRO_EVENT_TYPE type)
+        { 
+             if(keymap.find(key) != keymap.end()) //se il tasto è valido
+            {
+                int actual, temp;
+                if(key == ALLEGRO_KEY_SPACE) actual = temp = keys[1];
+                else                         actual = temp = keys[0];
+                
+
+                 if(type == ALLEGRO_EVENT_KEY_DOWN and keymap.find(key)->second != actual)
+                {
+                    temp = keymap.find(key)->second;
+                }
+                 else if(type == ALLEGRO_EVENT_KEY_UP and keymap.find(key)->second == actual)
+                {
+                    temp = still;
+                }
+
+                if(index.find(key) != index.end())
+                    keys[index.find(key)->second] = static_cast<KEYS>(temp);
+            }
+
+        }
+
+         int getKey(int k) const
+        {
+            if(index.find(k) != index.end()) 
+                return keys[index.find(k)->second];
+
+            return -1; //ERRORE ERRORE ERRORE
+        }
 };
 
 #endif
