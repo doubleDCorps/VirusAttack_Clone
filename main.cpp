@@ -110,7 +110,7 @@ void push_reverse_way(int&, vector<pair<int, int>>&, int&);
     {
         entities[i]->setAlive(false);
         al_set_target_bitmap(entities[i]->getBitmap());
-        al_clear_to_color(al_map_rgb(0, 0, 0));
+        al_clear_to_color(al_map_rgb(100, 0, 0));
     }
 }
 
@@ -201,7 +201,7 @@ void push_reverse_way(int&, vector<pair<int, int>>&, int&);
             redraw = true;
 
 
-            if(space) {
+            if(space && !(poly.hitsBorder(entities[0]->getData()))) {
                 if((key == UP || key == DOWN || key == LEFT || key == RIGHT) && first_reverse_step) {
                     first_reverse_step=false;
                     pressed_key=key;
@@ -239,6 +239,8 @@ void push_reverse_way(int&, vector<pair<int, int>>&, int&);
                     reverse_cont++;
                     }
                 }
+            else if(poly.hitsBorder(entities[0]->getData()))
+                reverse_way.clear();
             else {
                 push_reverse_way(reverse_cont, reverse_way, pressed_key);
                 first_reverse_step=true;

@@ -43,7 +43,7 @@ enum KEYS : int {still=0, UP=1, LEFT=2, DOWN=3, RIGHT=4};
     Il polimorfismo viene sfruttato per rendere più lineari alcune chiamate a funzione nella classe Level.
 */
  struct HitboxData
-{        
+{
     float c[4];
     
     HitboxData(float a, float b, float d=0, float e=0): c{a, b, d, e} {}
