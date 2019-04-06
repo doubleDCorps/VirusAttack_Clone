@@ -150,8 +150,8 @@
 
     bool redraw {true};
     bool STOP {false};
-    int spawn_time{0};
-    
+    int spawn_time{};
+
     al_register_event_source(coda_eventi, al_get_display_event_source(al_get_current_display()));
     al_register_event_source(coda_eventi, al_get_timer_event_source(timer));
     al_register_event_source(coda_eventi, al_get_keyboard_event_source());
@@ -187,8 +187,6 @@
             if(border.onEdge(player->getData().center()).first)
                 trace.clear();
             trace.pushPoint(player->getData().center());
-            
-            
             redraw = true;
         }
          else if(ev.type == ALLEGRO_EVENT_KEY_DOWN && ev.keyboard.keycode == ALLEGRO_KEY_ESCAPE)

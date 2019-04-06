@@ -1,6 +1,7 @@
 #include"Level.h"
 #include<allegro5/allegro.h>
 
+void push_reverse_way(int&, vector<pair<int, int>>&, int&);
  
  int main(int argc, char** argv)
 {
@@ -35,7 +36,9 @@
 
     return 0;
 }
-/*
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
  void entities_init(vector<Entity*>& entities)
 {
     entities.push_back(new Player{275, 70, 4, al_create_bitmap(30,30)});                                        //PLAYER
@@ -104,8 +107,9 @@
         al_clear_to_color(al_map_rgb(100, 0, 0));
     }
 }
-*/
-/*
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
  void level(ALLEGRO_DISPLAY* display, ALLEGRO_TIMER* timer)
 {
     ALLEGRO_EVENT_QUEUE *coda_eventi = al_create_event_queue();
@@ -296,5 +300,31 @@
 
     al_destroy_event_queue(coda_eventi);
 }
-*/
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+ void spawn(vector<Entity*>& entities)
+{   
+    for(unsigned i{2}; i < entities.size(); i++)
+     if(!entities[i]->isAlive())
+    {
+        entities[i]->setAlive(true);
+        entities[i]->setCord_x(entities[1]->getCord_x());
+        entities[i]->setCord_y(entities[1]->getCord_y());
+    }
+}
+
+void push_reverse_way(int &reverse_cont, vector<pair<int, int>> &reverse_way, int &pressed_key) {
+    if(reverse_cont!=0) {
+        if(pressed_key==1) //UP
+            reverse_way.push_back({reverse_cont, 3});
+        else if(pressed_key==2) //LEFT
+            reverse_way.push_back({reverse_cont, 4});
+        else if(pressed_key==3) //DOWN
+            reverse_way.push_back({reverse_cont, 1});
+        else if(pressed_key==4) //RIGHT
+            reverse_way.push_back({reverse_cont, 2});
+
+        reverse_cont=0;
+        }
+}
