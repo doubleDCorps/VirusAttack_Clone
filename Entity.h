@@ -28,13 +28,12 @@ enum DIRS : unsigned {NW=0, NE=1, SE=2, SW=3};
      && (in_range(y1a, min(y2a, y2b), max(y2a, y2b)) || in_range(y1b, min(y2a, y2b), max(y2a, y2b)) || in_range(y2a, min(y1a, y1b), max(y1a, y1b)) || in_range(y2b, min(y1a, y1b), max(y1a, y1b)) );
 }
 /*
-    Tre strutture dati elementari che definiscono i seguenti dati:
-        PointData:  coordinata x, coordinata y
+    Due strutture dati elementari che definiscono i seguenti dati:
         HitboxData: coordinata x, coordinata y, larghezza, altezza
         EntityData: coordinata x, coordinata y, larghezza, altezza, velocità x, velocità y
     Il polimorfismo viene sfruttato per rendere più lineari alcune chiamate a funzione nella classe Level.
 */
- class PointData
+ struct HitboxData
 {
     protected:
         constexpr static float EPS{0.1};
@@ -122,7 +121,7 @@ enum DIRS : unsigned {NW=0, NE=1, SE=2, SW=3};
         }
 };
 
- class EntityData: public HitboxData
+ struct EntityData: public HitboxData
 {
     private:
         constexpr static int projDir_x[]{0, -1, 0, 1};

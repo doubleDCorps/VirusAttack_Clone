@@ -69,14 +69,22 @@
     {
          if(argf) //se è avvenuta una collisione nella precedente direzione del player
         {
-            //KEYS k = peek_in_PilaDiGena();
-            //directions[ k ] = false;
-            //directions[ k > 2 ? k - 2 : k + 2 ] = true;
+            if(argc == LEFT && data.v[0] > 0 ||
+               argc == RIGHT && data.v[0] < 0 )
+                data.v[0] = -data.v[0];
+            
+            data.c[0] += data.v[0];
         }
-         else if(directions[argc])
+         else if(argc == UP || argc == DOWN)
         {
-            data.v[ argc%2 ] *= pow(-1, (argc-1)/2 + 1);
-            data.c[ argc%2 ] += data.v[ argc%2 ];
+            if(argc == UP && data.v[1] > 0 || 
+               argc == DOWN && data.v[1] < 0 )
+                data.v[1] = -data.v[1];
+            
+            data.c[1] += data.v[1];
         }
+
+        //if(is_safe && k%2 == position%2 && k != position)
+        //    is_safe = false;
     }
 */

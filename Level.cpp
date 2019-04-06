@@ -247,6 +247,6 @@
              (trace.empty() && 
               border.is_adj(Player->getData().c[0], Player->getData().c[1])))
         trace.push( Player->getData().c[0], Player->getData().c[1] );
-
+        
     return false;
 */
