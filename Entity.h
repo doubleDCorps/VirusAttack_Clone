@@ -19,14 +19,15 @@ enum AXIS : unsigned {none=0, X=1, Y=2, XY=3};
 enum KEYS : unsigned {still=0, UP=1, LEFT=2, DOWN=3, RIGHT=4, SPACE=5};
 enum DIRS : unsigned {NW=0, NE=1, SE=2, SW=3};
 
- inline bool in_range(int first, int lower_bound, int upper_bound) { return first >= lower_bound and first <= upper_bound; }
- 
+ inline bool in_range(int first, int lower_bound, int upper_bound) { return first >= lower_bound and first <= upper_bound; } 
+/*
  inline bool hitbox(int x1a, int y1a, int x1b, int y1b, int x2a, int y2a, int x2b, int y2b)
 {
     return
         (in_range(x1a, min(x2a, x2b), max(x2a, x2b)) || in_range(x1b, min(x2a, x2b), max(x2a, x2b)) || in_range(x2a, min(x1a, x1b), max(x1a, x1b)) || in_range(x2b, min(x1a, x1b), max(x1a, x1b)) )
      && (in_range(y1a, min(y2a, y2b), max(y2a, y2b)) || in_range(y1b, min(y2a, y2b), max(y2a, y2b)) || in_range(y2a, min(y1a, y1b), max(y1a, y1b)) || in_range(y2b, min(y1a, y1b), max(y1a, y1b)) );
 }
+*/
 /*
     Due strutture dati elementari che definiscono i seguenti dati:
         HitboxData: coordinata x, coordinata y, larghezza, altezza
@@ -44,7 +45,7 @@ enum DIRS : unsigned {NW=0, NE=1, SE=2, SW=3};
         PointData(const PointData& P): p{P.p[0], P.p[1]} {}
          PointData& operator=(const PointData& P)
         { 
-             if(this!=&P)
+             if(this != &P)
             { 
                 p[0]=P.p[0];
                 p[1]=P.p[1];
@@ -124,7 +125,7 @@ enum DIRS : unsigned {NW=0, NE=1, SE=2, SW=3};
  struct EntityData: public HitboxData
 {
     private:
-        constexpr static int projDir_x[]{0, -1, 0, 1};
+        constexpr static int projDir_x[]{0 ,-1, 0, 1};
         constexpr static int projDir_y[]{-1, 0, 1, 0};
 
         float v[2];
@@ -154,18 +155,15 @@ enum DIRS : unsigned {NW=0, NE=1, SE=2, SW=3};
 
          HitboxData projection(unsigned i) const
         { 
-            int offX{1}, offY{1};
-            if(v[0] < 0) offX = -1;
-            if(v[1] < 0) offY = -1;
+            float offX{v[0] < 0 ? -1.0f : 1.0f};
+            float offY{v[1] < 0 ? -1.0f : 1.0f};
              return
-            {   p[0] + projDir_x[i-1]*v[0]*offX*1.9,
-                p[1] + projDir_y[i-1]*v[1]*offY*1.9,
+            {   p[0] + projDir_x[i-1]*v[0]*offX*3.0f,
+                p[1] + projDir_y[i-1]*v[1]*offY*3.0f,
                 c[0], 
                 c[1]
             }; 
         } 
-   
-    //quali qualità posso ricavare da EntityData?   
 };
 
 /*
@@ -185,8 +183,8 @@ enum DIRS : unsigned {NW=0, NE=1, SE=2, SW=3};
     friend Level;
 
     public:
-        GameList() {}
-        GameList(const perimeter& p) { for(auto& i : p) pushPoint(i); }
+        GameList(): thickness(10), color(al_map_rgb(0, 0, 0)) {}
+        GameList(const perimeter& p, float t = 10, ALLEGRO_COLOR c = al_map_rgb(0, 0, 0)): thickness(t), color(c) { for(auto& i : p) pushPoint(i); }
         
         bool pushPoint(const PointData&);
         pair<AXIS, bool> onEdge(const HitboxData&) const;
@@ -196,9 +194,13 @@ enum DIRS : unsigned {NW=0, NE=1, SE=2, SW=3};
         bool o_inside(const HitboxData&) const;
         bool c_inside(const HitboxData&) const;
 
-        void print(ALLEGRO_BITMAP* buffer=nullptr) const;
+        void o_print(ALLEGRO_BITMAP* buffer=nullptr) const;
+        void c_print(ALLEGRO_BITMAP* buffer=nullptr) const;
 
     private:
+        float thickness;
+        ALLEGRO_COLOR color;
+        
         inline auto successor(perimeter::iterator it)                       { return ++it == end() ? begin() : it; }
         inline auto successor(perimeter::const_iterator it) const           { return ++it == cend() ? cbegin() : it; }
         inline auto successor(perimeter::reverse_iterator it)               { return ++it == rend() ? rbegin() : it; }

@@ -38,7 +38,7 @@ void push_reverse_way(int&, vector<pair<int, int>>&, int&);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+/*
  void entities_init(vector<Entity*>& entities)
 {
     entities.push_back(new Player{275, 70, 4, al_create_bitmap(30,30)});                                        //PLAYER
@@ -328,3 +328,4 @@ void push_reverse_way(int &reverse_cont, vector<pair<int, int>> &reverse_way, in
         reverse_cont=0;
         }
 }
+*/

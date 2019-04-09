@@ -21,7 +21,6 @@
         int directions[4] = {2, 2, 2, 2};
         KEYS keys[2] = {still, still};
         bool safe = true;
-        bool directions[4] = {true, true, true, true};
 
     public:
         Player(float x=0, float y=0, float v=0, ALLEGRO_BITMAP* p=nullptr)

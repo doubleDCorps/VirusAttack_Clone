@@ -6,24 +6,12 @@
 */
  bool GameList::pushPoint(const PointData& P)
 {
-     if(empty() || (size() == 1 && P.collinear(back())) || (size() >= 2 && !P.collinear(back(), *(++rbegin()))))
-    {
-        push_back(P);
-    }
-     else if(size() == 1 && P.collinear(front()) || (size() >= 2 && !P.collinear(front(), *(++begin()))))
-    {
-        push_front(P);
-    }
-     else if(size() >= 2 && P.collinear(back(), *(++rbegin())))
-    {
-        back() = P;
-    }
-     else if(size() >= 2 && P.collinear(front(), *(++begin())))
-    {
-        front() = P;
-    }
-     else
-        return false;
+    if(empty() or (size()==1 and P.collinear(back())) or (size()>=2 and !P.collinear(back(), *(++rbegin()))))   push_back(P);
+    else if(size()==1 and P.collinear(front()) or (size()>=2 and !P.collinear(front(), *(++begin()))))          push_front(P);
+    else if(size()>=2 and P.collinear(back(), *(++rbegin())))                                                   back() = P;
+    else if(size()>=2 and P.collinear(front(), *(++begin())))                                                   front() = P;
+    else return false;
+    
     return true;
 }
 
@@ -34,36 +22,24 @@
      for(auto it{ begin() }; it != end(); ++it)
     {
         // coordinate degli estremi del segmento
-        int x1{ P.x() }  , y1{ P.y() };
-        int w1{ P.dx() } , h1{ P.dy() };
-        int x2{ it->x() }, x3{ successor(it)->x() };
-        int y2{ it->y() }, y3{ successor(it)->y() };
+        float x1{ P.x() }  , w1{ P.dx() };
+        float y1{ P.y() }  , h1{ P.dy() };
+        float x2{ it->x() }, x3{ successor(it)->x() };
+        float y2{ it->y() }, y3{ successor(it)->y() };
 
         // il segmento è orizzontale
         // verifica se avviene una collisione fra le hitbox
-         if(x2 != x3 and P.collision({min(x2, x3), y2, abs(x2-x3), 7}))
-        {
-            if(y1 < y2)
-        //if(x2 != x3 && hitbox(x1, y1, x1+w1, y1+h1, x2, y2, x3, y2+14))
-                return {Y, true};
-            if(y1 >= y2)
-        //if(x2 != x3 && hitbox(x1, y1, x1+w1, y1+h1, x2, y2, x3, y2-14))
-                return {Y, false};
-        }
+        //if(x2 != x3 and P.collision({min(x2, x3), y2, abs(x2-x3), 7})) return {Y, y1 <= y2 ? true : false}; 
+        if(x2 > x3 and P.collision({min(x2, x3), y2-5, abs(x2-x3), 10})) return {Y, y1 <= y2-5 ? true : false};
+        if(x2 < x3 and P.collision({min(x2, x3), y2-5, abs(x2-x3), 10})) return {Y, y1 <= y2-5 ? true : false};
         // il segmento è verticale
         // verifica se avviene una collisione fra le hitbox
-         if(y2 != y3 and P.collision({x2, min(y2, y3), 7, abs(y2-y3)}))
-        {
-            if(x1 < x2)
-        //if(y2 != y3 && hitbox(x1, y1, x1+w1, y1+h1, x2, y2, x2+14, y3))
-                return {X, true}; 
-            if(x1 >= x2)
-        //if(y2 != y3 && hitbox(x1, y1, x1+w1, y1+h1, x2, y2, x2-14, y3))          
-                return {X, false};
-        }
+        //if(y2 != y3 and P.collision({x2, min(y2, y3), 7, abs(y2-y3)})) return {X, x1 <= x2 ? true : false};
+        if(y2 < y3 and P.collision({x2-5, min(y2, y3), 12, abs(y2-y3)})) return {X, x1 <= x2-5 ? true : false};
+        if(y2 > y3 and P.collision({x2-5, min(y2, y3), 12, abs(y2-y3)})) return {X, x1 <= x2-5 ? true : false};
     }
 
-    return {none,false};
+    return {none, false};
 }
 
  bool GameList::inArea(const HitboxData& P) const
@@ -74,13 +50,12 @@
 
      for(auto it{ begin() }; it != end(); ++it)
     {
-        int y1{ it->y() }; int y2{ successor(it)->y() };
+        float y1{ it->y() }, y2{ successor(it)->y() };
 
-        if(P.collision({0, min(y1, y2), it->x(), abs(y1-y2)}))
-        //if(y2-y1!=0 && hitbox(P.x(), P.y(), P.x()+P.dx(), P.y()+P.dy(), 0, min(y1, y2), y1, max(y1, y2)))
-        {
-            if(y2-y1 < 0) --cont;
-            if(y2-y1 > 0) ++cont;
+         if(P.collision({0, min(y1, y2), it->x(), abs(y1-y2)}))
+        { 
+            if(y2 < y1)      --cont;
+            else if(y2 > y1) ++cont;
         }
     }
 
@@ -91,45 +66,59 @@
 {
     pair<AXIS, bool> cond = onEdge(E);
     
-     if(cond.first == X)
-    {
-        if((E.vx()>=0 and cond.second) or (E.vx()<=0 and !cond.second))
-            return X;
-    }
-     else if(cond.first == Y)
-    {
-        if((E.vy()>=0 and cond.second) or (E.vy()<=0 && !cond.second))
-            return Y;
-    }
-     else
-        return none;
+    if(cond.first == X and ((E.vx()>=0 and cond.second) or (E.vx()<0 and !cond.second))) return X;
+    if(cond.first == Y and ((E.vy()>=0 and cond.second) or (E.vy()<0 and !cond.second))) return Y;
+    
+    return none;
 }
 
- bool GameList::o_inside(const HitboxData& P) const { return !(onEdge(P).first) && inArea(P); }
- bool GameList::c_inside(const HitboxData& P) const { return onEdge(P).first || inArea(P);    }
+ bool GameList::o_inside(const HitboxData& P) const { return !(onEdge(P).first) and inArea(P); }
+ bool GameList::c_inside(const HitboxData& P) const { return onEdge(P).first or inArea(P); }
 
- void GameList::print(ALLEGRO_BITMAP* buffer) const //fixare i nomi delle variabili
+ void GameList::c_print(ALLEGRO_BITMAP* buffer) const
 {
     if(empty()) return;
 
      if(buffer!=nullptr)
     {
         al_set_target_bitmap(buffer);
-        for(auto it{ begin() }; it != end(); ++it)
-         if(successor(it)!=end() || (successor(it)==end() && successor(it)->collinear(*it)))    
+         for(auto it{ begin() }; it != end(); ++it)
         {
             if(it->x() == successor(it)->x())
-                al_draw_line(it->x(), min(it->y(), successor(it)->y())-5,
-                             it->x(), max(it->y(), successor(it)->y())+5,
-                             al_map_rgb(0, 0, 0), 10);
+                al_draw_line(it->x(), min(it->y(), successor(it)->y())-thickness/2,
+                             it->x(), max(it->y(), successor(it)->y())+thickness/2,
+                             color, thickness);
 
             else if(it->y() == successor(it)->y())
-                al_draw_line(min(it->x(), successor(it)->x())-5, it->y(),
-                             max(it->x(), successor(it)->x())+5, it->y(), 
-                             al_map_rgb(0, 0, 0), 10);
+                al_draw_line(min(it->x(), successor(it)->x())-thickness/2, it->y(),
+                             max(it->x(), successor(it)->x())+thickness/2, it->y(), 
+                             color, thickness);
         }
     }
 }
+
+ void GameList::o_print(ALLEGRO_BITMAP* buffer) const
+{
+    if(empty()) return;
+
+     if(buffer!=nullptr)
+    {
+        al_set_target_bitmap(buffer);
+         for(auto it{ begin() }; successor(it) != begin(); ++it)
+        {
+            if(it->x() == successor(it)->x())
+                al_draw_line(it->x(), min(it->y(), successor(it)->y())-thickness/2,
+                             it->x(), max(it->y(), successor(it)->y())+thickness/2,
+                             color, thickness);
+
+            else if(it->y() == successor(it)->y())
+                al_draw_line(min(it->x(), successor(it)->x())-thickness/2, it->y(),
+                             max(it->x(), successor(it)->x())+thickness/2, it->y(), 
+                             color, thickness);
+        }
+    }
+}
+
 
 /*
  bool GameList::inside(const HitboxData& P) const //fixare i nomi delle variabili

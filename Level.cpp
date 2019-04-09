@@ -95,8 +95,8 @@
 
  void Level::defPerInit(ALLEGRO_DISPLAY_MODE d)
 {
-    float x{ d.width/2  - 500/2 };
-    float y{ d.height/2 - 500/2 };
+    float x{ d.width/2  - 500/2.0f };
+    float y{ d.height/2 - 500/2.0f };
 
     defPerimeter = {
         {x      , y      },
@@ -121,8 +121,8 @@
 
     int area{};
     for(auto it{ GL.begin() }; it!=GL.end(); ++it)
-        area += (it->x() + GL.successor(it)->x() )*
-                (GL.successor(it)->y() - it->y() );
+        area += ( it->x() + GL.successor(it)->x() )*
+                ( GL.successor(it)->y() - it->y() );
     area/=2;
 
     return area;
@@ -177,7 +177,7 @@
             
             //boss routines
             spawn_time++;
-             if(spawn_time==360 or spawn_time==2161 && entities[1]->isAlive())
+             if((spawn_time==360 or spawn_time==2161) and entities[1]->isAlive())
             {
                 spawn(entities);
                 if(spawn_time!=360)
@@ -189,9 +189,9 @@
             trace.pushPoint(player->getData().center());
             redraw = true;
         }
-         else if(ev.type == ALLEGRO_EVENT_KEY_DOWN && ev.keyboard.keycode == ALLEGRO_KEY_ESCAPE)
+         else if(ev.type == ALLEGRO_EVENT_KEY_DOWN and ev.keyboard.keycode == ALLEGRO_KEY_ESCAPE)
                     STOP = true;
-         else if(ev.type == ALLEGRO_EVENT_KEY_DOWN || ev.type == ALLEGRO_EVENT_KEY_UP)
+         else if(ev.type == ALLEGRO_EVENT_KEY_DOWN or ev.type == ALLEGRO_EVENT_KEY_UP)
                 player->setKey(ev.keyboard.keycode, ev.type);
         
          if(redraw and al_is_event_queue_empty(coda_eventi) )
@@ -201,7 +201,7 @@
             al_clear_to_color(al_map_rgb(255, 255, 255));
 
             //ok
-            trace.print(al_get_backbuffer(al_get_current_display()));
+            trace.o_print(al_get_backbuffer(al_get_current_display()));
 
             //redo this prints
             for(unsigned i = numBosses; i < entities.size(); ++i)
@@ -209,7 +209,7 @@
                     al_draw_bitmap(entities[i]->getBitmap(), entities[i]->getCord_x(), entities[i]->getCord_y(), 0);
 
             //ok            
-            border.print(al_get_backbuffer(al_get_current_display()));
+            border.c_print(al_get_backbuffer(al_get_current_display()));
             
             al_draw_bitmap(entities[0]->getBitmap(), entities[0]->getCord_x(), entities[0]->getCord_y(), 0);
 
