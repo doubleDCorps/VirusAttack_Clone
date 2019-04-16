@@ -15,19 +15,11 @@
 #include<cassert>
 using namespace std;
 
-enum AXIS : unsigned {none=0, X=1, Y=2, XY=3};
-enum KEYS : unsigned {still=0, UP=1, LEFT=2, DOWN=3, RIGHT=4, SPACE=5};
-enum DIRS : unsigned {NW=0, NE=1, SE=2, SW=3};
+enum AXIS : int {none=0, X=1, Y=2, XY=3};
+enum KEYS : int {still=0, UP=1, LEFT=2, DOWN=3, RIGHT=4, SPACE=5};
+enum DIRS : int {NW=0, NE=1, SE=2, SW=3};
 
  inline bool in_range(int first, int lower_bound, int upper_bound) { return first >= lower_bound and first <= upper_bound; } 
-/*
- inline bool hitbox(int x1a, int y1a, int x1b, int y1b, int x2a, int y2a, int x2b, int y2b)
-{
-    return
-        (in_range(x1a, min(x2a, x2b), max(x2a, x2b)) || in_range(x1b, min(x2a, x2b), max(x2a, x2b)) || in_range(x2a, min(x1a, x1b), max(x1a, x1b)) || in_range(x2b, min(x1a, x1b), max(x1a, x1b)) )
-     && (in_range(y1a, min(y2a, y2b), max(y2a, y2b)) || in_range(y1b, min(y2a, y2b), max(y2a, y2b)) || in_range(y2a, min(y1a, y1b), max(y1a, y1b)) || in_range(y2b, min(y1a, y1b), max(y1a, y1b)) );
-}
-*/
 /*
     Due strutture dati elementari che definiscono i seguenti dati:
         HitboxData: coordinata x, coordinata y, larghezza, altezza
@@ -37,10 +29,11 @@ enum DIRS : unsigned {NW=0, NE=1, SE=2, SW=3};
  struct PointData
 {
     protected:
-        constexpr static float EPS{0.1};
         float p[2];
 
     public:
+        constexpr static float EPS{2};
+
         PointData(float a, float b): p{a, b} {}
         PointData(const PointData& P): p{P.p[0], P.p[1]} {}
          PointData& operator=(const PointData& P)
@@ -59,26 +52,17 @@ enum DIRS : unsigned {NW=0, NE=1, SE=2, SW=3};
         void x(float x) { p[0] = x > 0 ? x : 0; } 
         void y(float y) { p[1] = y > 0 ? y : 0; }
 
-        bool operator==(const PointData& P) const { return fabs(p[0] - P.p[0])<EPS and fabs(p[1] - P.p[1])<EPS; }
-        bool operator!=(const PointData& P) const { return !(*this == P); }
-         
-         AXIS collinear(const PointData& P) const  
-        { 
-            bool by = fabs(p[1] - P.p[1])<EPS;
-            bool bx = fabs(p[0] - P.p[0])<EPS;
-            
-            return
-                bx and by ? XY : bx ? X : by ? Y : none;
-        }
-         
-         bool collinear(const PointData& P1, const PointData& P2) const
-        {
-            AXIS r1 = collinear(P1);
-            AXIS r2 = collinear(P2);
-            
-            return
-                r1 != none && r2 != none && (r1 == XY || r2 == XY || r1 == r2);
-        }
+        bool operator==(const PointData& P) const { return fabs(p[0] - P.p[0])<=EPS and fabs(p[1] - P.p[1])<=EPS; }
+        bool operator!=(const PointData& P) const { return !(*this == P); } 
+        /*
+            Verifica se due punti sono collineari (la coordinata x oppure y è corrispondente).
+            Due punti uguali risulteranno collineari.
+        */
+         AXIS collinear(const PointData&) const;
+        /*
+            Verifica se i tre punti si trovano tutti sulla stessa retta (ossia, sono reciprocamente collineari).
+        */
+         bool collinear(const PointData&, const PointData&) const;
 };
 
  class HitboxData: public PointData
@@ -92,7 +76,7 @@ enum DIRS : unsigned {NW=0, NE=1, SE=2, SW=3};
     public:
         HitboxData(float a, float b, float d=0, float e=0): PointData{a, b}, c{d, e} {}
         HitboxData(const HitboxData& H): PointData(H), c{H.c[0], H.c[1]} {}
-        HitboxData(const PointData& P): PointData(P), c{4, 4} {}
+        HitboxData(const PointData& P): PointData(P), c{2, 2} {}
          HitboxData& operator=(const HitboxData& H)
         { 
             PointData::operator=(H);
@@ -110,16 +94,18 @@ enum DIRS : unsigned {NW=0, NE=1, SE=2, SW=3};
         float dy() const { return c[1]; }
         void dx(float x) { c[0] = x; }
         void dy(float y) { c[1] = y; }
-
-        PointData point(unsigned i) const       { return {p[0] + hitDir_x[i] * c[0] , p[1] + hitDir_y[i] * c[1]  }; }
-        PointData center() const                { return {p[0] + c[0]/2             , p[1] + c[1]/2              }; }
-
-         bool collision(const HitboxData& D) const 
-        {
-            return
-                (in_range(p[0], D.p[0], D.p[0]+D.c[0]) or in_range(p[0]+c[0], D.p[0], D.p[0]+D.c[0]) or in_range(D.p[0], p[0], p[0]+c[0]) or in_range(D.p[0]+D.c[0], p[0], p[0]+c[0]))
-            and (in_range(p[1], D.p[1], D.p[1]+D.c[1]) or in_range(p[1]+c[1], D.p[1], D.p[1]+D.c[1]) or in_range(D.p[1], p[1], p[1]+c[1]) or in_range(D.p[1]+D.c[1], p[1], p[1]+c[1]));
-        }
+        /*
+            Genera uno degli estremi della hitbox in base alla variabile presa in input.
+        */
+        PointData point(unsigned) const;
+        /*
+            Restituisce il punto che si trova al centro della hitbox.
+        */
+        PointData center() const;
+        /*
+            Verifica la presenza di collisioni fra l'oggetto e l'Hitbox D utilizzando un algoritmo "bounding box".
+        */
+        bool collision(const HitboxData&) const;
 };
 
  struct EntityData: public HitboxData
@@ -152,18 +138,10 @@ enum DIRS : unsigned {NW=0, NE=1, SE=2, SW=3};
         float vy() const { return v[1]; }
         void vx(float x) { v[0] = x; }
         void vy(float y) { v[1] = y; }
-
-         HitboxData projection(unsigned i) const
-        { 
-            float offX{v[0] < 0 ? -1.0f : 1.0f};
-            float offY{v[1] < 0 ? -1.0f : 1.0f};
-             return
-            {   p[0] + projDir_x[i-1]*v[0]*offX*3.0f,
-                p[1] + projDir_y[i-1]*v[1]*offY*3.0f,
-                c[0], 
-                c[1]
-            }; 
-        } 
+        /*
+            Genera una hitbox corrispondente all'oggetto traslato lungo la direzione scelta.
+        */
+        HitboxData projection(unsigned) const;
 };
 
 /*
@@ -175,35 +153,78 @@ enum DIRS : unsigned {NW=0, NE=1, SE=2, SW=3};
     composti da ogni coppia di elementi della lista.
 */
  class Level;
-
  typedef list<PointData> perimeter;
 
  class GameList: private perimeter
 {
     friend Level;
+    friend ostream& operator<<(ostream&, const GameList&);
 
     public:
-        GameList(): thickness(10), color(al_map_rgb(0, 0, 0)) {}
-        GameList(const perimeter& p, float t = 10, ALLEGRO_COLOR c = al_map_rgb(0, 0, 0)): thickness(t), color(c) { for(auto& i : p) pushPoint(i); }
+        GameList(): thickness(1), color(al_map_rgb(255, 255, 255)) {}
+        GameList(const perimeter& p, float t = 1, ALLEGRO_COLOR c = al_map_rgb(255, 255, 255)): thickness(t), color(c) { for(auto& i : p) pushPoint(i); }
         
+        PointData front() const { return perimeter::front(); }
+        void clear() { perimeter::clear(); }
+        bool empty() const { return perimeter::empty(); }
+        
+        /*
+            Aggiungi un punto sul tracciato, se soddisfa le condizioni.
+        */        
         bool pushPoint(const PointData&);
+        /*
+            Verifica se il punto si trova sulla lista.
+        */
         pair<AXIS, bool> onEdge(const HitboxData&) const;
+        /*
+            Se la linea è chiusa, verifica se l'hitbox si trova al suo interno;
+            Se la liena è aperta, verifica se l'hitbox si trova a sinistra della linea.
+        */
         bool inArea(const HitboxData&) const;
-
+        
+        // ?metodo che restituisce un PointData contenente le distanze minime sui due assi?
+        
+        /*
+            Utilizza onEdge per verificare che la collisione sia coerente con la direzione
+            di movimento dell'Entity.
+        */
         AXIS collides(const EntityData&) const;
+        /*
+            Verifica se l'hitbox si trova strettamente dentro l'area della linea
+            (ovvero: verifica se l'hitbox sia interna all'area senza toccare il bordo).
+        */
         bool o_inside(const HitboxData&) const;
+        /*
+            Verifica se l'hitbox si trovi dentro l'area (bordo incluso).
+        */
         bool c_inside(const HitboxData&) const;
-
-        void o_print(ALLEGRO_BITMAP* buffer=nullptr) const;
-        void c_print(ALLEGRO_BITMAP* buffer=nullptr) const;
+        /*
+            Stampa l'oggetto senza l'ultimo tratto (la chiusura).
+        */
+        void u_print(ALLEGRO_BITMAP* buffer=nullptr) const;
+        /*
+            Stampa l'oggetto (incluso l'ultimo tratto).
+        */
+        void l_print(ALLEGRO_BITMAP* buffer=nullptr) const;
 
     private:
         float thickness;
         ALLEGRO_COLOR color;
-        
+        /*
+            Restituisce il punto successivo, secondo il critero di chiusura della lista.
+        */
         inline auto successor(perimeter::iterator it)                       { return ++it == end() ? begin() : it; }
+        /*
+            Restituisce il punto successivo, secondo il critero di chiusura della lista.
+        */
         inline auto successor(perimeter::const_iterator it) const           { return ++it == cend() ? cbegin() : it; }
+        /*
+            Restituisce il punto successivo, secondo il critero di chiusura della lista.
+        */
         inline auto successor(perimeter::reverse_iterator it)               { return ++it == rend() ? rbegin() : it; }
+        /*
+            Restituisce il punto successivo, secondo il critero di chiusura della lista.
+        */
         inline auto successor(perimeter::const_reverse_iterator it) const   { return ++it == crend() ? crbegin() : it; }
 };
 
@@ -219,9 +240,19 @@ enum DIRS : unsigned {NW=0, NE=1, SE=2, SW=3};
         virtual ~Entity() {};
 
         virtual void update(const GameList&) = 0;
-
+        /*
+            Getter della bitmap
+            ERRORE: ce ne sono due? 
+        */
         const ALLEGRO_BITMAP *getBitmap() const { return image; }
+        /*
+            Getter della bitmap
+            ERRORE: ce ne sono due? 
+        */
         ALLEGRO_BITMAP *getBitmap()             { return image; }
+        /*
+            Setta la bitmap dell'entità a quella ricevuta (aggiornando i dati coerentemente).
+        */
          void setBitmap(ALLEGRO_BITMAP* p)       
         {
             image = p;
@@ -231,21 +262,50 @@ enum DIRS : unsigned {NW=0, NE=1, SE=2, SW=3};
                 data.dy( al_get_bitmap_height(p)+4 );
             }
         }
-
+        /*
+            Verifica se l'entità è ancora in vita (attiva).
+        */
         bool isAlive() const                    { return lifes > 0; }
+        /*
+            Imposta il numero di vite al valore restituito.
+            ERRORE: il Player mette un limite più stringente
+        */
         void setAlive(unsigned k)               { lifes = k; } 
-        
+        /*
+            Restituisce l'EntityData contenente le informazioni sull'entità.
+        */
         const EntityData& getData() const       { return data; }
-        //l'intero gruppo di setter e getter vanno ripensati
+        /*
+            ERRORE: l'intero gruppo di setter e getter vanno ripensati
+        */
         float getCord_x() const                 { return data.x()+2; }
+        /*
+            ERRORE: l'intero gruppo di setter e getter vanno ripensati
+        */
         float getCord_y() const                 { return data.y()+2; }
+        /*
+            ERRORE: l'intero gruppo di setter e getter vanno ripensati
+        */
         float getVelocity_x() const             { return data.vx(); }
+        /*
+            ERRORE: l'intero gruppo di setter e getter vanno ripensati
+        */
         float getVelocity_y() const             { return data.vy(); }
-
+        /*
+            setter della coordinata x dell'entità
+        */
         void setCord_x(float cx)                { data.x(cx-2); }
+        /*
+            setter della coordinata y dell'entità
+        */
         void setCord_y(float cy)                { data.y(cy-2); }
-        //ERRORE: nella classe Player le velocità devono sempre essere le stesse
+        /*
+            ERRORE: nella classe Player le velocità devono sempre essere le stesse
+        */
         void setVelocity_x(float vx)            { data.vx(vx); }
+        /*
+            ERRORE: nella classe Player le velocità devono sempre essere le stesse
+        */
         void setVelocity_y(float vy)            { data.vy(vy); }
 };
 

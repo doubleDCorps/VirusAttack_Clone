@@ -2,11 +2,11 @@
 
  void entities_init(vector<Entity*>& entities)
 {
-    entities.push_back(new Player{150, 150, al_create_bitmap(30,30)});                                        //PLAYER
-    entities.push_back(new Enemy{float(800)/2-30/2, float(600)/2-30/2, -4.0, -4.0, al_create_bitmap(30,30)});   //BOSS 
+    entities.push_back(new Player{135, 150, al_create_bitmap(30,30)});                                        //PLAYER
+    entities.push_back(new Enemy{float(800)/2-30/2, float(600)/2-30/2, -4.0, -4.0, al_create_bitmap(30,30)}); //BOSS 
     
     for(unsigned i=0; i<12; ++i)
-        entities.push_back(new Enemy{float(800)/2-30/2, float(600)/2-30/2, 0, 0, al_create_bitmap(30,30)});     //MINIONS
+        entities.push_back(new Enemy{float(800)/2-30/2, float(600)/2-30/2, 0, 0, al_create_bitmap(30,30)});   //MINIONS
 
     const int enemy_velocity{25};
 
@@ -66,7 +66,7 @@
     {
         entities[i]->setAlive(false);
         al_set_target_bitmap(entities[i]->getBitmap());
-        al_clear_to_color(al_map_rgb(0, 0, 0));
+        al_clear_to_color(al_map_rgb(255, 255, 255));
     }
 }
 
@@ -79,13 +79,6 @@
         entities[i]->setCord_x(entities[1]->getCord_x());
         entities[i]->setCord_y(entities[1]->getCord_y());
     }
-}
-
- Level::Level(unsigned difficulty, ALLEGRO_DISPLAY_MODE settings, ALLEGRO_TIMER* tim)
-{
-    defPerInit(settings); 
-    setDifficulty(difficulty);
-    timer = tim;
 }
 
  void Level::setDifficulty(unsigned difficulty)
@@ -105,16 +98,14 @@
         {x      , y + 500}
     };
 }
-/*
-    Viene calcolata l'area utilizzando il seguente algoritmo:
-    dato un poligono chiuso definito da una lista di coordinate (x, y) concatenate,
-    dove con concatenate si intende che almeno un elemento di ogni coppia è uguale a quello
-    del successivo e che ogni coppia ha l'elemento opposto in comune rispetto alla precedente,
-    si sommano le aree rettangolari ottenute da ogni coppia di coordinate concantenate, sfruttando
-    la differenza fra le y per determinare il "segno" che indichi se l'area appartiene
-    alla figura descritta (positiva) o altrimenti (negatva).
-    La somma viene poi dimezzata per ottenere il valore numerico corrispondente all'area del poligono.
-*/
+
+ Level::Level(unsigned difficulty, ALLEGRO_DISPLAY_MODE settings, ALLEGRO_TIMER* tim)
+{
+    defPerInit(settings); 
+    setDifficulty(difficulty);
+    timer = tim;
+}
+
  int Level::getArea(const GameList& GL) const
 {
     if(GL.empty()) return -1;
@@ -132,10 +123,12 @@
 {
     GameList border(defPerimeter);
     GameList trace;
-
     vector<Entity*> entities;
+    Player* player;
+    //Boss* boss; //potrebbe?
+    
     entities_init(entities);
-    Player* player = dynamic_cast<Player*>(entities[0]);
+    player = dynamic_cast<Player*>(entities[0]);
     
     ALLEGRO_EVENT_QUEUE *coda_eventi = al_create_event_queue();
      if(!coda_eventi) 
@@ -151,6 +144,7 @@
     bool redraw {true};
     bool STOP {false};
     int spawn_time{};
+    bool debug_print{false};
 
     al_register_event_source(coda_eventi, al_get_display_event_source(al_get_current_display()));
     al_register_event_source(coda_eventi, al_get_timer_event_source(timer));
@@ -162,74 +156,105 @@
         ALLEGRO_EVENT ev;
         al_wait_for_event(coda_eventi, &ev);
 
-        if(ev.type == ALLEGRO_EVENT_DISPLAY_CLOSE)
+         if(ev.type == ALLEGRO_EVENT_DISPLAY_CLOSE)
             STOP = true;
          else if(ev.type == ALLEGRO_EVENT_TIMER)
         {
-            //condizioni di uscita
-            //STOP = (getArea(border)/2500 <= 30) or (!entities[0]->isAlive()); 
-
-            //routines
+            /*
+                condizioni di uscita
+            */
+            STOP = (getArea(border)/2500 <= 25) or (!entities[0]->isAlive()); 
+            /*
+                routines, pt. 1
+            */
             for(unsigned i=0; i < entities.size(); ++i)
-             if(i < 1 or i > numBosses or 
+             if(i < 1 or //manca la condizione che impedisce la collisione con la traccia 
+                i > numBosses or 
                (i >= 1 and i <= numBosses and (spawn_time<300 or spawn_time>420) and (spawn_time<2101 or spawn_time>2221)))
                 entities[i]->update(border);
-            
-            //boss routines
-            spawn_time++;
+            /*
+                routines, pt. 2
+            */
+            for(unsigned i=0; i < entities.size(); ++i)
+             if(i != 0 and trace.collides(entities[i]->getData()))
+            {
+                //il player deve morire e venire riallocato
+                //entities[i]->setVelocity_x( -entities[i]->getVelocity_x() );
+                //entities[i]->setVelocity_y( -entities[i]->getVelocity_y() );
+                break;
+            }
+            /*
+                boss routines
+            */
+            ++spawn_time;
              if((spawn_time==360 or spawn_time==2161) and entities[1]->isAlive())
             {
                 spawn(entities);
                 if(spawn_time!=360)
                     spawn_time=360;
             }
-            
-            if(border.onEdge(player->getData().center()).first)
+            /*
+                trace routines
+            */
+            if(trace.size() > 2) debug_print = true;
+            if(border.onEdge(player->getData().center()).first and player->getData().center() != trace.front())
+            {
+                 if(debug_print)
+                {
+                    cout << trace << endl;
+                    debug_print = false;
+                }
+                // if(trace.front().collinear(trace.back()) and trace.size() > 1)
+                //    cout << "C" << trace.size() << endl;
                 trace.clear();
+            }//condizione che disabilita l'aggiornamento?
             trace.pushPoint(player->getData().center());
+            /*
+                abilita il redraw
+            */
             redraw = true;
         }
          else if(ev.type == ALLEGRO_EVENT_KEY_DOWN and ev.keyboard.keycode == ALLEGRO_KEY_ESCAPE)
-                    STOP = true;
+            STOP = true;
          else if(ev.type == ALLEGRO_EVENT_KEY_DOWN or ev.type == ALLEGRO_EVENT_KEY_UP)
-                player->setKey(ev.keyboard.keycode, ev.type);
-        
-         if(redraw and al_is_event_queue_empty(coda_eventi) )
+            player->setKey(ev.keyboard.keycode, ev.type);
+        /*
+            QUESTO DEVE DIVENTARE GESTIONE GRAFICA?
+        */
+         if(redraw and al_is_event_queue_empty(coda_eventi))
         {
             redraw = false;
-
-            al_clear_to_color(al_map_rgb(255, 255, 255));
-
+            al_clear_to_color(al_map_rgb(0, 0, 0));
+            //redo this print
+            al_draw_bitmap(entities[0]->getBitmap(), entities[0]->getCord_x(), entities[0]->getCord_y(), 0);
             //ok
-            trace.o_print(al_get_backbuffer(al_get_current_display()));
-
+            trace.u_print(al_get_backbuffer(al_get_current_display()));
             //redo this prints
             for(unsigned i = numBosses; i < entities.size(); ++i)
                 if(entities[i]->isAlive())
                     al_draw_bitmap(entities[i]->getBitmap(), entities[i]->getCord_x(), entities[i]->getCord_y(), 0);
-
             //ok            
-            border.c_print(al_get_backbuffer(al_get_current_display()));
-            
-            al_draw_bitmap(entities[0]->getBitmap(), entities[0]->getCord_x(), entities[0]->getCord_y(), 0);
-
+            border.l_print(al_get_backbuffer(al_get_current_display()));
+            //ok
             al_flip_display();
         }
     }
-
+    /*
+        deallocazione delle risorse locali
+    */
      for(int i{}; i<entities.size(); ++i)
     {
         al_destroy_bitmap(entities[i]->getBitmap());
         delete entities[i];
     }
-
     al_destroy_event_queue(coda_eventi);
+    //non so se ci voglia, quando testeremo partite successive vedremo
     al_stop_timer(timer);
 }
 
 /*
-     if(trace.size() > 1 && 
-        trace.push(Player->getData().c[0], Player->getData().c[1]) &&
+     if(trace.size() > 1 and 
+        trace.push(Player->getData().c[0], Player->getData().c[1]) and
         border.is_adj(trace.back().first, trace.back().second) )
     {
         if(insideTrace(Boss->getData()) )
@@ -243,8 +268,8 @@
         trace.clear();
         return true;
     }
-     else if(!trace.empty() ||
-             (trace.empty() && 
+     else if(!trace.empty() or
+             (trace.empty() and 
               border.is_adj(Player->getData().c[0], Player->getData().c[1])))
         trace.push( Player->getData().c[0], Player->getData().c[1] );
         
