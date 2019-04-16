@@ -11,6 +11,7 @@
         virtual void update(const GameList&) override;
 };
 
+ void push_reverse_way(int &reverse_cont, vector<pair<int, int>> &reverse_way, int &pressed_key);
  class Player: public Entity
 {
     private:
@@ -20,6 +21,11 @@
         int directions[4] = {2, 2, 2, 2};
         KEYS keys[2] = {still, still};
         bool safe = true;
+        bool force_reverse_way = {false};
+        int reverse_cont{0};
+        int pressed_key{0};
+        vector<pair<int, int>>reverse_way;
+        bool first_reverse_step{true};
 
     public:
         Player(float x=0, float y=0, float v=0, ALLEGRO_BITMAP* p=nullptr)
