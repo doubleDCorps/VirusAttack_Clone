@@ -76,6 +76,7 @@ enum DIRS : int {NW=0, NE=1, SE=2, SW=3};
     public:
         HitboxData(float a, float b, float d=0, float e=0): PointData{a, b}, c{d, e} {}
         HitboxData(const HitboxData& H): PointData(H), c{H.c[0], H.c[1]} {}
+        HitboxData(const PointData& P, float dim): PointData(P), c{dim, dim} {}
         HitboxData(const PointData& P): PointData(P), c{2, 2} {}
          HitboxData& operator=(const HitboxData& H)
         { 
