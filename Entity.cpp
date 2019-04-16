@@ -7,9 +7,13 @@
  bool GameList::pushPoint(const PointData& P)
 {
     if(empty() or (size()==1 and P.collinear(back())) or (size()>=2 and !P.collinear(back(), *(++rbegin()))))   push_back(P);
-    else if(size()==1 and P.collinear(front()) or (size()>=2 and !P.collinear(front(), *(++begin()))))          push_front(P);
-    else if(size()>=2 and P.collinear(back(), *(++rbegin())))                                                   back() = P;
-    else if(size()>=2 and P.collinear(front(), *(++begin())))                                                   front() = P;
+    //else if(size()==1 and P.collinear(front()) or (size()>=2 and !P.collinear(front(), *(++begin()))))          push_front(P);
+    else if(size()>=2 and P.collinear(back(), *(++rbegin()))) {
+        if(P == back() and P == *(++rbegin()))
+            pop_back();
+        back() = P;
+        }
+    //else if(size()>=2 and P.collinear(front(), *(++begin())))                                                   front() = P;
     else return false;
     
     return true;

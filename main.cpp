@@ -1,7 +1,5 @@
 #include"Level.h"
 #include<allegro5/allegro.h>
-
-void push_reverse_way(int&, vector<pair<int, int>>&, int&);
  
  int main(int argc, char** argv)
 {

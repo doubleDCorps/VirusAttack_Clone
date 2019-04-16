@@ -12,6 +12,7 @@
         virtual void update(const GameList&) override;
 };
 
+ void push_reverse_way(int &reverse_cont, vector<pair<int, int>> &reverse_way, int &pressed_key);
  class Player: public Entity
 {
     private:
@@ -21,6 +22,11 @@
         int directions[4] = {2, 2, 2, 2};
         KEYS keys[2] = {still, still};
         bool safe = true;
+        bool force_reverse_way = {false};
+        int reverse_cont{0};
+        int pressed_key{0};
+        vector<pair<int, int>>reverse_way;
+        bool first_reverse_step{true};
 
     public:
         Player(float x=0, float y=0, float v=0, ALLEGRO_BITMAP* p=nullptr)
@@ -41,16 +47,15 @@
         { 
              if(keymap.find(key) != keymap.end()) //se il tasto è valido
             {
-                int actual, temp;
-                if(key == ALLEGRO_KEY_SPACE) actual = temp = keys[1];
-                else                         actual = temp = keys[0];
+                int temp;
+                if(key == ALLEGRO_KEY_SPACE) temp = keys[1];
+                else                         temp = keys[0];
                 
-
-                 if(type == ALLEGRO_EVENT_KEY_DOWN and keymap.find(key)->second != actual)
+                 if(type == ALLEGRO_EVENT_KEY_DOWN and keymap.find(key)->second != temp)
                 {
                     temp = keymap.find(key)->second;
                 }
-                 else if(type == ALLEGRO_EVENT_KEY_UP and keymap.find(key)->second == actual)
+                 else if(type == ALLEGRO_EVENT_KEY_UP and keymap.find(key)->second == temp)
                 {
                     temp = still;
                 }
@@ -61,12 +66,32 @@
 
         }
 
+         void setSpace(KEYS key)
+        {
+            keys[1] = key;
+        }
+
+         bool getForce_reverse_way() const
+        {
+            return force_reverse_way;
+        }
+
+         void setForce_reverse_way(bool k)
+        {
+            force_reverse_way = k;
+        }
+
          int getKey(int k) const
         {
             if(index.find(k) != index.end()) 
                 return keys[index.find(k)->second];
 
             return -1; //ERRORE ERRORE ERRORE
+        }
+
+         KEYS getKeys(int x) const
+        {
+            return keys[x];
         }
 };
 

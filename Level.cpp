@@ -162,19 +162,11 @@
         ALLEGRO_EVENT ev;
         al_wait_for_event(coda_eventi, &ev);
 
-        if(ev.type == ALLEGRO_EVENT_DISPLAY_CLOSE)
-            STOP = true;
-         else if(ev.type == ALLEGRO_EVENT_TIMER)
+         if(ev.type == ALLEGRO_EVENT_TIMER)
         {
             //condizioni di uscita
             //STOP = (getArea(border)/2500 <= 30) or (!entities[0]->isAlive()); 
 
-            //routines
-            for(unsigned i=0; i < entities.size(); ++i)
-             if(i < 1 or i > numBosses or 
-               (i >= 1 and i <= numBosses and (spawn_time<300 or spawn_time>420) and (spawn_time<2101 or spawn_time>2221)))
-                entities[i]->update(border);
-            
             //boss routines
             spawn_time++;
              if((spawn_time==360 or spawn_time==2161) and entities[1]->isAlive())
@@ -187,13 +179,24 @@
             if(border.onEdge(player->getData().center()).first)
                 trace.clear();
             trace.pushPoint(player->getData().center());
+
+            //routines
+            for(unsigned i=0; i < entities.size(); ++i)
+             if(i<1 or i > numBosses or 
+               (i >= 1 and i <= numBosses and (spawn_time<300 or spawn_time>420) and (spawn_time<2101 or spawn_time>2221)))
+                entities[i]->update(border);
+        
             redraw = true;
         }
          else if(ev.type == ALLEGRO_EVENT_KEY_DOWN and ev.keyboard.keycode == ALLEGRO_KEY_ESCAPE)
                     STOP = true;
+         else if(ev.type == ALLEGRO_EVENT_DISPLAY_CLOSE)
+            STOP = true;
          else if(ev.type == ALLEGRO_EVENT_KEY_DOWN or ev.type == ALLEGRO_EVENT_KEY_UP)
-                player->setKey(ev.keyboard.keycode, ev.type);
+            player->setKey(ev.keyboard.keycode, ev.type);
+
         
+             
          if(redraw and al_is_event_queue_empty(coda_eventi) )
         {
             redraw = false;
