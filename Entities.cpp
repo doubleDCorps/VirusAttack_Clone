@@ -25,6 +25,8 @@
         if(key==ALLEGRO_KEY_SPACE or (!safe or (!temp or (directions[temp-1]==2 or (keys[1] and directions[temp-1]==1)))))
             keys[index.find(key)->second] = static_cast<KEYS>(temp);
     }
+}
+
 void push_reverse_way(int &reverse_cont, vector<pair<int, int>> &reverse_way, int &pressed_key) {
     if(reverse_cont!=0) {
         if(pressed_key==UP) //UP
@@ -42,36 +44,7 @@ void push_reverse_way(int &reverse_cont, vector<pair<int, int>> &reverse_way, in
 
  void Player::update(const GameList& GL)
 {
-     switch(keys[0])
-    {
-        case LEFT:  if(data.vx() > 0) data.vx( -data.vx() ); break;
-        case RIGHT: if(data.vx() < 0) data.vx( -data.vx() ); break;
-        case UP:    if(data.vy() > 0) data.vy( -data.vy() ); break;
-        case DOWN:  if(data.vy() < 0) data.vy( -data.vy() ); break;
-        default:    break;
-    }
-
-    if(keys[0]!=still)
-     for(unsigned i = UP; i < SPACE; ++i)
-    { 
-        if(!GL.c_inside(data.projection(i).center()))     directions[i-1] = 0; 
-        else if(GL.o_inside(data.projection(i).center())) directions[i-1] = 1;
-        else                                              directions[i-1] = 2;
-    }
     
-     if(keys[0]!=still and directions[keys[0]-1]==1 and (keys[1]!=still or (keys[1]==still and force_reverse_way)))
-    {
-        if(keys[0]==UP or keys[0]==DOWN)    data.y( data.y() + data.vy() );
-        else                                data.x( data.x() + data.vx() );
-    
-    } else if(keys[0]!=still and directions[keys[0]-1]==2)
-    {
-        if(keys[0]==UP or keys[0]==DOWN)    data.y( data.y() + data.vy() );
-        else                                data.x( data.x() + data.vx() );
-    }
-    
-    safe = GL.onEdge(data.center()).first ? true : false;
-
     if(keys[1] != still && !GL.collides(data)) {
             if((keys[0] == UP || keys[0] == DOWN || keys[0] == LEFT || keys[0] == RIGHT) && first_reverse_step) {
                 first_reverse_step=false;
@@ -110,11 +83,7 @@ void push_reverse_way(int &reverse_cont, vector<pair<int, int>> &reverse_way, in
                 reverse_cont++;
                 }
             }
-    else if(GL.collides(data)) {
-        reverse_way.clear();
-        force_reverse_way=false;
-        }
-    else {    
+    else if(keys[1]==still) {    
         push_reverse_way(reverse_cont, reverse_way, pressed_key);
         first_reverse_step=true;
 
@@ -127,7 +96,7 @@ void push_reverse_way(int &reverse_cont, vector<pair<int, int>> &reverse_way, in
         //_____________________________________*/
 
             if(reverse_way.size()!=0) { //ALGORITMO CAMMINO INVERSO
-                if(reverse_way[reverse_way.size()-1].first>0) {
+                if(reverse_way[reverse_way.size()-1].first>=0) {
                     keys[0]=(KEYS)reverse_way[reverse_way.size()-1].second;
                     force_reverse_way=true;
                     }
@@ -137,9 +106,38 @@ void push_reverse_way(int &reverse_cont, vector<pair<int, int>> &reverse_way, in
                     reverse_way.pop_back();
                 }
     }
+    else if(GL.collides(data)) {
+        reverse_way.clear();
+        force_reverse_way=false;
+    }
 
-    return;
-}
+     switch(keys[0])
+    {
+        case LEFT:  if(data.vx() > 0) data.vx( -data.vx() ); break;
+        case RIGHT: if(data.vx() < 0) data.vx( -data.vx() ); break;
+        case UP:    if(data.vy() > 0) data.vy( -data.vy() ); break;
+        case DOWN:  if(data.vy() < 0) data.vy( -data.vy() ); break;
+        default:    break;
+    }
+
+     if(keys[0]!=still and directions[keys[0]-1]==1 and (keys[1]!=still or (keys[1]==still and force_reverse_way)))
+    {
+        if(keys[0]==UP or keys[0]==DOWN)    data.y( data.y() + data.vy() );
+        else                                data.x( data.x() + data.vx() );
+    
+    } else if(keys[0]!=still and directions[keys[0]-1]==2)
+    {
+        if(keys[0]==UP or keys[0]==DOWN)    data.y( data.y() + data.vy() );
+        else                                data.x( data.x() + data.vx() );
+    }
+   
+    if(keys[0]!=still)
+     for(unsigned i = UP; i < SPACE; ++i)
+    { 
+        if(!GL.c_inside(data.projection(i).center()))     directions[i-1] = 0; 
+        else if(GL.o_inside(data.projection(i).center())) directions[i-1] = 1;
+        else                                              directions[i-1] = 2; //keys[1] = SPACE; }
+    }
 
     safe = GL.onEdge(data.center()).first ? true : false;
 }
