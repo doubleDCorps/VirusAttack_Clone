@@ -12,7 +12,9 @@
 #include<cstdlib>
 #include<cmath>
 #include<map>
+#include<algorithm>
 #include<cassert>
+#include<climits>
 using namespace std;
 
 enum AXIS : int {none=0, X=1, Y=2, XY=3};
@@ -26,22 +28,22 @@ enum DIRS : int {NW=0, NE=1, SE=2, SW=3};
         EntityData: coordinata x, coordinata y, larghezza, altezza, velocità x, velocità y
     Il polimorfismo viene sfruttato per rendere più lineari alcune chiamate a funzione nella classe Level.
 */
- struct PointData
+ class PointData
 {
     protected:
         float p[2];
 
     public:
-        constexpr static float EPS{2};
-
+        constexpr static float EPS{0.1F};
+        PointData(): p{0.0F, 0.0F} {}
         PointData(float a, float b): p{a, b} {}
         PointData(const PointData& P): p{P.p[0], P.p[1]} {}
          PointData& operator=(const PointData& P)
         { 
              if(this != &P)
             { 
-                p[0]=P.p[0];
-                p[1]=P.p[1];
+                this->p[0]=P.p[0];
+                this->p[1]=P.p[1];
             } 
             return *this;
         }
@@ -63,6 +65,10 @@ enum DIRS : int {NW=0, NE=1, SE=2, SW=3};
             Verifica se i tre punti si trovano tutti sulla stessa retta (ossia, sono reciprocamente collineari).
         */
          bool collinear(const PointData&, const PointData&) const;
+        /*
+            Genera la proiezione del punto sul segmento con estremi i due parametri.
+        */
+         PointData projection(const PointData&, const PointData&) const;
 };
 
  class HitboxData: public PointData
@@ -76,15 +82,15 @@ enum DIRS : int {NW=0, NE=1, SE=2, SW=3};
     public:
         HitboxData(float a, float b, float d=0, float e=0): PointData{a, b}, c{d, e} {}
         HitboxData(const HitboxData& H): PointData(H), c{H.c[0], H.c[1]} {}
-        HitboxData(const PointData& P, float dim): PointData(P), c{dim, dim} {}
-        HitboxData(const PointData& P): PointData(P), c{2, 2} {}
+        HitboxData(const PointData& P, float dx=4, float dy=4): PointData({P.x()-dx/2, P.y()-dy/2}), c{dx, dy} {}
+        //HitboxData(const PointData& P): PointData(P), c{2, 2} {}
          HitboxData& operator=(const HitboxData& H)
         { 
-            PointData::operator=(H);
              if(this!=&H)
             {
-                c[0]=H.c[0];
-                c[1]=H.c[1]; 
+                PointData::operator=(H);
+                this->c[0]=H.c[0];
+                this->c[1]=H.c[1]; 
             } 
             
             return *this; 
@@ -120,15 +126,17 @@ enum DIRS : int {NW=0, NE=1, SE=2, SW=3};
     public:
         EntityData(float a, float b, float c=0, float d=0, float e=0, float f=0): HitboxData{a, b, e, f}, v{c, d} {}
         EntityData(const EntityData& E): HitboxData(E), v{E.v[0], E.v[1]} {}
-        EntityData(const HitboxData& H): HitboxData(H), v{0, 0} {}
-        EntityData(const PointData& P): HitboxData(P), v{0, 0} {}
+        explicit EntityData(const HitboxData& H, float vx=0, float vy=0): HitboxData(H), v{vx, vy} {}
+        explicit EntityData(const PointData& P, float dx=2, float dy=2, float vx=0, float vy=0): HitboxData(P, dx, dy), v{vx, vy} {}
+        //EntityData(const HitboxData& H): HitboxData(H), v{0, 0} {}
+        //EntityData(const PointData& P): HitboxData(P), v{0, 0} {}
          EntityData& operator=(const EntityData& E)
         { 
-            HitboxData::operator=(E);
              if(this!=&E)
             {
-                c[0]=E.c[0];
-                c[1]=E.c[1]; 
+                HitboxData::operator=(E);
+                this->c[0]=E.c[0];
+                this->c[1]=E.c[1]; 
             } 
             
             return *this; 
@@ -164,10 +172,21 @@ enum DIRS : int {NW=0, NE=1, SE=2, SW=3};
     public:
         GameList(): thickness(1), color(al_map_rgb(255, 255, 255)) {}
         GameList(const perimeter& p, float t = 1, ALLEGRO_COLOR c = al_map_rgb(255, 255, 255)): thickness(t), color(c) { for(auto& i : p) pushPoint(i); }
-        
-        PointData front() const { return perimeter::front(); }
-        void clear() { perimeter::clear(); }
-        bool empty() const { return perimeter::empty(); }
+        GameList(const GameList& GL): perimeter(GL), thickness(GL.thickness), color(GL.color) {}
+         GameList& operator=(const GameList& GL)
+        {
+             if(this != &GL)
+            {
+                perimeter::operator=(GL);
+                thickness = GL.thickness;
+                color = GL.color;
+            }
+
+            return *this;
+        }
+        //PointData front() const { return perimeter::front(); }
+        //void clear() { perimeter::clear(); }
+        //bool empty() const { return perimeter::empty(); }
         
         /*
             Aggiungi un punto sul tracciato, se soddisfa le condizioni.
@@ -182,9 +201,16 @@ enum DIRS : int {NW=0, NE=1, SE=2, SW=3};
             Se la liena è aperta, verifica se l'hitbox si trova a sinistra della linea.
         */
         bool inArea(const HitboxData&) const;
+
+        /*
+            Restituisce il punto più vicino a quello ricevuto in input.
+        */
+        PointData nearestPoint(const PointData&) const;
         
-        // ?metodo che restituisce un PointData contenente le distanze minime sui due assi?
-        
+        /*
+            Restituisce la coppia di estremi del segmento più vicino al punto dato.
+        */
+        pair<PointData, PointData> nearestLine(const PointData&) const;
         /*
             Utilizza onEdge per verificare che la collisione sia coerente con la direzione
             di movimento dell'Entity.
@@ -266,7 +292,7 @@ enum DIRS : int {NW=0, NE=1, SE=2, SW=3};
         /*
             Verifica se l'entità è ancora in vita (attiva).
         */
-        bool isAlive() const                    { return lifes > 0; }
+        unsigned isAlive() const                { return lifes; }
         /*
             Imposta il numero di vite al valore restituito.
             ERRORE: il Player mette un limite più stringente

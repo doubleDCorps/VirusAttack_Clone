@@ -24,9 +24,11 @@
         bool force_reverse_way = {false};
         int reverse_cont{0};
         int pressed_key{0};
-        vector<pair<int, int>>reverse_way;
+        vector<pair<int, int>> reverse_way;
         bool first_reverse_step{true};
 
+        using Entity::setVelocity_x;
+        using Entity::setVelocity_y;
     public:
         Player(float x=0, float y=0, float v=0, ALLEGRO_BITMAP* p=nullptr)
             : Entity(x, y, v, v, p, 4) {}
@@ -56,6 +58,10 @@
             Restituisce lo stato attuale dello spazio (premuto/non premuto).
         */
         bool getSpace() const   { return keys[1]!=still; }
+        /*
+            imposta il centro del player alla posizione indicata.
+        */
+        void setCenter(const PointData& P) { data.x(P.x()-data.dx()/2.0F); data.y(P.y()-data.dy()/2.0F); }
 };
 
 #endif

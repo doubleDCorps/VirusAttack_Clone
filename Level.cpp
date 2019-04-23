@@ -144,7 +144,7 @@
     bool redraw {true};
     bool STOP {false};
     int spawn_time{};
-    bool debug_print{false};
+    bool trace_condition{false};
 
     al_register_event_source(coda_eventi, al_get_display_event_source(al_get_current_display()));
     al_register_event_source(coda_eventi, al_get_timer_event_source(timer));
@@ -165,6 +165,19 @@
             */
             STOP = (getArea(border)/2500 <= 25) or (!entities[0]->isAlive()); 
             /*
+                routines, pt. 2
+            */
+            if(!player->isSafe())
+            for(unsigned i=1; i < entities.size(); ++i)
+             if(entities[i]->isAlive() and trace.collides(entities[i]->getData()))
+            {
+                player->setCenter(border.nearestPoint(player->getData()));
+                //player->setAlive(player->isAlive() - 1);
+                cout << trace << endl;
+                trace.clear();
+                break;
+            }
+            /*
                 routines, pt. 1
             */
             for(unsigned i=0; i < entities.size(); ++i)
@@ -172,17 +185,6 @@
                 i > numBosses or 
                (i >= 1 and i <= numBosses and (spawn_time<300 or spawn_time>420) and (spawn_time<2101 or spawn_time>2221)))
                 entities[i]->update(border);
-            /*
-                routines, pt. 2
-            */
-            for(unsigned i=0; i < entities.size(); ++i)
-             if(i != 0 and trace.collides(entities[i]->getData()))
-            {
-                //il player deve morire e venire riallocato
-                //entities[i]->setVelocity_x( -entities[i]->getVelocity_x() );
-                //entities[i]->setVelocity_y( -entities[i]->getVelocity_y() );
-                break;
-            }
             /*
                 boss routines
             */
@@ -196,19 +198,32 @@
             /*
                 trace routines
             */
-            if(trace.size() > 2) debug_print = true;
-            if(border.onEdge(player->getData().center()).first and player->getData().center() != trace.front())
+            auto center = player->getData().center();
+            if(!player->isSafe())
+                trace_condition = true;
+            
+            trace.pushPoint(center);
+             if(trace.size() > 1)
             {
-                 if(debug_print)
-                {
-                    cout << trace << endl;
-                    debug_print = false;
+                auto temp = border.nearestLine(trace.front());
+                trace.front() = trace.front().projection(temp.first, temp.second);
+            }
+             if(border.onEdge(trace.back()).first and trace.back() != trace.front())
+            {
+                 if(trace_condition)
+                {   
+                    trace_condition = false;
+
+                    auto temp = border.nearestLine(trace.back());
+                    trace.back() = trace.back().projection(temp.first, temp.second);
+                    
+                    cout << trace << endl; 
+                    
+                    //algoritmo del taglio
                 }
-                // if(trace.front().collinear(trace.back()) and trace.size() > 1)
-                //    cout << "C" << trace.size() << endl;
+
                 trace.clear();
-            }//condizione che disabilita l'aggiornamento?
-            trace.pushPoint(player->getData().center());
+            }
             /*
                 abilita il redraw
             */
@@ -231,8 +246,8 @@
             trace.u_print(al_get_backbuffer(al_get_current_display()));
             //redo this prints
             for(unsigned i = numBosses; i < entities.size(); ++i)
-                if(entities[i]->isAlive())
-                    al_draw_bitmap(entities[i]->getBitmap(), entities[i]->getCord_x(), entities[i]->getCord_y(), 0);
+             if(entities[i]->isAlive())
+                al_draw_bitmap(entities[i]->getBitmap(), entities[i]->getCord_x(), entities[i]->getCord_y(), 0);
             //ok            
             border.l_print(al_get_backbuffer(al_get_current_display()));
             //ok
