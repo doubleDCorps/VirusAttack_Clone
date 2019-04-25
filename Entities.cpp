@@ -81,6 +81,15 @@ void push_reverse_way(int &reverse_cont, vector<pair<int, int>> &reverse_way, in
                 pressed_key = RIGHT;
                 reverse_cont++;
                 }
+                
+            if(reverse_way.size()!=0)
+                if(keys[0] == reverse_way[reverse_way.size()-1].second) {
+                    reverse_way[reverse_way.size()-1].first--;
+                    reverse_cont--;
+                    if(reverse_way[reverse_way.size()-1].first==0)
+                        reverse_way.pop_back();
+                    }
+
             }
     else if(keys[1]==still) {    
         push_reverse_way(reverse_cont, reverse_way, pressed_key);
