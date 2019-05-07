@@ -85,7 +85,7 @@ void push_reverse_way(int &reverse_cont, vector<pair<int, int>> &reverse_way, in
             if(reverse_way.size()!=0)
                 if(keys[0] == reverse_way[reverse_way.size()-1].second) {
                     reverse_way[reverse_way.size()-1].first--;
-                    reverse_cont--;
+                    reverse_cont--; //se diventasse =0?
                     if(reverse_way[reverse_way.size()-1].first==0)
                         reverse_way.pop_back();
                     }
@@ -113,8 +113,13 @@ void push_reverse_way(int &reverse_cont, vector<pair<int, int>> &reverse_way, in
                     reverse_way.pop_back();
             }
     }
+
     if(GL.onEdge(data.center()).first) {
+    
         reverse_way.clear();
+        first_reverse_step=true;
+        reverse_cont=0;
+        pressed_key = still;
         force_reverse_way = false;
     }
 
@@ -126,8 +131,7 @@ void push_reverse_way(int &reverse_cont, vector<pair<int, int>> &reverse_way, in
         case DOWN:  if(data.vy() < 0) data.vy( -data.vy() ); break;
         default:    break;
     }
-
-    if(keys[0]!=still)
+    
      for(unsigned i = UP; i < SPACE; ++i)
     { 
         if(!GL.c_inside(data.projection(i).center()))     directions[i-1] = 0; 

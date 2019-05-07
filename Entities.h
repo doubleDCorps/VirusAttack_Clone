@@ -21,10 +21,11 @@
         int directions[4] = {2, 2, 2, 2};
         KEYS keys[2] = {still, still};
         bool safe = true;
-        bool force_reverse_way = {false};
+
+        vector<pair<int, int>> reverse_way;
         int reverse_cont{0};
         int pressed_key{0};
-        vector<pair<int, int>> reverse_way;
+        bool force_reverse_way = {false};
         bool first_reverse_step{true};
 
         using Entity::setVelocity_x;
@@ -61,7 +62,24 @@
         /*
             imposta il centro del player alla posizione indicata.
         */
-        void setCenter(const PointData& P) { data.x(P.x()-data.dx()/2.0F); data.y(P.y()-data.dy()/2.0F); }
+         void setCenter(const PointData& P)
+        { 
+            data.x(P.x()-data.dx()/2.0F);
+            data.y(P.y()-data.dy()/2.0F);
+        }
+        /*
+            Svuota la pila dell'algoritmo reverse_way.
+        */
+         void clearReverse()
+        { 
+            reverse_way.clear();
+            pressed_key=still;
+            reverse_cont=0;
+            force_reverse_way=false;
+            first_reverse_step=true;
+            keys[1] = still;
+            keys[0] = still;
+        }
 };
 
 #endif

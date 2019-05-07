@@ -1,14 +1,6 @@
 #ifndef POLY_H_
 #define POLY_H_
 #include"Entities.h"
- /*
-    Inizializza tutte le entità (Player/Boss/altri nemici) in accordo con il display. 
- */
- void entities_init(vector<Entity*>& entities);
- /*
-    Se ci sono dei nemici inattivi, uno viene riattivato all'interno dell'area di gioco.
- */
- void spawn(vector<Entity*>& entities);
 
  class Level
 {
@@ -30,7 +22,13 @@
         unsigned difficulty;
         ALLEGRO_TIMER* timer;
         unsigned numBosses;
-        
+        /*
+            Parametri usati in loop.
+        */
+        GameList border;
+        GameList trace;
+        vector<Entity*> entities;
+        Player* player;
         /*
             Inizializza il bordo di default del livello (uguale per tutti).
         */
@@ -43,6 +41,14 @@
             Getter della difficoltà.
         */
         unsigned getDifficulty() const;
+        /*
+            Inizializza tutte le entità (Player/Boss/altri nemici) in accordo con il display. 
+        */
+        void entities_init();
+        /*
+            Se ci sono dei nemici inattivi, uno viene riattivato all'interno dell'area di gioco.
+        */
+        void spawn();
         /*
             Viene calcolata l'area utilizzando il seguente algoritmo:
             dato un poligono chiuso definito da una lista di coordinate (x, y) concatenate,

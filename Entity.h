@@ -54,7 +54,7 @@ enum DIRS : int {NW=0, NE=1, SE=2, SW=3};
         void x(float x) { p[0] = x > 0 ? x : 0; } 
         void y(float y) { p[1] = y > 0 ? y : 0; }
 
-        bool operator==(const PointData& P) const { return fabs(p[0] - P.p[0])<=EPS and fabs(p[1] - P.p[1])<=EPS; }
+        bool operator==(const PointData& P) const { return abs(p[0] - P.p[0])<=EPS and abs(p[1] - P.p[1])<=EPS; }
         bool operator!=(const PointData& P) const { return !(*this == P); } 
         /*
             Verifica se due punti sono collineari (la coordinata x oppure y è corrispondente).
@@ -65,6 +65,10 @@ enum DIRS : int {NW=0, NE=1, SE=2, SW=3};
             Verifica se i tre punti si trovano tutti sulla stessa retta (ossia, sono reciprocamente collineari).
         */
          bool collinear(const PointData&, const PointData&) const;
+        /*
+            Calcola la distanza fra due punti.
+        */
+         float distance(const PointData&) const;
         /*
             Genera la proiezione del punto sul segmento con estremi i due parametri.
         */
@@ -225,6 +229,10 @@ enum DIRS : int {NW=0, NE=1, SE=2, SW=3};
             Verifica se l'hitbox si trovi dentro l'area (bordo incluso).
         */
         bool c_inside(const HitboxData&) const;
+        /*
+            Verifica che il tracciato sia chiuso.
+        */
+        bool is_closed() const;
         /*
             Stampa l'oggetto senza l'ultimo tratto (la chiusura).
         */

@@ -4,8 +4,8 @@
 
  AXIS PointData::collinear(const PointData& P) const  
 { 
-    bool by = abs(p[1] - P.p[1])<=EPS;
     bool bx = abs(p[0] - P.p[0])<=EPS;
+    bool by = abs(p[1] - P.p[1])<=EPS;
             
     return
         bx and by ? XY :
@@ -15,51 +15,52 @@
 
  bool PointData::collinear(const PointData& P1, const PointData& P2) const
 {
-    //static AXIS past1 = none, past2 = none;
-
     AXIS r1 = collinear(P1);
     AXIS r2 = collinear(P2);
-    /*
-    if(past1 != r1 or past2 != r2)
-    {
-        switch(r1){
-            case none:  cout << "none "; break;
-            case X:     cout << "X "; break;
-            case Y:     cout << "Y "; break;
-            case XY:    cout << "XY "; break;
-        }
-        switch(r2){
-            case none:  cout << " none "; break;
-            case X:     cout << " X "; break;
-            case Y:     cout << " Y "; break;
-            case XY:    cout << " XY "; break;
-        }
-        cout << endl;
-        past1 = r1;
-        past2 = r2;
-    }
-    */
+
     return
         r1 != none and 
         r2 != none and 
         (r1 == XY or r2 == XY or r1 == r2);
 }
 
+ float PointData::distance(const PointData& P) const
+{
+    AXIS condition = collinear(P);
+
+     if(condition == none)
+    {
+        float x = p[0] - P.p[0];
+        float y = p[1] - P.p[1];
+
+        return sqrt(x*x + y*y);
+    }
+     else if(condition == X)
+    {
+        return p[1] - P.p[1];
+    }
+     else if(condition == Y)
+    {
+        return p[0] - P.p[0];
+    }
+
+    return 0.0F;
+}
+
  PointData PointData::projection(const PointData& P1, const PointData& P2) const
 {
-    AXIS cond = P1.collinear(P2);
-    
-    if(cond == X)       return {P1.p[0], p[1]};
-    else if(cond == Y)  return {p[0], P1.p[1]};
-    else if(cond == XY) return P1;
-    
-    float x0 = min(P1.p[0], P2.p[0]),       y0 = min(P1.p[1], P2.p[1]);
-    float tx = max(P1.p[0], P2.p[0]) - x0,  ty = max(P1.p[1], P2.p[1]) - y0;    
-    float x = abs(p[0]-x0),                 y = abs(p[1]-y0);
+    float vx = P1.p[0] - P2.p[0];
+    float vy = P1.p[1] - P2.p[1];
+    float wx = p[0] - P2.p[0];
+    float wy = p[1] - P2.p[1];
 
-    float k = (x*tx + y*ty)/(tx*tx + ty*ty);
+    float k = (wx*vx + wy*vy)/(vx*vx + vy*vy);
 
-    return { k*x, k*y };
+    vx = k*vx + P2.p[0];
+    vy = k*vy + P2.p[1];
+
+    return {in_range(vx, min(P1.p[0], P2.p[0]), max(P1.p[0], P2.p[0])) ? vx : P2.p[0],
+            in_range(vy, min(P1.p[1], P2.p[1]), max(P1.p[1], P2.p[1])) ? vy : P2.p[1]};
 }
 
 //Metodi della classe HitboxData
@@ -95,13 +96,10 @@
 //Metodi della classe EntityData
 
  HitboxData EntityData::projection(unsigned i) const
-{ 
-    float offX {v[0] < 0 ? -1.0F : 1.0F};
-    float offY {v[1] < 0 ? -1.0F : 1.0F};
-     
+{  
      return
-    {   p[0] + projDir_x[i-1]*v[0]*offX*3.0F,
-        p[1] + projDir_y[i-1]*v[1]*offY*3.0F,
+    {   p[0] + projDir_x[i-1]*abs(v[0])*3.0F,
+        p[1] + projDir_y[i-1]*abs(v[1])*3.0F,
         c[0], 
         c[1]
     };
@@ -119,24 +117,22 @@
 
  bool GameList::pushPoint(const PointData& P)
 {
-    if(size()>=2 and P.collinear(back(), *(++rbegin())))
+    if(find(begin(), end(), P)!=end())
+        pop_back();
+
+     if(size()>=2 and P!=back() and P!=*(++rbegin()) and P.collinear(back(), *(++rbegin())))
     {
         back() = P;
     }
-    else if(empty() or
-        (size()==1 and P.collinear(back()) and P != back()) or 
-        (size()>=2 and !P.collinear(back(), *(++rbegin())) and P != back()))
+    if(empty() or (P != back() and P!=*(++rbegin()) and
+        (size()==1 and P.collinear(back())) or 
+        (size()>=2 and !P.collinear(back(), *(++rbegin())))))
     {
         
         push_back(P);
     }
     else
         return false;
-
-    if(size()>=2 and P==back() and P==*(++rbegin()))
-    {
-        pop_back();
-    }
 
     return true;
 }
@@ -201,49 +197,55 @@
 }
 
  bool GameList::o_inside(const HitboxData& P) const { return !(onEdge(P).first) and inArea(P); }
- bool GameList::c_inside(const HitboxData& P) const { return onEdge(P).first or inArea(P); }
+ bool GameList::c_inside(const HitboxData& P) const { return   onEdge(P).first  or  inArea(P); }
+
+ bool GameList::is_closed() const
+{
+    for(auto it{begin()}; it != end(); ++it)
+     if(!it->collinear(*successor(it)))
+        return false;
+    return true;
+}
 
  PointData GameList::nearestPoint(const PointData& P) const
 {
-    PointData temp = {0.0F, 0.0F};
-    PointData dist = {10000.0F, 10000.0F};
+    perimeter::const_iterator output{begin()};
+    float dist = 100000.0F;
+    float condition;
 
-    for(const PointData& i : *this)
-     if(abs(i.x() - P.x()) < dist.x() or (abs(i.x() - P.x()) == dist.x() and abs(i.y() - P.y()) < dist.y()))
+     for(auto it{ begin() }; it != end(); ++it)
     {
-        dist.x(abs(i.x() - P.x()));
-        dist.y(abs(i.y() - P.y()));
-        temp = i;
+        condition = abs(P.distance(P.projection(*it, *successor(it))));
+         if(condition < dist)
+        {
+            dist = condition;
+            output = it;
+        }
     }
-
-    return temp;
+    
+    return P.projection(*output, *successor(output));
 }
 
  pair<PointData, PointData> GameList::nearestLine(const PointData& P) const
 {
     perimeter::const_iterator t1{cbegin()};
-    perimeter::const_iterator t2{successor(cbegin())};
     float dist = 10000.0F;
+    float condition;
 
      for(auto it{cbegin()}; it != cend(); ++it)
     {
-         if(it->collinear(*successor(it)) == X and abs(P.x() - it->x()) < dist)
+        condition = abs(P.distance(P.projection(*it, *successor(it))));
+         if(condition < dist)
         {
-            dist = abs(P.x() - it->x());
+            dist = condition;
             t1 = it;
-            t2 = successor(it);
-        }
-         else if(it->collinear(*successor(it)) == Y and abs(P.y() - it->y()) < dist)
-        {
-            dist = abs(P.y() - it->y());
-            t1 = it;
-            t2 = successor(it);
         }
     }
 
-    return {*t1, *t2};
+    return {*t1, *successor(t1)};
 }
 
+//DA RIFARE
  void GameList::u_print(ALLEGRO_BITMAP* buffer) const
 {
     if(empty()) return;
@@ -259,13 +261,14 @@
                              color, thickness);
 
             else if(abs(it->y() - successor(it)->y()) <= PointData::EPS)
-                al_draw_line(min(it->x(), successor(it)->x())-thickness/2.0, it->y(),
-                             max(it->x(), successor(it)->x())+thickness/2.0, it->y(), 
+                al_draw_line(min(it->x(), successor(it)->x())-thickness/2.0F, it->y(),
+                             max(it->x(), successor(it)->x())+thickness/2.0F, it->y(), 
                              color, thickness);
         }
     }
 }
 
+//DA RIFARE
  void GameList::l_print(ALLEGRO_BITMAP* buffer) const
 {
     if(empty()) return;
@@ -276,13 +279,13 @@
          for(auto it{ begin() }; it != end(); ++it)
         {
             if(abs(it->x() - successor(it)->x()) <= PointData::EPS)
-                al_draw_line(it->x(), min(it->y(), successor(it)->y())-thickness/2,
-                             it->x(), max(it->y(), successor(it)->y())+thickness/2,
+                al_draw_line(it->x(), min(it->y(), successor(it)->y())-thickness/2.0F,
+                             it->x(), max(it->y(), successor(it)->y())+thickness/2.0F,
                              color, thickness);
 
             else if(abs(it->y() - successor(it)->y()) <= PointData::EPS)
-                al_draw_line(min(it->x(), successor(it)->x())-thickness/2, it->y(),
-                             max(it->x(), successor(it)->x())+thickness/2, it->y(), 
+                al_draw_line(min(it->x(), successor(it)->x())-thickness/2.0F, it->y(),
+                             max(it->x(), successor(it)->x())+thickness/2.0F, it->y(), 
                              color, thickness);
         }
     }
