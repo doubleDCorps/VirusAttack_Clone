@@ -30,13 +30,11 @@
         al_destroy_timer(timer);
         return -1;
     }
-    
     /*
         Istanzia il livello (qui in futuro istanze di menu etc.?)
     */
     Level level(1, disp_data, timer);
     level.loop();
-
     /*
         Deallocazione risorse condivise.
     */

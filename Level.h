@@ -1,6 +1,6 @@
 #ifndef POLY_H_
 #define POLY_H_
-#include"Entities.h"
+#include"Player.h"
 
  class Level
 {

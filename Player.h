@@ -1,17 +1,10 @@
-#ifndef ENTITIES_H
-#define ENTITIES_H
+#ifndef PLAYER_H
+#define PLAYER_H
 
-#include "Entity.h"
-
- class Enemy: public Entity
-{
-    public:
-        Enemy(float x=0, float y=0, float vx=0, float vy=0, ALLEGRO_BITMAP* p=nullptr): Entity(x, y, vx, vy, p, 1) {}
-
-        virtual void update(const GameList&) override;
-};
+#include "Enemy.h"
 
  void push_reverse_way(int &reverse_cont, vector<pair<int, int>> &reverse_way, int &pressed_key);
+
  class Player: public Entity
 {
     private:

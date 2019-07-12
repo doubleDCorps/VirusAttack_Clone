@@ -1,17 +1,4 @@
-#include"Entities.h"
-
- void Enemy::update(const GameList& GL)
-{     
-     if(GL.c_inside(data))
-    {
-        if(GL.collides(data) == X)  data.vx( -data.vx() );
-        if(GL.collides(data) == Y)  data.vy( -data.vy() );
-
-        data.x( data.x() + data.vx() );
-        data.y( data.y() + data.vy() );
-    }
-     else setAlive(false);
-}
+#include"Player.h"
 
  void Player::setKey(int key, ALLEGRO_EVENT_TYPE type)
 { 
@@ -28,7 +15,9 @@
 }
 
 void push_reverse_way(int &reverse_cont, vector<pair<int, int>> &reverse_way, int &pressed_key) {
+    
     if(reverse_cont!=0) {
+        
         if(pressed_key==UP) //UP
             reverse_way.push_back({reverse_cont, DOWN});
         else if(pressed_key==LEFT) //LEFT
@@ -39,7 +28,7 @@ void push_reverse_way(int &reverse_cont, vector<pair<int, int>> &reverse_way, in
             reverse_way.push_back({reverse_cont, LEFT});
 
         reverse_cont=0;
-        }
+    }
 }
 
  void Player::update(const GameList& GL)

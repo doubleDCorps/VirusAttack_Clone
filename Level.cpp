@@ -1,5 +1,23 @@
 #include "Level.h"
 
+ void Level::defPerInit(ALLEGRO_DISPLAY_MODE d)
+{
+    float x{ d.width/2  - 500/2.0f };
+    float y{ d.height/2 - 500/2.0f };
+
+    defPerimeter = {
+        {x      , y      },
+        {x + 500, y      },
+        {x + 500, y + 500},
+        {x      , y + 500}
+    };
+}
+
+ void Level::setDifficulty(unsigned difficulty)
+{
+    numBosses = 1;
+}
+
  void Level::entities_init()
 {
     entities.push_back(new Player{135, 150, al_create_bitmap(30,30)});                                        //PLAYER
@@ -81,31 +99,6 @@
     }
 }
 
- void Level::setDifficulty(unsigned difficulty)
-{
-    numBosses = 1;
-}
-
- void Level::defPerInit(ALLEGRO_DISPLAY_MODE d)
-{
-    float x{ d.width/2  - 500/2.0f };
-    float y{ d.height/2 - 500/2.0f };
-
-    defPerimeter = {
-        {x      , y      },
-        {x + 500, y      },
-        {x + 500, y + 500},
-        {x      , y + 500}
-    };
-}
-
- Level::Level(unsigned difficulty, ALLEGRO_DISPLAY_MODE settings, ALLEGRO_TIMER* tim)
-{
-    defPerInit(settings); 
-    setDifficulty(difficulty);
-    timer = tim;
-}
-
  int Level::getArea(const GameList& GL) const
 {
     if(GL.size() < 2) return -1;
@@ -116,7 +109,14 @@
                 ( GL.successor(it)->y() - it->y() );
     area/=2;
 
-    return area;
+    return abs(area);
+}
+
+ Level::Level(unsigned difficulty, ALLEGRO_DISPLAY_MODE settings, ALLEGRO_TIMER* tim)
+{
+    defPerInit(settings); 
+    setDifficulty(difficulty);
+    timer = tim;
 }
 
  void Level::loop()
@@ -132,7 +132,7 @@
     {
         al_destroy_display(al_get_current_display());
         al_destroy_timer(timer); 
-        return; 
+        return;
     }
 
     al_set_target_bitmap(al_get_backbuffer(al_get_current_display()));
@@ -153,14 +153,126 @@
         ALLEGRO_EVENT ev;
         al_wait_for_event(coda_eventi, &ev);
 
-         if(ev.type == ALLEGRO_EVENT_DISPLAY_CLOSE)
+        if(ev.type == ALLEGRO_EVENT_DISPLAY_CLOSE)
             STOP = true;
          else if(ev.type == ALLEGRO_EVENT_TIMER)
         {
             /*
                 condizioni di uscita
             */
-            STOP = (getArea(border)/2500 <= 5) or (!entities[0]->isAlive()); 
+            STOP = (getArea(border)/2500 <= 20) or (!entities[0]->isAlive());
+            if(STOP)
+                cout << getArea(border)/2500; 
+            /*
+                trace routines
+            */
+            auto center = player->getData().center();
+            if(!player->isSafe())
+                trace_condition = true;
+            
+            trace.pushPoint(center);
+             if(trace.size() > 1)
+            {
+                auto temp = border.nearestLine(trace.front());
+                trace.front() = trace.front().projection(temp.first, temp.second);
+            }
+             if(border.onEdge(center).first and trace.back() != trace.front())
+            {
+                
+                auto temp = border.nearestLine(trace.back());
+                trace.back() = trace.back().projection(temp.first, temp.second);
+                    
+                 if(trace_condition)
+                {   
+                    trace_condition = false;
+
+                    if(trace.back() == trace.front())
+                        trace.pop_back();
+                    if(trace.size() >= 2) {
+                    cout << "trace" << trace << endl; 
+                    cout << "border" << border << endl;
+                    
+                    GameList first = trace;  //prima partizione
+                    GameList second = trace; //seconda partizione
+
+                    //si inizializzano i due punti di inserimento
+                    perimeter::iterator startFirst, startSecond;
+                    perimeter::iterator iFirst, iSecond;
+                    perimeter::iterator endFirst, endSecond;
+                    short condizione = 0;
+                    for(auto it{border.begin()}; it!=border.end(); ++it) {
+                        if(trace.front().collinear(*it, *border.successor(it))) {
+                            if(condizione == 0) condizione = 1;
+                            if(condizione == 1) {
+                                endSecond = border.successor(it);
+                                endFirst = it; 
+                            } else if(condizione == 2) {
+                                endSecond = it;
+                                endFirst = border.successor(it);      
+                            }
+                        }
+                        if(trace.back().collinear(*it, *border.successor(it))) {
+                            if(condizione == 0) condizione = 2;
+                            if(condizione == 1) {
+                                startSecond = iSecond = it;
+                                startFirst = iFirst = border.successor(it);
+                            } else if(condizione == 2) {
+                                startSecond = iSecond = border.successor(it);
+                                startFirst = iFirst = it;
+                            }
+                        }
+                    }
+
+                    //VA VERIFICATO CHE DUE PUNTI NON SIANO SULLA STESSA PARTIZIONE
+                    bool specialCase1 = (startFirst == endSecond);
+                    bool specialCase2 = (startSecond == endFirst);
+
+                    //si inseriscono gli elementi nelle due liste finchè non sono finiti
+                    if(!specialCase1) { 
+                    while(endSecond != iFirst) {
+                        
+                        assert(iFirst != border.end());
+                        
+                        first.pushPoint(*iFirst);
+                        if(condizione == 2)
+                            iFirst = border.predecessor(iFirst);
+                        else
+                            iFirst = border.successor(iFirst);                            
+                    }
+                    }else if(!specialCase2){
+                    while(endFirst != iSecond) {
+                        
+                        assert(iSecond != border.end()); 
+                        
+                        second.pushPoint(*iSecond);
+                        if(condizione == 2) 
+                            iSecond = border.successor(iSecond);
+                        else                  
+                            iSecond = border.predecessor(iSecond);
+                    }
+                    } else if(specialCase1){
+                        
+                        if(condizione == 2) {
+                            for(auto it{iSecond}; border.successor(it) != iSecond; it = border.successor(it))
+                                second.pushPoint(*it);
+                            second.pushPoint(*endSecond);
+                        } else {
+                            for(auto it{iFirst}; border.successor(it) != iFirst; it = border.successor(it))
+                                first.pushPoint(*it);
+                            first.pushPoint(*endFirst);
+                        }
+                    } 
+
+                    cout << "first" << first << endl;
+                    cout << "second" << second << endl;
+                    
+                    if(first.c_inside(entities[1]->getData()))  border = first;
+                    else                                        border = second;
+                    }
+                    player->clearReverse();
+                }
+                trace.clear();
+            }
             /*
                 routines, pt. 2
             */
@@ -168,11 +280,10 @@
             for(unsigned i=1; i < entities.size(); ++i)
              if(entities[i]->isAlive() and trace.collides(entities[i]->getData()))
             {
-                //player->setCenter(border.nearestPoint(player->getData()));
+                player->setCenter(border.nearestPoint(player->getData()));
                 //player->setAlive(player->isAlive() - 1); //REDO THIS ASAP
-                //cout << trace << endl;
-                //trace.clear();
-                //player->clearReverse();
+                trace.clear();
+                player->clearReverse();
                 break;
             }
             /*
@@ -192,172 +303,6 @@
                 spawn();
                 if(spawn_time!=360)
                     spawn_time=360;
-            }
-            /*
-                trace routines
-            */
-            auto center = player->getData().center();
-            if(!player->isSafe())
-                trace_condition = true;
-            
-            trace.pushPoint(center);
-             if(trace.size() > 1)
-            {
-                auto temp = border.nearestLine(trace.front());
-                trace.front() = trace.front().projection(temp.first, temp.second);
-            }
-             if(border.onEdge(center).first and trace.back() != trace.front())
-            {
-                 if(trace_condition)
-                {   
-                    trace_condition = false;
-
-                    auto temp = border.nearestLine(trace.back());
-                    trace.back() = trace.back().projection(temp.first, temp.second);
-                    if(trace.back() == trace.front())
-                        trace.pop_back();
-
-                    cout << "trace" << trace << endl; 
-                    cout << "border" << border << endl;
-                    
-                    //algoritmo del taglio
-
-                    perimeter first; 
-                    perimeter second;
-                    //pair<list<PointData>::const_iterator, bool> first_insertion_point = {first.begin(), true};
-                    //pair<list<PointData>::const_iterator, bool> second_insertion_point = {second.begin(), true};
-                    int which = 0;
-                    
-                     for(auto it{border.begin()}; it!=border.end(); ++it)
-                    {
-                         if(which==0 or which==2)
-                        {
-                            first.push_back(*it);
-                             if(trace.back().collinear(*it, *border.successor(it)))
-                            {
-                                if(!trace.back().collinear(trace.front()))
-                                {
-                                    which = 1;
-                                    cout << "Caso1\n";
-                                }first.insert(first.end(), trace.rbegin(), trace.rend());
-                                //first_insertion_point = {((++first.rbegin()).base()), false};
-
-                            }
-                             else if(trace.front().collinear(*it, *border.successor(it)))
-                            {
-                                if(!trace.back().collinear(trace.front()))
-                                {
-                                    which = 1;
-                                    cout << "Caso2\n";
-                                }first.insert(first.end(), trace.begin(), trace.end());
-                                //first_insertion_point = {((++first.rbegin()).base()), true};
-                            } 
-                        }
-                         else if(which == 1)
-                        {
-                            second.push_back(*it);
-                             if(trace.back().collinear(*it, *border.successor(it)))
-                            {
-                                if(!trace.back().collinear(trace.front()))
-                                    which = 2;
-                                second.insert(second.end(), trace.rbegin(), trace.rend());
-                                //second_insertion_point = {((++second.rbegin()).base()), false};
-                            }
-                             else if(trace.front().collinear(*it, *border.successor(it)))
-                            {
-                                if(!trace.back().collinear(trace.front()))
-                                    which = 2;
-                                second.insert(second.end(), trace.begin(), trace.end());
-                                //second_insertion_point = {((++second.rbegin()).base()), true};
-                            }
-                        }    
-                    }
-
-                    //STAMPE DI PROVA
-                    cout << "first partition\n";
-                    for(auto& i : first)
-                        cout << '(' << i.x() << ' ' << i.y() << ')' << endl;
-
-                    //STAMPE DI PROVA
-                    cout << "second partition\n";
-                    for(auto& i : second)
-                        cout << '(' << i.x() << ' ' << i.y() << ')' << endl;
-
-                    //if(first.size() > 1) ++first_insertion_point.first;
-                    //if(second.size() > 1) ++second_insertion_point.first;
-                    /*
-                     if(!first.empty())
-                    {
-                    
-                         if(first_insertion_point.second)
-                        {
-                            if(first_insertion_point.first->collinear(*trace.begin()))
-                                ++first_insertion_point.first;
-                            first.insert(first_insertion_point.first, trace.begin(), trace.end());
-                        }
-                         else
-                        {
-                            if(first_insertion_point.first->collinear(*trace.rbegin()))
-                                ++first_insertion_point.first;
-                            first.insert(first_insertion_point.first, trace.rbegin(), trace.rend());
-                        }
-
-                        //STAMPE DI PROVA
-                        cout << "complete first partition\n";
-                        for(auto& i : first)
-                            cout << '(' << i.x() << ' ' << i.y() << ')' << endl;
-                        
-                        //assert(first.front().collinear(first.back()));
-
-                        
-                    }
-
-                     if(!second.empty())
-                    {   
-                         if(second_insertion_point.second)
-                        {
-                            if(second_insertion_point.first->collinear(*trace.begin()))
-                                ++second_insertion_point.first;
-                            second.insert(second_insertion_point.first, trace.begin(), trace.end());
-                        }
-                         else
-                        {
-                            if(second_insertion_point.first->collinear(*trace.rbegin()))
-                                ++second_insertion_point.first;
-                            second.insert(second_insertion_point.first, trace.rbegin(), trace.rend());
-                        }
-                        //STAMPE DI PROVA
-                        cout << "complete second partition\n";
-                        for(auto& i : second)
-                            cout << '(' << i.x() << ' ' << i.y() << ')' << endl;
-                        
-                        //assert(second.front().collinear(second.back()));
-
-                        GameList newBorder = second;
-                         if(newBorder.is_closed() and newBorder.o_inside(entities[1]->getData()))
-                        {
-                            border = second;
-                            cout << "Picked second\n";
-                        }
-                    }
-                    */
-                    GameList newBorder1 = first;
-                    GameList newBorder2 = second;
-                    
-                     if(!first.empty() and newBorder1.is_closed() and newBorder1.c_inside(entities[1]->getData()))
-                    {
-                        border = newBorder1;
-                        cout << "Picked first\n";
-                    }
-                     else if(!second.empty() and newBorder2.is_closed() and newBorder2.c_inside(entities[1]->getData()))
-                    {
-                        border = newBorder2;
-                        cout << "Picked second\n";
-                    }
-
-                    player->clearReverse();
-                }
-                trace.clear();
             }
             /*
                 abilita il redraw
@@ -398,6 +343,8 @@
         delete entities[i];
     }
     al_destroy_event_queue(coda_eventi);
+    border.clear();
+    trace.clear();
     //non so se ci voglia, quando testeremo partite successive vedremo
     //al_stop_timer(timer);
 }
