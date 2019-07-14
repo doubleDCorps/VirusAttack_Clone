@@ -23,4 +23,6 @@ enum DIRS : int {NW=0, NE=1, SE=2, SW=3};
 
 inline bool in_range(int first, int lower_bound, int upper_bound) { return first >= lower_bound and first <= upper_bound; } 
 
+const bool debug_mode = true;
+
 #endif

@@ -270,7 +270,7 @@
                         }
                     } 
 
-                    cout << "first" << first << endl;
+                    cout << "first"  << first  << endl;
                     cout << "second" << second << endl;
                     
                     if(first.c_inside(entities[1]->getData()))  border = first;
@@ -329,7 +329,6 @@
             /*
                 routines, pt. 2
             */
-            bool debug_mode = true;
             if(!player->isSafe())
             for(unsigned i=1; i < entities.size(); ++i)
              if(entities[i]->isAlive() and trace.collides(entities[i]->getData()) and !debug_mode)
