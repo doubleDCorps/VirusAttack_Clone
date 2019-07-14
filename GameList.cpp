@@ -96,6 +96,8 @@
 
  bool GameList::is_closed() const
 {
+    if(size() <= 2)
+        return false;
     for(auto it{begin()}; it != end(); ++it)
      if(!it->collinear(*successor(it)))
         return false;

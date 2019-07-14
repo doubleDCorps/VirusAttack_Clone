@@ -280,6 +280,50 @@
                     player->clearReverse();
                 }
  */
+                if(trace_condition) {
+
+                    if(trace.back() == trace.front())
+                        trace.pop_back();
+                    if(trace.size() >= 2) {
+
+                        trace_condition = false;
+
+                        GameList fst = trace;
+                        GameList snd = trace;
+                        //1. Elaborare una condizione di inserimento valida
+                            //1.1. Manca completamente un controllo sul lato d'inserimento, urgh
+                        vector<bool> flags(border.size(), false);
+                        while(any_of(flags.begin(), flags.end(), [](const bool& a) {
+                            return !a;
+                        })) {
+                        
+                            if(fst.is_closed())
+                                break;
+                        
+                            pair<decltype(border.begin()), int> pivot{border.begin(), 10000};
+                        
+                            for(auto it{border.begin()}; it != border.end(); ++it) {
+                                if(!flags[distance(border.begin(), it)]) {
+                                    if(it->distance(trace.back()) < pivot.second             //se il punto è il più vicino all'inserimento
+                                    && !it->collinear(trace.back(), *(++trace.rbegin()))) {  //se non è un punto inutile
+                                        pivot = {it, it->distance(trace.back())};
+                                    } 
+                                } 
+                            }
+
+                            fst.pushPoint(*pivot.first);
+                            flags[distance(border.begin(), pivot.first)] = true;
+                        }
+                        //2. Verificare che le liste siano chiuse e il calcolo dell'area non fallisca
+                        if(fst.is_closed()) {
+                            
+                            cout << "old:\n" << border << std::endl;
+                            cout << "new:\n" << fst    << std::endl;
+                            border = fst;
+                        }
+                        player->clearReverse();
+                    }
+                }
                 trace.clear();
             }
             /*
