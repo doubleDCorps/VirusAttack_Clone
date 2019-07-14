@@ -173,15 +173,20 @@
             trace.pushPoint(center);
              if(trace.size() > 1)
             {
+                //questo dovrebbe sempre recuperare il punto corrispondente sul bordo
+                //in quali casi fallisce? Se fallisce
                 auto temp = border.nearestLine(trace.front());
                 trace.front() = trace.front().projection(temp.first, temp.second);
             }
+            //se il player si trova sul bordo e l'inizio e la fine del tracciato non coincidono
              if(border.onEdge(center).first and trace.back() != trace.front())
             {
-                
+                //questo dovrebbe sempre recuperare il punto corrispondente alla fine del
+                //tracciato, proiettato sul bordo
+                //in quali casi fallisce? Se fallisce
                 auto temp = border.nearestLine(trace.back());
                 trace.back() = trace.back().projection(temp.first, temp.second);
-                    
+/*                    
                  if(trace_condition)
                 {   
                     trace_condition = false;
@@ -192,8 +197,10 @@
                     cout << "trace" << trace << endl; 
                     cout << "border" << border << endl;
                     
-                    GameList first = trace;  //prima partizione
-                    GameList second = trace; //seconda partizione
+                    //prima partizione
+                    GameList first = trace;
+                    //seconda partizione
+                    GameList second = trace;
 
                     //si inizializzano i due punti di inserimento
                     perimeter::iterator startFirst, startSecond;
@@ -239,7 +246,7 @@
                         else
                             iFirst = border.successor(iFirst);                            
                     }
-                    }else if(!specialCase2){
+                    }else if(!specialCase2) {
                     while(endFirst != iSecond) {
                         
                         assert(iSecond != border.end()); 
@@ -250,7 +257,7 @@
                         else                  
                             iSecond = border.predecessor(iSecond);
                     }
-                    } else if(specialCase1){
+                    } else if(specialCase1) {
                         
                         if(condizione == 2) {
                             for(auto it{iSecond}; border.successor(it) != iSecond; it = border.successor(it))
@@ -269,19 +276,22 @@
                     if(first.c_inside(entities[1]->getData()))  border = first;
                     else                                        border = second;
                     }
+
                     player->clearReverse();
                 }
+ */
                 trace.clear();
             }
             /*
                 routines, pt. 2
             */
+            bool debug_mode = true;
             if(!player->isSafe())
             for(unsigned i=1; i < entities.size(); ++i)
-             if(entities[i]->isAlive() and trace.collides(entities[i]->getData()))
+             if(entities[i]->isAlive() and trace.collides(entities[i]->getData()) and !debug_mode)
             {
                 player->setCenter(border.nearestPoint(player->getData()));
-                //player->setAlive(player->isAlive() - 1); //REDO THIS ASAP
+                player->setAlive(player->isAlive() - 1); //REDO THIS ASAP
                 trace.clear();
                 player->clearReverse();
                 break;
@@ -291,18 +301,17 @@
             */
             for(unsigned i=0; i < entities.size(); ++i)
              if(i < 1 or //manca la condizione che impedisce la collisione con la traccia 
-                i > numBosses or 
-               (i >= 1 and i <= numBosses and (spawn_time<300 or spawn_time>420) and (spawn_time<2101 or spawn_time>2221)))
+                i > numBosses or (i >= 1 and i <= numBosses and (spawn_time<300 or spawn_time>420) and (spawn_time<2101 or spawn_time>2221)))
                 entities[i]->update(border);
             /*
                 boss routines
             */
             ++spawn_time;
-             if((spawn_time==360 or spawn_time==2161) and entities[1]->isAlive())
+             if((spawn_time == 360 or spawn_time == 2161) and entities[1]->isAlive())
             {
                 spawn();
-                if(spawn_time!=360)
-                    spawn_time=360;
+                if(spawn_time != 360)
+                    spawn_time = 360;
             }
             /*
                 abilita il redraw

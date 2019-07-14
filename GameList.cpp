@@ -8,20 +8,18 @@
     return os;
 }
 
+//cambiando la policy d'inserimento probabilmente si risolverebbero un sacco di problemi
  bool GameList::pushPoint(const PointData& P)
 {
-    if(find(begin(), end(), P)!=end())
+    if(find(begin(), end(), P) != end())
         pop_back();
 
      if(size()>=2 and P!=back() and P!=*(++rbegin()) and P.collinear(back(), *(++rbegin())))
     {
         back() = P;
     }
-     if(empty() or (P != back() and P!=*(++rbegin()) and
-        (size()==1 and P.collinear(back())) or 
-        (size()>=2 and !P.collinear(back(), *(++rbegin())))))
+     if(empty() or (P != back() and (size()==1 and P.collinear(back())) or (size()>=2 and P!=*(++rbegin()) and !P.collinear(back(), *(++rbegin())))))
     {
-        
         push_back(P);
     }
     else
@@ -32,7 +30,9 @@
 
  pair<AXIS, bool> GameList::onEdge(const HitboxData& P) const
 {
-    if(empty()) return {XY, true};
+//  non ha un cazzo di senso, perchè?
+    if(empty())
+        return {XY, true};
 
      for(auto it{ begin() }; it != end(); ++it)
     {
@@ -61,12 +61,13 @@
 
  bool GameList::inArea(const HitboxData& P) const
 {
-    if(empty()) return false;
+    if(empty())
+        return false;
 
     int cont{};
 
      for(auto it{ begin() }; it != end(); ++it)
-        if(it->x() == successor(it)->x()){
+        if(it->x() == successor(it)->x()) {
             float y1{ it->y() };
             float y2{ successor(it)->y() };
 
@@ -117,7 +118,6 @@
         }
     }
     
-//  qua senza controlli può accadere che il risultato abbia i segni invertiti
     return P.projection(*output, *successor(output));
 }
 
@@ -129,7 +129,6 @@
 
      for(auto it{cbegin()}; it != cend(); ++it)
     {
-    //  qua senza controlli può accadere che il risultato abbia i segni invertiti
         condition = abs(P.distance(P.projection(*it, *successor(it))));
          if(condition < dist)
         {
