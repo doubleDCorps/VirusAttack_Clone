@@ -148,6 +148,10 @@
     al_register_event_source(coda_eventi, al_get_keyboard_event_source());
     al_start_timer(timer);
 
+    auto percentArea     = [&](){ return getArea(border)/2500; };
+    auto areaCondition   = [&](){ return percentArea() <= 20; };
+    auto playerCondition = [&](){ return !entities[0]->isAlive(); };
+
      while(!STOP)
     {
         ALLEGRO_EVENT ev;
@@ -160,9 +164,10 @@
             /*
                 condizioni di uscita
             */
-            STOP = (getArea(border)/2500 <= 20) or (!entities[0]->isAlive());
+            STOP = //areaCondition() or 
+            playerCondition();
             if(STOP)
-                cout << getArea(border)/2500; 
+                cout << percentArea();
             /*
                 trace routines
             */
@@ -293,37 +298,60 @@
                         //1. Elaborare una condizione di inserimento valida
                             //1.1. Manca completamente un controllo sul lato d'inserimento, urgh
                         vector<bool> flags(border.size(), false);
-                        while(any_of(flags.begin(), flags.end(), [](const bool& a) {
-                            return !a;
-                        })) {
                         
-                            if(fst.is_closed())
-                                break;
+                        auto pivot = border.begin();
+                        bool kill = false;
+                        while(!kill) {
                         
-                            pair<decltype(border.begin()), int> pivot{border.begin(), 10000};
-                        
-                            for(auto it{border.begin()}; it != border.end(); ++it) {
+                            bool hasDoneSomething = false;
+                            for(auto it{pivot}; it != border.end(); ++it) {
+                                //se non è stato inserito
                                 if(!flags[distance(border.begin(), it)]) {
-                                    if(it->distance(trace.back()) < pivot.second             //se il punto è il più vicino all'inserimento
-                                    && !it->collinear(trace.back(), *(++trace.rbegin()))) {  //se non è un punto inutile
-                                        pivot = {it, it->distance(trace.back())};
-                                    } 
-                                } 
+                                    //se non è un punto inutile
+                                    if(!it->collinear(trace.back(), *(++trace.rbegin()))) {  
+                                        if(!fst.is_closed() && snd.is_closed() && fst.pushPoint(*it)) {
+                                            flags[distance(border.begin(), it)] = true;
+                                            hasDoneSomething = true;
+                                        } else if(!snd.is_closed() && fst.is_closed() && snd.pushPoint(*it)) {
+                                            flags[distance(border.begin(), it)] = true;
+                                            hasDoneSomething = true;
+                                        } else if(snd.is_closed() && fst.is_closed() && snd.pushPoint(*it)) {
+                                            flags[distance(border.begin(), it)] = true;
+                                            hasDoneSomething = true;
+                                        } else if(!snd.is_closed() && !fst.is_closed() && fst.pushPoint(*it)) {
+                                            flags[distance(border.begin(), it)] = true;
+                                            hasDoneSomething = true;
+                                        }
+                                    }
+                                }
                             }
 
-                            fst.pushPoint(*pivot.first);
-                            flags[distance(border.begin(), pivot.first)] = true;
+                            if(!hasDoneSomething) {
+                                kill = true;
+                            }
+
+                            cout << "old:" << border << std::endl;
+                            cout << "fst:" << fst    << std::endl;
+                            cout << "snd:" << snd    << std::endl;
+                            for(auto el : flags) cout << " " << el; 
+                            cout << std::endl;
+                        
                         }
                         //2. Verificare che le liste siano chiuse e il calcolo dell'area non fallisca
-                        if(fst.is_closed()) {
-                            
-                            cout << "old:\n" << border << std::endl;
-                            cout << "new:\n" << fst    << std::endl;
+                        
+                        cout << "old:" << border << std::endl;
+                        cout << "fst:" << fst    << std::endl;
+                        cout << "snd:" << snd    << std::endl;
+                        
+                        if(fst.is_closed() && fst.c_inside(entities[1]->getData()))
                             border = fst;
-                        }
+                        else if(snd.is_closed() && snd.c_inside(entities[1]->getData()))
+                            border = snd;
+                        
                         player->clearReverse();
                     }
                 }
+
                 trace.clear();
             }
             /*

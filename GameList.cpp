@@ -3,7 +3,7 @@
  ostream& operator<<(ostream& os, const GameList& GL) //stampe di prova, usate per il debugging
 {
     for(auto& it : GL)
-        os << "\n[" << it.x() << ' ' << it.y() << ']';
+        os << " [" << it.x() << ' ' << it.y() << ']';
 
     return os;
 }
@@ -11,21 +11,21 @@
 //cambiando la policy d'inserimento probabilmente si risolverebbero un sacco di problemi
  bool GameList::pushPoint(const PointData& P)
 {
+    //?
     if(find(begin(), end(), P) != end())
-        pop_back();
-
-     if(size()>=2 and P!=back() and P!=*(++rbegin()) and P.collinear(back(), *(++rbegin())))
-    {
-        back() = P;
-    }
-     if(empty() or (P != back() and (size()==1 and P.collinear(back())) or (size()>=2 and P!=*(++rbegin()) and !P.collinear(back(), *(++rbegin())))))
-    {
-        push_back(P);
-    }
-    else
         return false;
-
-    return true;
+    //?
+    if(empty() or (P.collinear(back()) and (size()==1 or (size()>=2 and !P.collinear(back(), *(++rbegin())))))) {
+        push_back(P); 
+        return true;
+    }
+    //?
+    if(size()>=2 and P.collinear(back(), *(++rbegin()))) {
+        back() = P; 
+        return true;
+    }
+    
+    return false;
 }
 
  pair<AXIS, bool> GameList::onEdge(const HitboxData& P) const
