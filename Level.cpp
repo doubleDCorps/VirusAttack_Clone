@@ -178,17 +178,17 @@
             trace.pushPoint(center);
              if(trace.size() > 1)
             {
-                //questo dovrebbe sempre recuperare il punto corrispondente sul bordo
-                //in quali casi fallisce? Se fallisce
+//              questo dovrebbe sempre recuperare il punto corrispondente sul bordo
+//              in quali casi fallisce? Se fallisce
                 auto temp = border.nearestLine(trace.front());
                 trace.front() = trace.front().projection(temp.first, temp.second);
             }
-            //se il player si trova sul bordo e l'inizio e la fine del tracciato non coincidono
+//          se il player si trova sul bordo e l'inizio e la fine del tracciato non coincidono
              if(border.onEdge(center).first and trace.back() != trace.front())
             {
-                //questo dovrebbe sempre recuperare il punto corrispondente alla fine del
-                //tracciato, proiettato sul bordo
-                //in quali casi fallisce? Se fallisce
+//              questo dovrebbe sempre recuperare il punto corrispondente alla fine del
+//              tracciato, proiettato sul bordo
+//              in quali casi fallisce? Se fallisce
                 auto temp = border.nearestLine(trace.back());
                 trace.back() = trace.back().projection(temp.first, temp.second);
 /*                    
@@ -289,65 +289,88 @@
 
                     if(trace.back() == trace.front())
                         trace.pop_back();
+
                     if(trace.size() >= 2) {
 
                         trace_condition = false;
 
                         GameList fst = trace;
                         GameList snd = trace;
-                        //1. Elaborare una condizione di inserimento valida
-                            //1.1. Manca completamente un controllo sul lato d'inserimento, urgh
+                        
                         vector<bool> flags(border.size(), false);
                         
-                        auto pivot = border.begin();
                         bool kill = false;
                         while(!kill) {
-                        
+                            
                             bool hasDoneSomething = false;
-                            for(auto it{pivot}; it != border.end(); ++it) {
+                            for(auto it{border.begin()}; it != border.end(); ++it) {
                                 //se non è stato inserito
-                                if(!flags[distance(border.begin(), it)]) {
-                                    //se non è un punto inutile
-                                    if(!it->collinear(trace.back(), *(++trace.rbegin()))) {  
-                                        if(!fst.is_closed() && snd.is_closed() && fst.pushPoint(*it)) {
+                                if(!flags[distance(border.begin(), it)]
+                                //se non è un punto inutile
+                                and !it->collinear(trace.back(), *(++trace.rbegin()))) {  
+                                    
+                                    if(snd.is_closed() and fst.is_closed()) {
+                                    
+                                        if(fst.o_inside(entities[1]->getData()) 
+                                        and fst.o_inside(entities[1]->getData().projection())) {
+                                            border = fst;
+                                            cout << "fst choice" << std::endl << std::endl;
+                                            kill = true;
+                                            break;
+
+                                        } else if(snd.o_inside(entities[1]->getData()) 
+                                                and snd.o_inside(entities[1]->getData().projection())) {
+                                            border = snd;
+                                            cout << "snd choice" << std::endl << std::endl;
+                                            kill = true;
+                                            break;
+
+                                        } else if(snd.pushPoint(*it)) {
                                             flags[distance(border.begin(), it)] = true;
                                             hasDoneSomething = true;
-                                        } else if(!snd.is_closed() && fst.is_closed() && snd.pushPoint(*it)) {
-                                            flags[distance(border.begin(), it)] = true;
-                                            hasDoneSomething = true;
-                                        } else if(snd.is_closed() && fst.is_closed() && snd.pushPoint(*it)) {
-                                            flags[distance(border.begin(), it)] = true;
-                                            hasDoneSomething = true;
-                                        } else if(!snd.is_closed() && !fst.is_closed() && fst.pushPoint(*it)) {
-                                            flags[distance(border.begin(), it)] = true;
-                                            hasDoneSomething = true;
+                                        
                                         }
+                                    
+                                    } else if(!fst.is_closed() and fst.pushPoint(*it)) {
+                                    
+                                        flags[distance(border.begin(), it)] = true;
+                                        hasDoneSomething = true;
+
+                                    } else if(!snd.is_closed() and snd.pushPoint(*it)) {
+                                    
+                                        flags[distance(border.begin(), it)] = true;
+                                        hasDoneSomething = true;
+                                    
                                     }
                                 }
                             }
 
-                            if(!hasDoneSomething) {
-                                kill = true;
-                            }
-
-                            cout << "old:" << border << std::endl;
+                            if(!hasDoneSomething) kill = true;
+                         /* cout << "old:" << border << std::endl;
                             cout << "fst:" << fst    << std::endl;
                             cout << "snd:" << snd    << std::endl;
                             for(auto el : flags) cout << " " << el; 
-                            cout << std::endl;
-                        
+                            cout << std::endl; */                        
                         }
-                        //2. Verificare che le liste siano chiuse e il calcolo dell'area non fallisca
                         
                         cout << "old:" << border << std::endl;
                         cout << "fst:" << fst    << std::endl;
                         cout << "snd:" << snd    << std::endl;
                         
-                        if(fst.is_closed() && fst.c_inside(entities[1]->getData()))
+                        if(fst.is_closed() 
+                        && fst.o_inside(entities[1]->getData())
+                        && fst.o_inside(entities[1]->getData().projection())) {
                             border = fst;
-                        else if(snd.is_closed() && snd.c_inside(entities[1]->getData()))
-                            border = snd;
+                            cout << "fst choice" << std::endl << std::endl;
                         
+                        } else if(snd.is_closed() 
+                                && snd.o_inside(entities[1]->getData())
+                                && snd.o_inside(entities[1]->getData().projection())) {
+                            border = snd;
+                            cout << "snd choice" << std::endl << std::endl;
+                        
+                        }
+
                         player->clearReverse();
                     }
                 }

@@ -48,6 +48,18 @@
             Genera la proiezione del punto sul segmento con estremi i due parametri.
         */
          PointData projection(const PointData&, const PointData&) const;
-};
+        /*
+            Generalizzazione di in_range per una tripla (p, this, r) di punti.
+        */
+         bool on_segment(const PointData& p, const PointData& r) const;
+};  
+/*
+    Stabilisce l'orientamento di una tripla (p, q, r) di punti.
+*/
+ int orientation(const PointData& p, const PointData& q, const PointData& r); 
+/*
+    Verifica se i segmenti l1 ed l2 si intersecano.
+*/
+ bool doIntersect(const pair<PointData, PointData>& l1, const pair<PointData, PointData>& l2);
 
 #endif

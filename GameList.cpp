@@ -11,17 +11,43 @@
 //cambiando la policy d'inserimento probabilmente si risolverebbero un sacco di problemi
  bool GameList::pushPoint(const PointData& P)
 {
-    //?
     if(find(begin(), end(), P) != end())
         return false;
-    //?
-    if(empty() or (P.collinear(back()) and (size()==1 or (size()>=2 and !P.collinear(back(), *(++rbegin())))))) {
+
+    if(empty() or (P.collinear(back()) and (size() == 1 or (size() >= 2 and !P.collinear(back(), *(++rbegin())))))) {
+        
         push_back(P); 
         return true;
     }
-    //?
-    if(size()>=2 and P.collinear(back(), *(++rbegin()))) {
+
+    if(size() >= 2 and P.collinear(back(), *(++rbegin()))) {
+        
         back() = P; 
+        return true;
+    }
+    
+    return false;
+}
+
+ bool GameList::insertPoint(const PointData& P, bool direction)
+{
+    auto A = direction ? back() : front();
+    auto B = direction ? *(++rbegin()) : *(++begin());
+
+    if(find(begin(), end(), P) != end())
+        return false;
+
+    if(empty() or (P.collinear(A) and (size() == 1 or (size() >= 2 and !P.collinear(A, B))))) {
+        
+        if(direction)   push_back(P);
+        else            push_front(P);
+        return true;
+    }
+
+    if(size() >= 2 and P.collinear(A, B)) {
+        
+        if(direction)   back() = P;
+        else            front() = P;  
         return true;
     }
     
@@ -45,13 +71,13 @@
         // il segmento è orizzontale
         // verifica se avviene una collisione fra le hitbox
         //if(x2 != x3 and P.collision({min(x2, x3), y2, abs(x2-x3), 7})) return {Y, y1 <= y2 ? true : false}; 
-        if(x2!=x3 and P.collision({min(x2, x3), y2-6, abs(x2-x3), 12}))
+        if(x2 != x3 and P.collision({min(x2, x3), y2-6, abs(x2-x3), 12}))
             return 
                 {Y, y1 <= y2-6 ? true : false};
         // il segmento è verticale
         // verifica se avviene una collisione fra le hitbox
         //if(y2 != y3 and P.collision({x2, min(y2, y3), 7, abs(y2-y3)})) return {X, x1 <= x2 ? true : false};
-        if(y2!=y3 and P.collision({x2-6, min(y2, y3), 12, abs(y2-y3)})) 
+        if(y2 != y3 and P.collision({x2-6, min(y2, y3), 12, abs(y2-y3)})) 
             return 
                 {X, x1 <= x2-6 ? true : false};
     }

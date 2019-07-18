@@ -6,9 +6,8 @@
  struct EntityData: public HitboxData
 {
     private:
-        constexpr static int projDir_x[]{0 ,-1, 0, 1};
+        constexpr static int projDir_x[]{ 0,-1, 0, 1};
         constexpr static int projDir_y[]{-1, 0, 1, 0};
-
         float v[2];
     
     public:
@@ -38,7 +37,9 @@
         /*
             Genera una hitbox corrispondente all'oggetto traslato lungo la direzione scelta.
         */
+        HitboxData projection(int, int) const;
         HitboxData projection(unsigned) const;
+        HitboxData projection() const;
 };
 
 #endif

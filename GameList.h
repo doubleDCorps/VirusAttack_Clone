@@ -42,6 +42,7 @@
             Aggiungi un punto sul tracciato, se soddisfa le condizioni.
         */        
         bool pushPoint(const PointData&);
+        bool insertPoint(const PointData&, bool);
         /*
             Verifica se il punto si trova sulla lista.
         */
