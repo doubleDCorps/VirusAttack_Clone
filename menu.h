@@ -32,7 +32,7 @@ class Menu {
         short unsigned wait_choice() {
             cout << "sono in attesa di scelta" << endl;
             short unsigned state = 1;
-            al_flush_event_queue(coda_eventi);
+            //al_flush_event_queue(coda_eventi);
             ALLEGRO_EVENT event;
             al_start_timer(timer);
             bool redraw = true;
@@ -80,6 +80,6 @@ class Menu {
             }
             
 
-            al_flush_event_queue(coda_eventi);
+            //al_flush_event_queue(coda_eventi);
         }
 };
