@@ -70,8 +70,8 @@ class Menu {
                     
                     al_set_target_backbuffer(display);
                     al_clear_to_color(al_map_rgb(255, 255, 255));
-                    //al_draw_bitmap(buffer, 0, 0, 0);
-                    al_draw_scaled_bitmap(buffer, 0, 0, 1280, 720, scale_X, scale_Y, scale_W, scale_H, 0);
+                    al_draw_bitmap(buffer, 0, 0, 0);
+                    //al_draw_scaled_bitmap(buffer, 0, 0, 1280, 720, scale_X, scale_Y, scale_W, scale_H, 0);
                     al_flip_display();
                     redraw=false;
                 }
