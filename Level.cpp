@@ -148,9 +148,9 @@
     al_register_event_source(coda_eventi, al_get_keyboard_event_source());
     al_start_timer(timer);
 
-    auto percentArea     = [&](){ return getArea(border)/2500; };
-    auto areaCondition   = [&](){ return percentArea() <= 20; };
-    auto playerCondition = [&](){ return !entities[0]->isAlive(); };
+    const auto& percentArea     = [&](){ return getArea(border)/2500; };
+    const auto& areaCondition   = [&](){ return percentArea() <= 20; };
+    const auto& playerCondition = [&](){ return !entities[0]->isAlive(); };
 
      while(!STOP)
     {
@@ -299,7 +299,8 @@
                         
                         vector<bool> flags(border.size(), false);
                         
-                        bool kill = false;
+                        bool kill   = false;
+                        bool chosen = false;
                         while(!kill) {
                             
                             bool hasDoneSomething = false;
@@ -313,19 +314,24 @@
                                     
                                         if(fst.o_inside(entities[1]->getData()) 
                                         and fst.o_inside(entities[1]->getData().projection())) {
+                                            
                                             border = fst;
                                             cout << "fst choice" << std::endl << std::endl;
-                                            kill = true;
+                                            kill   = true;
+                                            chosen = true;
                                             break;
 
                                         } else if(snd.o_inside(entities[1]->getData()) 
                                                 and snd.o_inside(entities[1]->getData().projection())) {
+                                            
                                             border = snd;
                                             cout << "snd choice" << std::endl << std::endl;
-                                            kill = true;
+                                            kill   = true;
+                                            chosen = true;
                                             break;
 
                                         } else if(snd.pushPoint(*it)) {
+                                            
                                             flags[distance(border.begin(), it)] = true;
                                             hasDoneSomething = true;
                                         
@@ -346,29 +352,35 @@
                             }
 
                             if(!hasDoneSomething) kill = true;
-                         /* cout << "old:" << border << std::endl;
+                        /* 
+                            cout << "old:" << border << std::endl;
                             cout << "fst:" << fst    << std::endl;
                             cout << "snd:" << snd    << std::endl;
                             for(auto el : flags) cout << " " << el; 
-                            cout << std::endl; */                        
+                            cout << std::endl;
+                        */                        
                         }
                         
                         cout << "old:" << border << std::endl;
                         cout << "fst:" << fst    << std::endl;
                         cout << "snd:" << snd    << std::endl;
                         
-                        if(fst.is_closed() 
-                        && fst.o_inside(entities[1]->getData())
-                        && fst.o_inside(entities[1]->getData().projection())) {
-                            border = fst;
-                            cout << "fst choice" << std::endl << std::endl;
+                        if(!chosen) {
+                            if(fst.is_closed() 
+                            and fst.o_inside(entities[1]->getData())
+                            and fst.o_inside(entities[1]->getData().projection())) {
+                            
+                                border = fst;
+                                cout << "fst choice" << std::endl << std::endl;
                         
-                        } else if(snd.is_closed() 
-                                && snd.o_inside(entities[1]->getData())
-                                && snd.o_inside(entities[1]->getData().projection())) {
-                            border = snd;
-                            cout << "snd choice" << std::endl << std::endl;
-                        
+                            } else if(snd.is_closed() 
+                                   and snd.o_inside(entities[1]->getData())
+                                   and snd.o_inside(entities[1]->getData().projection())) {
+                            
+                                border = snd;
+                                cout << "snd choice" << std::endl << std::endl;
+
+                            }
                         }
 
                         player->clearReverse();
@@ -445,6 +457,7 @@
         al_destroy_bitmap(entities[i]->getBitmap());
         delete entities[i];
     }
+
     al_destroy_event_queue(coda_eventi);
     border.clear();
     trace.clear();
