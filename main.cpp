@@ -1,40 +1,81 @@
 #include"Level.h"
+#include"menu.h"
+#include<iostream>
 #include<allegro5/allegro.h>
+#include<allegro5/allegro5.h>
+#include<allegro5/allegro_image.h>
  
  int main(int argc, char** argv)
 {
+    cout << "sono depresso" << endl;
     /*
         Inizializzazione stati di Allegro e srand per alcune routines.
     */
     srand(time(0));
-    if(!al_init() or !al_install_keyboard() or !al_init_primitives_addon()) return -1;
+    if(!al_init() or !al_init_image_addon() or !al_install_keyboard() or !al_init_primitives_addon()) return -1;
     /*
         Inizializzazione del display (legge la risoluzione da quelle di default del dispositivo).
     */
+
+    cout << "senza disp_data" << endl;
     ALLEGRO_DISPLAY_MODE disp_data;
      for(unsigned i{}; i < al_get_num_display_modes(); ++i)
     {
         al_get_display_mode(i, &disp_data);
-        if(disp_data.width>=800 and disp_data.width<=900 and disp_data.height>=600 and disp_data.height<=700)
+        if(disp_data.width>=1280 and disp_data.width<=1380 and disp_data.height>=720 and disp_data.height<=820)
             break;
     }
-    al_set_new_display_flags(ALLEGRO_WINDOWED);
+    cout << "con disp_data" << endl;
+    cout << disp_data.width << " " << disp_data.height << endl;
     
-    ALLEGRO_TIMER *timer = al_create_timer(1.0/disp_data.refresh_rate);
+    ALLEGRO_TIMER *timer = al_create_timer(1.0/30);
      if(!timer)
         return -1;
     
+    al_set_new_display_flags(ALLEGRO_FULLSCREEN_WINDOW);
     ALLEGRO_DISPLAY *display = al_create_display(disp_data.width, disp_data.height);
      if(!display)
     { 
         al_destroy_timer(timer);
         return -1;
     }
+
+    ALLEGRO_EVENT_QUEUE *coda_eventi = al_create_event_queue();
+
     /*
         Istanzia il livello (qui in futuro istanze di menu etc.?)
     */
+
+    al_register_event_source(coda_eventi, al_get_keyboard_event_source());
+    al_register_event_source(coda_eventi, al_get_display_event_source(display));
+    al_register_event_source(coda_eventi, al_get_timer_event_source(timer));
+    
+    al_hide_mouse_cursor(display); //nasconde il cursore poichè non utilizzato.
+
+	float windowHeight = al_get_display_height(display);
+    float windowWidth = al_get_display_width(display);
+    float sx = windowWidth / float(disp_data.width);
+    float sy = windowHeight / float(disp_data.height);
+    float scale = std::min(sx, sy);
+    float scale_W = disp_data.width * scale;
+    float scale_H = disp_data.height * scale;
+    float scale_X = (windowWidth - scale_W) / 2.0f;
+    float scale_Y = (windowHeight - scale_H) / 2.0f;
+
     Level level(1, disp_data, timer);
-    level.loop();
+    Menu menu(display, timer, coda_eventi, scale_W, scale_H, scale_X, scale_Y);
+    short unsigned choice = 0;
+
+   while(true) {
+        choice = menu.wait_choice();
+        if(choice == 1) //START
+            level.loop();
+        else if(choice == 2) //EXIT
+            break;
+    }
+    cout << "esco dal while" << endl;
+
+
     /*
         Deallocazione risorse condivise.
     */
