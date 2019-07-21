@@ -1,6 +1,8 @@
 #ifndef POLY_H_
 #define POLY_H_
 #include"Sounds.h"
+#include"menu.h"
+#include"Text.h"
 #include"Player.h"
 
  class Level
@@ -31,6 +33,7 @@
         vector<Entity*> entities;
         Player* player;
         Sounds* sounds;
+        ScaledBitmap background;
         /*
             Inizializza il bordo di default del livello (uguale per tutti).
         */

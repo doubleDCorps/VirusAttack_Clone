@@ -112,12 +112,13 @@
     return abs(area);
 }
 
- Level::Level(unsigned difficulty, ALLEGRO_DISPLAY_MODE settings, ALLEGRO_TIMER* tim, Sounds* sounds)
+ Level::Level(unsigned difficulty, ALLEGRO_DISPLAY_MODE settings, ALLEGRO_TIMER* tim, Sounds* sounds): background()
 {
     defPerInit(settings); 
     setDifficulty(difficulty);
     timer = tim;
     this->sounds=sounds;
+    background.setMyBitmap("resources/level/background.png");
 }
 
  void Level::loop()
@@ -436,6 +437,7 @@
         {
             redraw = false;
             al_clear_to_color(al_map_rgb(0, 0, 0));
+            background.draw_scaled();
             //redo this print
             al_draw_bitmap(entities[0]->getBitmap(), entities[0]->getCord_x(), entities[0]->getCord_y(), 0);
             //ok
