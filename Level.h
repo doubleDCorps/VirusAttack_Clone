@@ -1,11 +1,12 @@
 #ifndef POLY_H_
 #define POLY_H_
+#include"Sounds.h"
 #include"Player.h"
 
  class Level
 {
     public:
-        Level(unsigned difficulty, ALLEGRO_DISPLAY_MODE settings, ALLEGRO_TIMER* tim);
+        Level(unsigned difficulty, ALLEGRO_DISPLAY_MODE settings, ALLEGRO_TIMER* tim, Sounds* sounds);
         /*
             Loop di gioco (escuzione effettiva del livello).
         */
@@ -29,6 +30,7 @@
         GameList trace;
         vector<Entity*> entities;
         Player* player;
+        Sounds* sounds;
         /*
             Inizializza il bordo di default del livello (uguale per tutti).
         */

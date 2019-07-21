@@ -112,11 +112,12 @@
     return abs(area);
 }
 
- Level::Level(unsigned difficulty, ALLEGRO_DISPLAY_MODE settings, ALLEGRO_TIMER* tim)
+ Level::Level(unsigned difficulty, ALLEGRO_DISPLAY_MODE settings, ALLEGRO_TIMER* tim, Sounds* sounds)
 {
     defPerInit(settings); 
     setDifficulty(difficulty);
     timer = tim;
+    this->sounds=sounds;
 }
 
  void Level::loop()
@@ -452,6 +453,9 @@
     /*
         deallocazione delle risorse locali
     */
+
+    sounds->stopInLevelTheme();
+
      for(int i{}; i<entities.size(); ++i)
     {
         al_destroy_bitmap(entities[i]->getBitmap());

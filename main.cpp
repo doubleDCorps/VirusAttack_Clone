@@ -1,21 +1,27 @@
 #include"Level.h"
 #include"menu.h"
 #include<iostream>
-#include<allegro5/allegro.h>
-#include<allegro5/allegro5.h>
-#include<allegro5/allegro_image.h>
  
  int main(int argc, char** argv)
 {
+
+
     cout << "sono depresso" << endl;
     /*
         Inizializzazione stati di Allegro e srand per alcune routines.
     */
     srand(time(0));
-    if(!al_init() or !al_init_image_addon() or !al_install_keyboard() or !al_init_primitives_addon()) return -1;
+    if(!al_init() or
+       !al_init_image_addon() or
+       !al_install_audio() or
+       !al_init_acodec_addon() or
+       !al_install_keyboard() or
+       !al_init_primitives_addon())
+            return -1;
     /*
         Inizializzazione del display (legge la risoluzione da quelle di default del dispositivo).
     */
+
 
     cout << "senza disp_data" << endl;
     ALLEGRO_DISPLAY_MODE disp_data;
@@ -52,24 +58,20 @@
     
     al_hide_mouse_cursor(display); //nasconde il cursore poichè non utilizzato.
 
-	float windowHeight = al_get_display_height(display);
-    float windowWidth = al_get_display_width(display);
-    float sx = windowWidth / float(disp_data.width);
-    float sy = windowHeight / float(disp_data.height);
-    float scale = std::min(sx, sy);
-    float scale_W = disp_data.width * scale;
-    float scale_H = disp_data.height * scale;
-    float scale_X = (windowWidth - scale_W) / 2.0f;
-    float scale_Y = (windowHeight - scale_H) / 2.0f;
-
-    Level level(1, disp_data, timer);
-    Menu menu(display, timer, coda_eventi, scale_W, scale_H, scale_X, scale_Y);
+    Sounds sounds;
+    Level level(1, disp_data, timer, &sounds);
+    Menu menu(display, timer, coda_eventi);
     short unsigned choice = 0;
 
    while(true) {
+        sounds.playMenuTheme();
         choice = menu.wait_choice();
-        if(choice == 1) //START
+        
+        if(choice == 1) { //START
+            sounds.stopMenuTheme();
+            sounds.playInLevelTheme();
             level.loop();
+        }
         else if(choice == 2) //EXIT
             break;
     }
@@ -79,6 +81,7 @@
     /*
         Deallocazione risorse condivise.
     */
+
     al_destroy_display(display);
     al_destroy_timer(timer);
 
