@@ -38,7 +38,6 @@ class Menu {
             while(true) {
                 cout << "dentro dal while" << endl;
                 
-
                 al_wait_for_event(coda_eventi, &event);
                 switch(event.type) {
                     case ALLEGRO_EVENT_TIMER:
@@ -58,22 +57,26 @@ class Menu {
                         return 2;
                 }
 
+                cout << "so al redraw\n";
+
                 if(redraw and al_is_event_queue_empty(coda_eventi)) {
+                    cout << "so dentro l'if\n";
                     al_set_target_bitmap(buffer.getMyBitmap());
+                    cout << "ho settato la bitmap\n";
                     if(state == 1)
                         start_selected.draw();
                     else if(state == 2)
                         exit_selected.draw();
-                    
+                    cout << "ho disegnato sul buffer\n";
                     al_set_target_backbuffer(display);
                     al_clear_to_color(al_map_rgb(0, 0, 0));
-
+                    cout << "ho disegnato buffer\n";
                     buffer.draw_scaled();
                     al_flip_display();
                     redraw=false;
                 }
 
-
+                cout << "fine ciclo\n";
             }
             
 
