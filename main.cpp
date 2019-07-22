@@ -12,8 +12,6 @@
     srand(time(0));
     if(!al_init() or
        !al_init_image_addon() or
-       !al_init_font_addon() or
-       !al_init_ttf_addon() or
        !al_install_audio() or
        !al_init_acodec_addon() or
        !al_install_keyboard() or

@@ -112,7 +112,7 @@
     return abs(area);
 }
 
- Level::Level(unsigned difficulty, ALLEGRO_DISPLAY_MODE settings, ALLEGRO_TIMER* tim, Sounds* sounds): background()
+ Level::Level(unsigned difficulty, ALLEGRO_DISPLAY_MODE settings, ALLEGRO_TIMER* tim, Sounds* sounds): background(), areaBar(), livesBar(), respawnBar()
 {
     defPerInit(settings); 
     setDifficulty(difficulty);
@@ -438,6 +438,8 @@
             redraw = false;
             al_clear_to_color(al_map_rgb(0, 0, 0));
             background.draw_scaled();
+            updateLateralPane(spawn_time);
+
             //redo this print
             al_draw_bitmap(entities[0]->getBitmap(), entities[0]->getCord_x(), entities[0]->getCord_y(), 0);
             //ok
@@ -469,4 +471,50 @@
     trace.clear();
     //non so se ci voglia, quando testeremo partite successive vedremo
     //al_stop_timer(timer);
+}
+
+void Level::updateLateralPane(int spawn_time) {
+//    /* PANNELLO AREA OCCUPATA */
+//    if(perc_area>=0 and perc_area<25)
+//        areaBar.setMyBitmap("resources/level/lateralPane/areaBar/0.png");
+//    else if(perc_area>=25 and perc_area<50)
+//        areaBar.setMyBitmap("resources/level/lateralPane/areaBar/25.png");
+//    else if(perc_area>=50 and perc_area<75)
+//        areaBar.setMyBitmap("resources/level/lateralPane/areaBar/50.png");
+//    else if(perc_area>=75)
+//        areaBar.setMyBitmap("resources/level/lateralPane/areaBar/75.png");
+//
+//
+//    /* PANNELLO VITE RIMANENTI */
+//    if(lives == 3)
+//        areaBar.setMyBitmap("resources/level/lateralPane/livesBar/3.png");
+//    else if(lives == 2)
+//        areaBar.setMyBitmap("resources/level/lateralPane/livesBar/2.png");
+//    else if(lives == 1)
+//        areaBar.setMyBitmap("resources/level/lateralPane/livesBar/1.png");
+//    else if(lives == 0)
+//        areaBar.setMyBitmap("resources/level/lateralPane/livesBar/0.png");
+//
+//
+//    /* PANNELLO TEMPO DI RESPAWN DEI MOB */
+//    if(spawn_time >= 360 and spawn_time < 585)   
+//        areaBar.setMyBitmap("resources/level/lateralPane/respawnBar/7.png");
+//    else if(spawn_time >= 585 and spawn_time < 810)   
+//        areaBar.setMyBitmap("resources/level/lateralPane/respawnBar/6.png");
+//    else if(spawn_time >= 810 and spawn_time < 1035)   
+//        areaBar.setMyBitmap("resources/level/lateralPane/respawnBar/5.png");
+//    else if(spawn_time >= 1035 and spawn_time < 1260)   
+//        areaBar.setMyBitmap("resources/level/lateralPane/respawnBar/4.png");
+//    else if(spawn_time >= 1260 and spawn_time < 1485)   
+//        areaBar.setMyBitmap("resources/level/lateralPane/respawnBar/3.png");
+//    else if(spawn_time >= 1485 and spawn_time < 1710)   
+//        areaBar.setMyBitmap("resources/level/lateralPane/respawnBar/2.png");
+//    else if(spawn_time >= 1710 and spawn_time < 1935)   
+//        areaBar.setMyBitmap("resources/level/lateralPane/respawnBar/1.png");
+//    else if(spawn_time >= 1935)   
+//        areaBar.setMyBitmap("resources/level/lateralPane/respawnBar/0.png");
+//
+//    areaBar.draw();
+//    livesBar.draw();
+//    respawnBar.draw();    
 }

@@ -2,7 +2,6 @@
 #define POLY_H_
 #include"Sounds.h"
 #include"menu.h"
-#include"Text.h"
 #include"Player.h"
 
  class Level
@@ -34,6 +33,10 @@
         Player* player;
         Sounds* sounds;
         ScaledBitmap background;
+        ScaledBitmap areaBar;
+        ScaledBitmap livesBar;
+        ScaledBitmap respawnBar;
+
         /*
             Inizializza il bordo di default del livello (uguale per tutti).
         */
@@ -65,6 +68,8 @@
             La somma viene poi dimezzata per ottenere il valore numerico corrispondente all'area del poligono.
         */
         int getArea(const GameList& GL) const;
+
+        void updateLateralPane(int spawn_time);
 };
 
 #endif
