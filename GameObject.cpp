@@ -34,12 +34,6 @@ int GameObject::pos() const {
     return x * Root::getDim() + y;
 }
 
-bool GameObject::operator==(const GameObject& G) const {
-    
-    return abs(x - G.x) <= 0.45f 
-       and abs(y - G.y) <= 0.45f;
-}
-
 void GameObject::reposition(int val) {
 
     bool enablePrint = false;
@@ -92,4 +86,25 @@ void GameObject::setImage(string path) {
 void GameObject::setImage(int x, int y, ALLEGRO_COLOR c) {
 
     image.setMyBitmap(x*GameObject::getSize(), y*GameObject::getSize(), c);
+}
+
+void GameObject::addToX(float dx) {
+
+    x += dx;
+}
+
+void GameObject::addToY(float dy) {
+
+    y += dy;
+}
+
+bool GameObject::operator==(const GameObject& G) const {
+    
+    return abs(x - G.x) <= 1.0f 
+       and abs(y - G.y) <= 1.0f;
+}
+
+bool GameObject::operator!=(const GameObject& G) const {
+
+    return !operator==(G);
 }

@@ -151,9 +151,9 @@ void Level::initMap() {
                         4.0f, 4.0f);
     player->setImage(player->getW(), player->getH(), al_map_rgb(100, 200, 150));
     allocation.push_back(player);
-    entities[player->pos()] = player;
     cout << "entro nel respawn\n";
     respawnPlayer();
+    entities[player->pos()] = player;
     
     //allocazione boss
     boss.push_back(new Enemy(val.first, val.second, 
@@ -164,18 +164,25 @@ void Level::initMap() {
     allocation.push_back(boss[0]);
     entities[boss[0]->pos()] = boss[0];
 
+    
+    cout << "Level::initMap(): enemy list\n"; 
     //allocazione nemici
     int v = boss[0]->pos();
     for(const auto& value : Root::makeExtendedNeighborhood(v)) {
         
-        int dx = v/Root::getDim() - value/Root::getDim();
-        int dy = v%Root::getDim() - value%Root::getDim();
+        float dx = float(v/Root::getDim() - value/Root::getDim());
+        float dy = float(v%Root::getDim() - value%Root::getDim());
+
+        dx = (dx == 0) ? dy*2.0f : dx*4.0f;
+        dy = (dy == 0) ? dx*2.0f : dy*4.0f;
 
         Entity* temp = new Enemy(0, 0, 3, 3, dx, dy, false);
         temp->reposition(value);
         temp->setImage(temp->getW(), temp->getH(), al_map_rgb(200, 100, 150));
         allocation.push_back(temp);
         entities[temp->pos()] = temp;
+    
+        cout << " - " << temp << ": " << dx << ":" << dy << "\n"; 
     }
 }
 
@@ -185,12 +192,12 @@ void Level::delMap() {
         delete val;
 }
 
-const GameObject *const Level::borderGet(int val) const {
+const Hitbox *const Level::borderGet(int val) const {
     
     return isObj(val) ? borders.at(val) : nullptr;
 }
 
-const GameObject *const Level::entityGet(int val) const {
+const Entity *const Level::entityGet(int val) const {
     
     return isBody(val) ? entities.at(val) : nullptr;
 }
@@ -260,18 +267,17 @@ int Level::getArea() const {
         retval += 1;
         //cout <<"Level::getArea() " << next << "-" << retval << "\n";
         //si generano tutte le posizioni vicine valide
-        for(const auto& element : Root::makeNeighborhood(next))
+        for(const auto& element : Root::makeExtendedNeighborhood(next))
         //se non è già stato analizzato
          if(analyzed.find(element) == analyzed.end() and getObj(element) != Type::BORDER) {
             positions.push(element);
         }
     }
     cout << "\n Level::getArea() alg complete " 
-    << (retval * 100.0f) / (float)Root::getDim()*Root::getDim() << endl;
+    << (retval * 100) / Root::getDim()*Root::getDim() << endl;
     
     return 
-        (retval * 100.0f) / 
-        (float)Root::getDim()*Root::getDim();
+        (retval * 100) / Root::getDim()*Root::getDim();
 }
 
 int Level::gameLoop() {
@@ -313,36 +319,52 @@ int Level::gameLoop() {
         } else if(ev.type == ALLEGRO_EVENT_TIMER) {
             cout << "-ALLEGRO_EVENT_TIMER ";
              
-            STOP = (getArea() <= 25) or player->loseCondition();
+            //STOP = (getArea() <= 25) or player->loseCondition();
     
             for(const auto& it : entities) {
                 
                 it.second->update();
                 
-                const auto& vel = borderGet(it.second->pos());
-                if(vel != nullptr and it.second->locksOnObj(vel)) {
-                    
-                    if(it.second != player) {
+                const auto& entvel = entityGet(it.second->pos());
+                const auto& borvel = borderGet(it.second->pos());
                         
-                        if(it.second->checkForCollision(player)) {
+                cout << "\n THIS entvel: " << entvel << " borvel: " << borvel << endl;
+                
+                if(entvel != nullptr and it.second->checkForCollision(entvel) 
+                or borvel != nullptr and it.second->checkForCollision(borvel)) {
+                    
+                    it.second->bounce(it.second->pos());    
+
+                    if(*it.second != *player) {
+                        
+                        if(*entvel == *player) {
                             
                             player->deathEvent();
                             respawnPlayer();
                         
                         }
 
+                        if(borvel != nullptr and getObj(it.second->pos()) == Type::TRACE) {
+
+                            player->deathEvent();
+                            respawnPlayer();
+                        }
+
                         for(const auto& element : Root::makeExtendedNeighborhood(it.second->pos())) {
                         
-                            const auto& entvel = (Hitbox*)entityGet(element);
+                            const auto& entvel = entityGet(element);
                             const auto& borvel = borderGet(element);
+
+                            cout << "\n " << element << " entvel: " << entvel << " borvel: " << borvel << endl;
                             if(entvel != nullptr and it.second->checkForCollision(entvel) 
-                            or borvel != nullptr and it.second->GameObject::checkForCollision(borvel)) {
+                            or borvel != nullptr and it.second->checkForCollision(borvel)) {
                              
+                                cout << "it's gonna bounce\n";
                                 it.second->bounce(element);
                             }
                         
-                            if(getObj(element) == Type::TRACE
-                            and it.second->GameObject::checkForCollision(borderGet(element))) {
+                            if(getObj(element) == Type::TRACE and borvel != nullptr
+                            and it.second->checkForCollision(borvel)) {
 
                                 player->deathEvent();
                                 respawnPlayer();
@@ -364,7 +386,7 @@ int Level::gameLoop() {
                 
                         } else if(getObj(it.second->pos()) == Type::VOID) {
                 
-                            GameObject* temp = new Hitbox(0, 0, 1, 1);
+                            Hitbox* temp = new Hitbox(0, 0, 1, 1);
                             temp->reposition(it.second->pos());
                             
                             allocation.push_back(temp);
@@ -407,18 +429,12 @@ int Level::gameLoop() {
             redraw = false;
             
             ScaledBitmap::clear();
-            cout << "-redraw: clear done ";
             for(const auto& it : borders)
                 it.second->draw();
-            cout << "-redraw: borders done ";
             for(const auto& it : entities)
              if(it.second->isActive())
                 it.second->draw();
-            cout << "-redraw: entities done ";
             ScaledBitmap::render();
-            cout << "-redraw: rendering done ";
-            al_flip_display();
-            cout << "-redraw: all done ";
         }
 
         cout << endl << endl;

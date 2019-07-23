@@ -44,7 +44,7 @@ void ScaledBitmap::clear() {
     }
 
     if(enablePrint)
-    cout << "ScaledBitmap::clear() " << " " << buffer << "\n";
+        cout << "ScaledBitmap::clear() " << " " << buffer << "\n";
 }
 
 void ScaledBitmap::render() {
@@ -53,5 +53,74 @@ void ScaledBitmap::render() {
         al_set_target_backbuffer(al_get_current_display());
         al_clear_to_color(al_map_rgb(0, 0, 0));
         al_draw_scaled_bitmap(buffer, 0, 0, screenWidth(), screenHeight(), scale_X(), scale_Y(), scale_W(), scale_H(), 0);
+        al_flip_display();
     }
+}
+
+ScaledBitmap::ScaledBitmap(): bitmap(nullptr) { 
+            
+    if(refCount == 0)
+        initBuffer();
+    ++refCount;
+}
+
+ScaledBitmap::ScaledBitmap(const char* path): bitmap(al_load_bitmap(path)) { 
+            
+    if(refCount == 0)
+        initBuffer();
+    ++refCount;
+}
+
+ScaledBitmap::ScaledBitmap(int h, int w): bitmap(al_create_bitmap(h, w)) {
+            
+    if(refCount == 0)
+        initBuffer();
+    ++refCount;
+}
+
+ScaledBitmap::~ScaledBitmap() {
+            
+    if(bitmap != nullptr)
+        al_destroy_bitmap(bitmap);
+            
+    if(refCount > 0)
+        --refCount;
+    if(refCount == 0)
+        delBuffer();
+}
+
+void ScaledBitmap::draw(float x, float y)  {
+            
+    bool enablePrint = false;
+
+    if(bitmap != nullptr) {
+        al_set_target_bitmap(buffer);
+        al_draw_bitmap(bitmap, x, y, 0);
+    }
+
+    if(enablePrint)
+        cout << "ScaledBitmap::draw() " << this << bitmap << " -> " << buffer << endl;
+}
+
+ALLEGRO_BITMAP* ScaledBitmap::getMyBitmap() {
+            
+    return bitmap;
+}
+
+void ScaledBitmap::setMyBitmap(const char* path) {
+            
+    if(bitmap != nullptr)
+        al_destroy_bitmap(bitmap);
+
+    bitmap = al_load_bitmap(path);
+}
+
+void ScaledBitmap::setMyBitmap(int x, int y, ALLEGRO_COLOR c) {
+            
+    if(bitmap != nullptr)
+        al_destroy_bitmap(bitmap);
+
+    bitmap = al_create_bitmap(x, y);
+    al_set_target_bitmap(bitmap);
+    al_clear_to_color(c);
 }

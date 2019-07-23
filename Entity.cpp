@@ -30,29 +30,32 @@ float Entity::getYStep() const {
 
 void Entity::bounce(int val) {
 
-    bool check = false;
-    for(const auto& element : Root::makeNeighborhood(pos())) {
-        if(val == element) {
-            check = true;
-            if(pos() - val >= -1 and pos() - val <= 1) {
-                xspeed = -xspeed;
-            } else if(pos() - val >= -Root::getDim() and pos() - val <= Root::getDim()) {
-                yspeed = -yspeed;
-            }
-        }
-        if(check)
-            return;
+    if(pos() - val >= -1 or pos() - val <= 1) {
+        xspeed = -xspeed;
+    }
+    if(pos() - val >= -Root::getDim() or pos() - val <= Root::getDim()) {
+        yspeed = -yspeed;
     }
 }
 
-bool Entity::locksOnObj(const GameObject *const param) const {
+bool Entity::locksOnObj(const Hitbox *const param) const {
     
-    return *this == *param;
+    return abs(getX() - param->getX()) <= GameObject::getSize() 
+       and abs(getY() - param->getY()) <= GameObject::getSize();
+
 }
 
 bool Entity::checkForCollision(const Hitbox *const E) const {
 
-    return ((xspeed >= 0 and E->getX() >= getX()) or (xspeed <= 0 and E->getX() <= getX())) 
-       and ((yspeed >= 0 and E->getY() >= getY()) or (yspeed <= 0 and E->getY() <= getY()))
-       and Hitbox::checkForCollision(E);
+    bool enablePrint = true;
+
+    bool ret = 
+    ((xspeed >= 0 and E->getX() >= getX()) or (xspeed <= 0 and E->getX() <= getX())) 
+    and ((yspeed >= 0 and E->getY() >= getY()) or (yspeed <= 0 and E->getY() <= getY()))
+    and Hitbox::checkForCollision(E);
+
+    if(enablePrint)
+        cout << "\nEntity::checkForCollision(): " << this << " <-> " << E << " :: " << ret << endl;
+
+    return ret;
 }

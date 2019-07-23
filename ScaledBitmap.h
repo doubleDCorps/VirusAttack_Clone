@@ -20,13 +20,9 @@ class ScaledBitmap {
     
     private:
         static int refCount;
-
         static ALLEGRO_BITMAP *buffer;
-        
         static void initBuffer();
-
         static void delBuffer();
-
         ALLEGRO_BITMAP *bitmap;
 
     public:    
@@ -46,74 +42,17 @@ class ScaledBitmap {
 
         static float scale_X(); 
         static float scale_Y();
-    
-        ScaledBitmap(): bitmap(nullptr) { 
-            
-            if(refCount == 0)
-                initBuffer();
-            ++refCount;
-        }
-
-        ScaledBitmap(const char* path): bitmap(al_load_bitmap(path)) { 
-            
-            if(refCount == 0)
-                initBuffer();
-            ++refCount;
-        }
-
-        ScaledBitmap(int h, int w): bitmap(al_create_bitmap(h, w)) {
-            
-            if(refCount == 0)
-                initBuffer();
-            ++refCount;
-        }
-
-        ~ScaledBitmap() {
-            
-            if(bitmap != nullptr)
-                al_destroy_bitmap(bitmap);
-            
-            if(refCount > 0)
-                --refCount;
-            if(refCount == 0)
-                delBuffer();
-        }
-
         static void clear();
+        static void render();  
 
-        static void render();
+        ScaledBitmap();
+        ScaledBitmap(const char* path);
+        ScaledBitmap(int h, int w);
+        ~ScaledBitmap();
 
-        void draw(float x, float y) {
-            
-            bool enablePrint = false;
 
-            if(bitmap != nullptr) {
-                al_set_target_bitmap(buffer);
-                al_draw_bitmap(bitmap, x, y, 0);
-            }
-
-            if(enablePrint)
-            cout << "ScaledBitmap::draw() " << this << bitmap << endl;
-        }
-
-        ALLEGRO_BITMAP* getMyBitmap() {
-            
-            return bitmap;
-        }
-
-        void setMyBitmap(const char* path) {
-            
-            if(bitmap != nullptr)
-                al_destroy_bitmap(bitmap);
-            bitmap = al_load_bitmap(path);
-        }
-
-        void setMyBitmap(int x, int y, ALLEGRO_COLOR c) {
-            
-            if(bitmap != nullptr)
-                al_destroy_bitmap(bitmap);
-            bitmap = al_create_bitmap(x, y);
-            al_set_target_bitmap(bitmap);
-            al_clear_to_color(c);
-        }
+        void draw(float x, float y);
+        ALLEGRO_BITMAP* getMyBitmap();
+        void setMyBitmap(const char* path);
+        void setMyBitmap(int x, int y, ALLEGRO_COLOR c);
 };

@@ -11,7 +11,8 @@ void Enemy::deathEvent() {
 void Enemy::update() {
 
     if(!isActive()) return;
-    reposition(pos() + getXStep() + getYStep());
+    addToX(getXStep());
+    addToY(getYStep());
 
 }
         

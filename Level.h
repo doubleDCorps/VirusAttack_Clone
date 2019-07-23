@@ -5,7 +5,7 @@ class Level {
         enum class Body {PLAYER, ENEMY, BOSS, NONE};
         enum class Type {BORDER, TRACE, VOID};
         vector<GameObject*> allocation;
-        map<int, GameObject*> borders;
+        map<int, Hitbox*> borders;
         map<int, Entity*> entities;
         Player* player;
         vector<Enemy*> boss;
@@ -17,8 +17,8 @@ class Level {
         void initMap();
         void updateMap();
         void delMap();
-        const GameObject *const borderGet(int) const;
-        const GameObject *const entityGet(int) const;
+        const Hitbox *const borderGet(int) const;
+        const Entity *const entityGet(int) const;
         Type getObj(int) const;
         bool isObj(int) const;
         Body getBody(int) const;

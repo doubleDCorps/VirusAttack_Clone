@@ -20,6 +20,6 @@ class Entity: public Hitbox {
         float getXStep() const;
         float getYStep() const;
         void bounce(int val);
-        bool locksOnObj(const GameObject *const) const;
+        bool locksOnObj(const Hitbox *const) const;
         virtual bool checkForCollision(const Hitbox *const) const;
 };

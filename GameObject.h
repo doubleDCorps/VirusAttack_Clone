@@ -9,7 +9,9 @@ class GameObject {
     
     protected:
         ScaledBitmap image;
-
+        void addToX(float);
+        void addToY(float);
+        
     public:
         static void setSize(float);
         static float getSize();
@@ -20,11 +22,13 @@ class GameObject {
         float getX() const;
         float getY() const;
         int pos() const;
-        bool operator==(const GameObject&) const;
         void reposition(int);
         void reposition(float, float);
         void reposition(const GameObject&);
         bool checkForCollision(const GameObject *const) const;
         void setImage(string);
         void setImage(int, int, ALLEGRO_COLOR);
+
+        bool operator==(const GameObject&) const;
+        bool operator!=(const GameObject&) const;
 };
