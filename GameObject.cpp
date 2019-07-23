@@ -40,12 +40,12 @@ bool GameObject::operator==(const GameObject& G) const {
        and abs(y - G.y) <= 0.45f;
 }
 
-void GameObject::reposition(float val) {
+void GameObject::reposition(int val) {
 
     bool enablePrint = false;
 
-    float x = val/(float)ScaledBitmap::screenWidth();
-    float y = val - x;
+    float x = val/Root::getDim();
+    float y = val%Root::getDim();
 
     if(enablePrint)
     cout << "GameObject::reposition(float) " << this
@@ -91,5 +91,5 @@ void GameObject::setImage(string path) {
 
 void GameObject::setImage(int x, int y, ALLEGRO_COLOR c) {
 
-    image.setMyBitmap(x, y, c);
+    image.setMyBitmap(x*GameObject::getSize(), y*GameObject::getSize(), c);
 }

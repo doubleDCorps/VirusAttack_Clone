@@ -21,7 +21,7 @@ class GameObject {
         float getY() const;
         int pos() const;
         bool operator==(const GameObject&) const;
-        void reposition(float);
+        void reposition(int);
         void reposition(float, float);
         void reposition(const GameObject&);
         bool checkForCollision(const GameObject *const) const;
