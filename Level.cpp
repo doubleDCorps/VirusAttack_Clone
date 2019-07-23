@@ -81,38 +81,6 @@ void Level::updateMap() {
 
 void Level::initMap() {
     
-    //allocazione player
-    player = new Player(135.0f, 150.0f, 
-                        3, 3,
-                        4.0f, 4.0f);
-    player->setImage(player->getW()*GameObject::getSize(), player->getH()*GameObject::getSize(), al_map_rgb(100, 200, 150));
-    allocation.push_back(player);
-    entities[player->pos()] = player;
-    
-    //allocazione boss
-    boss.push_back(new Enemy((ScaledBitmap::screenWidth() - GameObject::getSize())/2.0f, 
-                             (ScaledBitmap::screenHeight() - GameObject::getSize())/2.0f, 
-                             3, 3, 
-                             -4.0, -4.0, 
-                             true));
-    boss[0]->setImage(boss[0]->getW()*GameObject::getSize(), boss[0]->getH()*GameObject::getSize(), al_map_rgb(150, 200, 100));
-    allocation.push_back(boss[0]);
-    entities[boss[0]->pos()] = boss[0];
-
-    //allocazione nemici
-    int v = boss[0]->pos();
-    for(const auto& value : Root::makeExtendedNeighborhood(v)) {
-        
-        int dx = v/Root::getDim() - value/Root::getDim();
-        int dy = v%Root::getDim() - value%Root::getDim();
-
-        Entity* temp = new Enemy(0, 0, 3, 3, dx, dy, false);
-        temp->reposition(value);
-        temp->setImage(temp->getW()*GameObject::getSize(), temp->getH()*GameObject::getSize(), al_map_rgb(200, 100, 150));
-        allocation.push_back(temp);
-        entities[temp->pos()] = temp;
-    }
-
     Hitbox* temp = nullptr;
     for(int i = 0; i < Root::getDim(); ++i) {
 
@@ -137,6 +105,39 @@ void Level::initMap() {
         temp->setImage(temp->getW()*GameObject::getSize(), temp->getH()*GameObject::getSize(), al_map_rgb(255, 255, 255));
         allocation.push_back(temp);
         borders[temp->pos()] = temp;
+    }
+
+    //allocazione player
+    player = new Player(0, 0, 
+                        3, 3,
+                        4.0f, 4.0f);
+    player->setImage(player->getW()*GameObject::getSize(), player->getH()*GameObject::getSize(), al_map_rgb(100, 200, 150));
+    allocation.push_back(player);
+    entities[player->pos()] = player;
+    respawnPlayer();
+    
+    //allocazione boss
+    boss.push_back(new Enemy(( (Root::getDim()-1)*GameObject::getSize() )/2.0f, 
+                             ( (Root::getDim()-1)*GameObject::getSize() )/2.0f, 
+                             3, 3, 
+                             -4.0, -4.0, 
+                             true));
+    boss[0]->setImage(boss[0]->getW()*GameObject::getSize(), boss[0]->getH()*GameObject::getSize(), al_map_rgb(150, 200, 100));
+    allocation.push_back(boss[0]);
+    entities[boss[0]->pos()] = boss[0];
+
+    //allocazione nemici
+    int v = boss[0]->pos();
+    for(const auto& value : Root::makeExtendedNeighborhood(v)) {
+        
+        int dx = v/Root::getDim() - value/Root::getDim();
+        int dy = v%Root::getDim() - value%Root::getDim();
+
+        Entity* temp = new Enemy(0, 0, 3, 3, dx, dy, false);
+        temp->reposition(value);
+        temp->setImage(temp->getW()*GameObject::getSize(), temp->getH()*GameObject::getSize(), al_map_rgb(200, 100, 150));
+        allocation.push_back(temp);
+        entities[temp->pos()] = temp;
     }
 }
 

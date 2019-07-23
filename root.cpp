@@ -13,7 +13,7 @@ bool checkRange(int a, int u, int l, bool left, bool right) {
 
 Root::Root() {}
 
-int Root::levelDimension = 600;
+int Root::levelDimension = 120;
 
 void Root::setDim(int d) {
 
