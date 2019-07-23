@@ -27,6 +27,9 @@ class Level {
         bool checkForBounds(int) const;
 
     public:
+        static int shift(int);
+        static pair<int, int> shift(int, int);
+
         Level(ALLEGRO_TIMER*);
 
         int getArea() const;

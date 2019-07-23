@@ -36,11 +36,14 @@ float ScaledBitmap::scale_Y()          { return (windowHeight() - scale_H()) / 2
 
 void ScaledBitmap::clear() {
 
+    bool enablePrint = false;
+
     if(buffer != nullptr) {
         al_set_target_bitmap(buffer);
         al_clear_to_color(al_map_rgb(0, 0, 0));
     }
 
+    if(enablePrint)
     cout << "ScaledBitmap::clear() " << " " << buffer << "\n";
 }
 

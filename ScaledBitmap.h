@@ -1,4 +1,8 @@
+#include<map>
 #include<iostream>
+#include<set>
+#include<vector>
+#include<queue>
 #include<algorithm>
 #include<string>
 #include<allegro5/allegro5.h>
@@ -81,11 +85,14 @@ class ScaledBitmap {
 
         void draw(float x, float y) {
             
+            bool enablePrint = false;
+
             if(bitmap != nullptr) {
                 al_set_target_bitmap(buffer);
                 al_draw_bitmap(bitmap, x, y, 0);
             }
 
+            if(enablePrint)
             cout << "ScaledBitmap::draw() " << this << bitmap << endl;
         }
 

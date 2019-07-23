@@ -1,8 +1,3 @@
-#include<map>
-#include<iostream>
-#include<set>
-#include<vector>
-#include<queue>
 #include"ScaledBitmap.h"
 using namespace std;
 

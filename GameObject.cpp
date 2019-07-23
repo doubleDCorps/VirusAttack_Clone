@@ -6,7 +6,11 @@ GameObject::GameObject(float _x, float _y): x(_x), y(_y), image() {}
 
 void GameObject::draw() {
 
+    bool enablePrint = false;
+
     image.draw(getX(), getY());
+    
+    if(enablePrint)
     cout << "GameObject::draw() " << this 
     << ": pos -> " << x << " " << y << endl;
 }
@@ -38,9 +42,12 @@ bool GameObject::operator==(const GameObject& G) const {
 
 void GameObject::reposition(float val) {
 
-    float x = val/(float)Root::getDim();
+    bool enablePrint = false;
+
+    float x = val/(float)ScaledBitmap::screenWidth();
     float y = val - x;
 
+    if(enablePrint)
     cout << "GameObject::reposition(float) " << this
     << ": " << val << " -> (" << x << ", " << y << ")\n";
 
