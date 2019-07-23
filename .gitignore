@@ -2,3 +2,4 @@
 *.exe
 *.json
 *.ipch
+*.out
