@@ -46,8 +46,12 @@ void Level::respawnPlayer() {
 
             if(pivot != -1) {
                 
+                entities.erase(player->pos());
+
                 player->reposition(pivot);
                 player->respawn();
+
+                entities[player->pos()] = player;
 
                 if(enablePrint)
                     cout << "lo riposiziono in : " << pivot <<  " -> " <<  player -> pos() << endl;
@@ -59,7 +63,7 @@ void Level::respawnPlayer() {
     }
 }
 
-void Level::spawnEnemy(const Enemy *const E) {
+void Level::spawnEnemy(const Entity *const E) {
     
     for(const auto& it : entities)
      if(getBody(it.second->pos()) == Body::ENEMY and !it.second->isActive()) {
@@ -69,8 +73,13 @@ void Level::spawnEnemy(const Enemy *const E) {
         for(const auto& val : N)
          if(getObj(val) == Type::VOID and getBody(val) == Body::NONE) {
              
+            entities.erase(it.second->pos());
+
             it.second->reposition(val);
             it.second->respawn();
+
+            entities[it.second->pos()] = it.second;
+
             return;
         }
     }
@@ -242,7 +251,7 @@ bool Level::canSpawn() const {
 
 bool Level::checkForBounds(int a) const {
     
-    return checkRange(a, 0, Root::getDim(), true, false);
+    return checkRange(a, 0, Root::getDim()*Root::getDim(), true, false);
 }
 
 int Level::getArea() const {
@@ -310,23 +319,113 @@ int Level::gameLoop() {
         ALLEGRO_EVENT ev;
         al_wait_for_event(coda_eventi, &ev);
 
-        cout << "-pre if ";
         if(ev.type == ALLEGRO_EVENT_DISPLAY_CLOSE) {
-            cout << "-byebye if ";
+//            cout << "-byebye if ";
             
             STOP = true;
 
         } else if(ev.type == ALLEGRO_EVENT_TIMER) {
-            cout << "-ALLEGRO_EVENT_TIMER ";
+//            cout << "-ALLEGRO_EVENT_TIMER ";
              
             //STOP = (getArea() <= 25) or player->loseCondition();
     
+            bool youCanOnlyDieOnce = false;
             for(const auto& it : entities) {
+
+                if(!checkForBounds(it.second->pos())) {
+                    
+                    it.second->deathEvent();
+                    continue;
+                }
+
+                bool move = true;
+                decltype(borderGet(it.second->pos())) borderValue = borderGet(it.second->pos());
+
+                if(borderValue != nullptr) {
+
+                    if(getBody(it.second->pos()) == Body::PLAYER) {
+
+                        if(getObj(it.second->pos()) == Type::BORDER) {
                 
-                it.second->update();
-                
-                const auto& entvel = entityGet(it.second->pos());
-                const auto& borvel = borderGet(it.second->pos());
+                            if(!player->isTraceEmpty())
+                                updateMap();
+                        }
+
+                    } else if(getBody(it.second->pos()) == Body::ENEMY) {
+
+                        if(!youCanOnlyDieOnce and getObj(it.second->pos()) == Type::TRACE) {
+
+                            move = false;
+                            youCanOnlyDieOnce = true;
+                            player->deathEvent();
+                            respawnPlayer();
+                        }
+
+                        if(move) it.second->bounce(it.second->pos());
+                    
+                    } else if(getBody(it.second->pos()) == Body::BOSS) {
+
+                        if(!youCanOnlyDieOnce and getObj(it.second->pos()) == Type::TRACE) {
+
+                            move = false;
+                            youCanOnlyDieOnce = true;
+                            player->deathEvent();
+                            respawnPlayer();
+                        }
+
+                        if(move) it.second->bounce(it.second->pos());
+                    }
+
+                } else {
+                    //cout<< it.second << " secondo if\n";
+                    //cout << (int)getBody(it.second->pos()) << " ";
+                    if(getBody(it.second->pos()) == Body::PLAYER) {
+
+                        cout << "player: " << it.second << endl;  
+                        Hitbox* temp = new Hitbox(0, 0, 1, 1);
+                        temp->reposition(it.second->pos());
+                            
+                        allocation.push_back(temp);
+                        borders[temp->pos()] = temp;
+                            
+                        player->updateTrace(borderGet(it.second->pos()));
+                    
+                    } else if(getBody(it.second->pos()) == Body::ENEMY) {
+
+                        cout << "enemy: " << it.second << endl;
+                        if(!youCanOnlyDieOnce and it.second->checkForCollision(player)) {
+
+                            youCanOnlyDieOnce = true;
+                            player->deathEvent();
+                            respawnPlayer();
+                        }
+
+                        entities.erase(it.second->pos());
+                        it.second->update();
+                        entities[it.second->pos()] = it.second;
+                    
+                    } else if(getBody(it.second->pos()) == Body::BOSS) {
+
+                        cout << "boss: " << it.second << endl;
+                        if(!youCanOnlyDieOnce and it.second->checkForCollision(player)) {
+
+                            youCanOnlyDieOnce = true;
+                            player->deathEvent();
+                            respawnPlayer();
+                        }
+
+                        if(canSpawn())
+                            spawnEnemy(it.second);
+
+                        entities.erase(it.second->pos());
+                        it.second->update();
+                        entities[it.second->pos()] = it.second;
+                    }
+                }
+            }
+/*                 
+                const auto entvel = entityGet(it.second->pos());
+                const auto borvel = borderGet(it.second->pos());
                         
                 cout << "\n THIS entvel: " << entvel << " borvel: " << borvel << endl;
                 
@@ -404,26 +503,23 @@ int Level::gameLoop() {
                     }
                 }
             }
-
-            cout << "-abilita il redraw ";
-
+*/           
             redraw = true;
-
         }
         else if(ev.type == ALLEGRO_EVENT_KEY_DOWN and ev.keyboard.keycode == ALLEGRO_KEY_ESCAPE) {
-            cout << "-byebye2 if ";
+//            cout << "-byebye2 if ";
             
             STOP = true;
 
         }else if(ev.type == ALLEGRO_EVENT_KEY_DOWN or ev.type == ALLEGRO_EVENT_KEY_UP) {
-            cout << "-keyboard if ";
+//            cout << "-keyboard if ";
 
             player->updateKey(ev.keyboard.keycode, ev.type);
         }
         /*
             QUESTO DEVE DIVENTARE GESTIONE GRAFICA?
         */
-        cout << "-redraw if ";
+//        cout << "-redraw if ";
          if(redraw and al_is_event_queue_empty(coda_eventi))
         {
             redraw = false;
@@ -439,6 +535,9 @@ int Level::gameLoop() {
 
         cout << endl << endl;
     }
+
+//    for(const auto& element : entities)
+//        cout << "[" << element.first << " : " << element.second << "] -> " << element.second->isActive() << endl; 
 
     al_destroy_event_queue(coda_eventi);
     delMap();

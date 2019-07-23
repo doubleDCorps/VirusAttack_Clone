@@ -15,12 +15,14 @@ void Player::update() {
     if(!isActive()) return;
     
     //roba per il reverse algorithm
+    
     float arrx[] = {1.0f, -1.0f, 0.0f,  0.0f};
     float arry[] = {0.0f,  0.0f, 1.0f, -1.0f};
 
-    if(dir != Direction::STILL){
-        addToX(arrx[(int)dir]*getXStep());
-        addToY(arry[(int)dir]*getYStep());
+    if(dir != Direction::STILL) {
+        
+        addToX( arrx[(int)dir]*getXStep() );
+        addToY( arry[(int)dir]*getYStep() );
     }
 }
 

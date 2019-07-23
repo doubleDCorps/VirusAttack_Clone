@@ -13,7 +13,7 @@ class Level {
         ScaledBitmap background;
 
         void respawnPlayer();
-        void spawnEnemy(const Enemy *const);
+        void spawnEnemy(const Entity *const);
         void initMap();
         void updateMap();
         void delMap();
