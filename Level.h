@@ -1,70 +1,34 @@
-#ifndef POLY_H_
-#define POLY_H_
-#include"Sounds.h"
-#include"menu.h"
-#include"Text.h"
-#include"Player.h"
+#include"Enemy.h"
 
- class Level
-{
-    public:
-        Level(unsigned difficulty, ALLEGRO_DISPLAY_MODE settings, ALLEGRO_TIMER* tim, Sounds* sounds);
-        /*
-            Loop di gioco (escuzione effettiva del livello).
-        */
-        void loop();
-    
+class Level {
     private:
-        /*
-            Bordo di default per livello (dipende dai settaggi del display).
-        */
-        inline static perimeter defPerimeter{};
-        /*
-            Setting della difficoltà: influenza il numero di boss, la velocità dei nemici, e altro.
-        */
-        unsigned difficulty;
-        ALLEGRO_TIMER* timer;
-        unsigned numBosses;
-        /*
-            Parametri usati in loop.
-        */
-        GameList border;
-        GameList trace;
-        vector<Entity*> entities;
+        enum class Body {PLAYER, ENEMY, BOSS, NONE};
+        enum class Type {BORDER, TRACE, VOID};
+        vector<GameObject*> allocation;
+        map<int, GameObject*> borders;
+        map<int, Entity*> entities;
         Player* player;
-        Sounds* sounds;
+        vector<Enemy*> boss;
+        ALLEGRO_TIMER* timer;
         ScaledBitmap background;
-        /*
-            Inizializza il bordo di default del livello (uguale per tutti).
-        */
-        static void defPerInit(ALLEGRO_DISPLAY_MODE d);
-        /*
-            Funzione che regola i parametri che definiscono la difficoltà del livello.
-        */
-        void setDifficulty(unsigned d);
-        /*
-            Getter della difficoltà.
-        */
-        unsigned getDifficulty() const;
-        /*
-            Inizializza tutte le entità (Player/Boss/altri nemici) in accordo con il display. 
-        */
-        void entities_init();
-        /*
-            Se ci sono dei nemici inattivi, uno viene riattivato all'interno dell'area di gioco.
-        */
-        void spawn();
-        /*
-            Viene calcolata l'area utilizzando il seguente algoritmo:
-            dato un poligono chiuso definito da una lista di coordinate (x, y) concatenate,
-            dove con concatenate si intende che almeno un elemento di ogni coppia è uguale a quello
-            del successivo e che ogni coppia ha l'elemento opposto in comune rispetto alla precedente,
-            si sommano le aree rettangolari ottenute da ogni coppia di coordinate concantenate, sfruttando
-            la differenza fra le y per determinare il "segno" che indichi se l'area appartiene
-            alla figura descritta (positiva) o altrimenti (negatva).
-            La somma viene poi dimezzata per ottenere il valore numerico corrispondente all'area del poligono.
-        */
-        int getArea(const GameList& GL) const;
-};
 
-#endif
+        void respawnPlayer();
+        void spawnEnemy(const Enemy *const);
+        void initMap();
+        void updateMap();
+        void delMap();
+        const GameObject *const borderGet(int) const;
+        const GameObject *const entityGet(int) const;
+        Type getObj(int) const;
+        bool isObj(int) const;
+        Body getBody(int) const;
+        bool isBody(int) const;
+        bool canSpawn() const;
+        bool checkForBounds(int) const;
+
+    public:
+        Level(ALLEGRO_TIMER*);
+
+        int getArea() const;
+        int gameLoop();
+};

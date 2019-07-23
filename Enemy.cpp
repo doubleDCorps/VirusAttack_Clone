@@ -1,14 +1,21 @@
 #include"Enemy.h"
 
- void Enemy::update(const GameList& GL)
-{     
-     if(GL.c_inside(data))
-    {
-        if(GL.collides(data) == X)  data.vx( -data.vx() );
-        if(GL.collides(data) == Y)  data.vy( -data.vy() );
+Enemy::Enemy(float x, float y, unsigned w, unsigned h, float sx, float sy, bool b): 
+    Entity(x, y, w, h, sx, sy), boss(b) {}
 
-        data.x( data.x() + data.vx() );
-        data.y( data.y() + data.vy() );
-    }
-     else setAlive(false);
+void Enemy::deathEvent() {
+
+    setActive(false);
+}
+
+void Enemy::update() {
+
+    if(!isActive()) return;
+    reposition(pos() + getXStep() + getYStep());
+
+}
+        
+bool Enemy::isBoss() const {
+    
+    return boss;
 }

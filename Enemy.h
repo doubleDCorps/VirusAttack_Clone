@@ -1,14 +1,14 @@
-#ifndef ENEMY_H
-#define ENEMY_H
+#include"Player.h"
 
-#include"Entity.h"
-
- class Enemy: public Entity
-{
+class Enemy: public Entity {
+    private:
+        bool boss;
+    
     public:
-        Enemy(float x=0, float y=0, float vx=0, float vy=0, ALLEGRO_BITMAP* p=nullptr): Entity(x, y, vx, vy, p, 1) {}
+        Enemy(float, float, unsigned, unsigned, float, float, bool);
+        virtual ~Enemy() {}
+        virtual void deathEvent() override;
+        virtual void update() override;        
+        bool isBoss() const;
 
-        virtual void update(const GameList&) override;
 };
-
-#endif

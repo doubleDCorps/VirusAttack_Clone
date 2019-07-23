@@ -63,6 +63,17 @@ class Menu {
                     cout << "so dentro l'if\n";
                     al_set_target_bitmap(buffer.getMyBitmap());
                     cout << "ho settato la bitmap\n";
+
+                    cout << buffer.windowWidth << "\n"
+                    << buffer.windowHeight << "\n"
+                    << buffer.sx << "\n"
+                    << buffer.sy << "\n"
+                    << buffer.scale << "\n"
+                    << buffer.scale_W << "\n"
+                    << buffer.scale_H << "\n"
+                    << buffer.scale_X << "\n"
+                    << buffer.scale_Y << "\n";
+
                     if(state == 1)
                         start_selected.draw();
                     else if(state == 2)
