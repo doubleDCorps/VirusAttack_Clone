@@ -8,7 +8,7 @@ void GameObject::draw() {
 
     bool enablePrint = false;
 
-    image.draw(getX(), getY());
+    image.draw(getX()*getSize(), getY()*getSize());
     
     if(enablePrint)
     cout << "GameObject::draw() " << this 

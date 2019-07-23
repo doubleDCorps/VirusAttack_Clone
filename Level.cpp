@@ -2,7 +2,7 @@
 
 int Level::shift(int k) {
 
-    return k + (120/GameObject::getSize())*ScaledBitmap::screenWidth() + (60/GameObject::getSize());
+    return k + (120/GameObject::getSize())*Root::getDim() + (60/GameObject::getSize());
 }
 
 pair<int, int> Level::shift(int x, int y) {
@@ -17,11 +17,11 @@ void Level::respawnPlayer() {
     bool enablePrint = false;
     
     int pivot = -1;
-    vector<int> N = Root::makeNeighborhood(player->pos()/GameObject::getSize());
+    vector<int> N = Root::makeNeighborhood(player->pos());
     
     cout << "Level::respawnPlayer(): vicinato -> ";
     for(const auto& it : N) 
-     cout << " " << it;
+        cout << " " << it;
     cout << endl << endl;
 
     int arr[] = {1, -1, Root::getDim(), -Root::getDim()};
@@ -48,7 +48,7 @@ void Level::respawnPlayer() {
                 player->respawn();
 
                 cout << " " <<  player -> pos() << endl;
-                break;
+                return;
             }
         }
      }
@@ -67,11 +67,8 @@ void Level::spawnEnemy(const Enemy *const E) {
              
             it.second->reposition(val);
             it.second->respawn();
-            break;
-        
+            return;
         }
-        
-        break;
     }
 }
 
@@ -119,33 +116,33 @@ void Level::initMap() {
         float t = i;
 
         val = Level::shift(t, 0);
-        temp = new Hitbox(val.first*GameObject::getSize(), val.second*GameObject::getSize(), 1, 1);
+        temp = new Hitbox(val.first, val.second, 1, 1);
         temp->setImage(temp->getW()*GameObject::getSize(), temp->getH()*GameObject::getSize(), al_map_rgb(255, 255, 255));
         allocation.push_back(temp);
         borders[temp->pos()] = temp;
 
         val = Level::shift(0, t);
-        temp = new Hitbox(val.first*GameObject::getSize(), val.second*GameObject::getSize(), 1, 1);
+        temp = new Hitbox(val.first, val.second, 1, 1);
         temp->setImage(temp->getW()*GameObject::getSize(), temp->getH()*GameObject::getSize(), al_map_rgb(255, 255, 255));
         allocation.push_back(temp);
         borders[temp->pos()] = temp;
 
         val = Level::shift(t, (Root::getDim()-1));
-        temp = new Hitbox(val.first*GameObject::getSize(), val.second*GameObject::getSize(), 1, 1);
+        temp = new Hitbox(val.first, val.second, 1, 1);
         temp->setImage(temp->getW()*GameObject::getSize(), temp->getH()*GameObject::getSize(), al_map_rgb(255, 255, 255));
         allocation.push_back(temp);
         borders[temp->pos()] = temp;
 
         val = Level::shift((Root::getDim()-1), t);
-        temp = new Hitbox(val.first*GameObject::getSize(), val.second*GameObject::getSize(), 1, 1);
+        temp = new Hitbox(val.first, val.second, 1, 1);
         temp->setImage(temp->getW()*GameObject::getSize(), temp->getH()*GameObject::getSize(), al_map_rgb(255, 255, 255));
         allocation.push_back(temp);
         borders[temp->pos()] = temp;
     }
 
     //allocazione player
-    player = new Player(((Root::getDim()-1)*GameObject::getSize() )/2.0f + 120, 
-                        ((Root::getDim()-1)*GameObject::getSize() )/2.0f + 60, 
+    val = Level::shift(((Root::getDim()-1))/2.0f, ((Root::getDim()-1))/2.0f);
+    player = new Player(val.first, val.second, 
                         3, 3,
                         4.0f, 4.0f);
     player->setImage(player->getW()*GameObject::getSize(), player->getH()*GameObject::getSize(), al_map_rgb(100, 200, 150));

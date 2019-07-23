@@ -8,7 +8,6 @@ class Hitbox: public GameObject {
     public:
         Hitbox(float, float, unsigned, unsigned);
         virtual ~Hitbox() {}
-        virtual void draw();
         float getW() const;
         float getH() const;
         float getXW() const;

@@ -2,11 +2,6 @@
 
 Hitbox::Hitbox(float x, float y, unsigned w, unsigned h): GameObject(x, y), width(w), height(h) {}
 
-void Hitbox::draw() {
-
-    image.draw(getX(), getY());
-}
-
 float Hitbox::getW() const {
 
     return width;
