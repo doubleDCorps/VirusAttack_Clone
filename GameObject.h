@@ -4,6 +4,9 @@ class GameObject {
     
     private:
         static float dimension;
+        static int shift(int);
+        static pair<int, int> shift(int, int);
+
         float x;
         float y;
     

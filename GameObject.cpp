@@ -2,17 +2,28 @@
 
 float GameObject::dimension = 5;
 
+int GameObject::shift(int k) {
+
+    return k + (120/GameObject::getSize())*Root::getDim() + (60/GameObject::getSize());
+}
+
+pair<int, int> GameObject::shift(int x, int y) {
+
+    return {x + (120/GameObject::getSize()), y + (60/GameObject::getSize())};
+}
+
 GameObject::GameObject(float _x, float _y): x(_x), y(_y), image() {}
 
 void GameObject::draw() {
 
     bool enablePrint = false;
 
-    image.draw(getX()*getSize(), getY()*getSize());
+    const auto& val = shift(x, y);
+    image.draw(val.first*getSize(), val.second*getSize());
     
     if(enablePrint)
-    cout << "GameObject::draw() " << this 
-    << ": pos -> " << x << " " << y << endl;
+        cout << "GameObject::draw() " << this 
+        << ": pos -> " << x << " " << y << endl;
 }
 
 float GameObject::getX() const {
@@ -36,7 +47,7 @@ int GameObject::pos() const {
 
 void GameObject::reposition(int val) {
 
-    bool enablePrint = false;
+    bool enablePrint = true;
 
     float x = val/Root::getDim();
     float y = val%Root::getDim();

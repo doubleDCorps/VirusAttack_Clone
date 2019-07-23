@@ -1,5 +1,4 @@
 #include"ScaledBitmap.h"
-using namespace std;
 
 bool checkRange(int a, int u, int l);
 bool checkRange(int a, int u, int l, bool left, bool right);
@@ -14,4 +13,5 @@ class Root {
         static vector<int> makeExtendedNeighborhood(int);
         static void setDim(int);
         static int getDim();
+        static bool checkForBounds(int);
 };

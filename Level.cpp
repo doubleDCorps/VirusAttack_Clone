@@ -1,15 +1,5 @@
 #include"Level.h"
 
-int Level::shift(int k) {
-
-    return k + (120/GameObject::getSize())*Root::getDim() + (60/GameObject::getSize());
-}
-
-pair<int, int> Level::shift(int x, int y) {
-
-    return {x + (120/GameObject::getSize()), y + (60/GameObject::getSize())};
-}
-
 Level::Level(ALLEGRO_TIMER* t): timer(t), borders(), entities(), boss() {}
 
 void Level::respawnPlayer() {
@@ -32,14 +22,6 @@ void Level::respawnPlayer() {
      
      for(const auto& it : N) 
       for(int j = 0; j < 4; ++j) {
-        
-        if(enablePrint) {
-            cout << "Level::respawnPlayer(): " << player << ": " 
-            << Level::shift(it + arr[j]*i) << " -> " 
-            << Level::shift(it + arr[j]*i)/Root::getDim() << " "
-            << Level::shift(it + arr[j]*i) - Level::shift(it + arr[j]*i)/Root::getDim()
-            << "\n";
-        }
         
         if(getObj(it + arr[j]*i) == Type::BORDER) {
             pivot = it + arr[j]*i;
@@ -123,39 +105,49 @@ void Level::updateMap() {
 void Level::initMap() {
     
     Hitbox* temp = nullptr;
-    pair<int, int> val;
+
     for(int i = 0; i < Root::getDim(); ++i) {
 
-        float t = i;
+        //cout << "at value: " << i;
+        if(borders.find(i*Root::getDim()) == borders.end()) {
 
-        val = Level::shift(t, 0);
-        temp = new Hitbox(val.first, val.second, 1, 1);
-        temp->setImage(temp->getW(), temp->getH(), al_map_rgb(255, 255, 255));
-        allocation.push_back(temp);
-        borders[temp->pos()] = temp;
+            temp = new Hitbox(i, 0, 1, 1);
+            temp->setImage(temp->getW(), temp->getH(), al_map_rgb(255, 255, 255));
+            allocation.push_back(temp);
+            borders[temp->pos()] = temp;
+            //cout << " |" << temp->getX() << "-" << temp->getY() << "| ";
+        }
+        
+        if(borders.find(i) == borders.end()) {
+            
+            temp = new Hitbox(0, i, 1, 1);
+            temp->setImage(temp->getW(), temp->getH(), al_map_rgb(255, 255, 255));
+            allocation.push_back(temp);
+            borders[temp->pos()] = temp;
+            //cout << " |" << temp->getX() << "-" << temp->getY() << "| ";
+        }
 
-        val = Level::shift(0, t);
-        temp = new Hitbox(val.first, val.second, 1, 1);
-        temp->setImage(temp->getW(), temp->getH(), al_map_rgb(255, 255, 255));
-        allocation.push_back(temp);
-        borders[temp->pos()] = temp;
-
-        val = Level::shift(t, (Root::getDim()-1));
-        temp = new Hitbox(val.first, val.second, 1, 1);
-        temp->setImage(temp->getW(), temp->getH(), al_map_rgb(255, 255, 255));
-        allocation.push_back(temp);
-        borders[temp->pos()] = temp;
-
-        val = Level::shift((Root::getDim()-1), t);
-        temp = new Hitbox(val.first, val.second, 1, 1);
-        temp->setImage(temp->getW(), temp->getH(), al_map_rgb(255, 255, 255));
-        allocation.push_back(temp);
-        borders[temp->pos()] = temp;
+        if(borders.find(i*Root::getDim() + Root::getDim()-1) == borders.end()) {
+            
+            temp = new Hitbox(i, (Root::getDim()-1), 1, 1);
+            temp->setImage(temp->getW(), temp->getH(), al_map_rgb(255, 255, 255));
+            allocation.push_back(temp);
+            borders[temp->pos()] = temp;
+            //cout << " |" << temp->getX() << "-" << temp->getY() << "| ";
+        }
+        
+        if(borders.find((Root::getDim()-1)*Root::getDim() + i) == borders.end()) {
+            
+            temp = new Hitbox((Root::getDim()-1), i, 1, 1);
+            temp->setImage(temp->getW(), temp->getH(), al_map_rgb(255, 255, 255));
+            allocation.push_back(temp);
+            borders[temp->pos()] = temp;
+            //cout << " |" << temp->getX() << "-" << temp->getY() << "| ";
+        }
     }
 
     //allocazione player
-    val = Level::shift(((Root::getDim()-1))/2.0f, ((Root::getDim()-1))/2.0f);
-    player = new Player(val.first, val.second, 
+    player = new Player((Root::getDim()-1)/2, (Root::getDim()-1)/2, 
                         3, 3,
                         4.0f, 4.0f);
     player->setImage(player->getW(), player->getH(), al_map_rgb(100, 200, 150));
@@ -165,9 +157,9 @@ void Level::initMap() {
     entities[player->pos()] = player;
     
     //allocazione boss
-    boss.push_back(new Enemy(val.first, val.second, 
+    boss.push_back(new Enemy((Root::getDim()-1)/2, (Root::getDim()-1)/2,
                              3, 3, 
-                             -4.0, -4.0, 
+                             -1.0, -1.0, 
                              true));
     boss[0]->setImage(boss[0]->getW(), boss[0]->getH(), al_map_rgb(150, 200, 100));
     allocation.push_back(boss[0]);
@@ -177,13 +169,14 @@ void Level::initMap() {
     cout << "Level::initMap(): enemy list\n"; 
     //allocazione nemici
     int v = boss[0]->pos();
+    cout << "posizione boss: " << boss[0]->getX() << " " << boss[0]->getY() << endl;
     for(const auto& value : Root::makeExtendedNeighborhood(v)) {
         
-        float dx = float(v/Root::getDim() - value/Root::getDim());
-        float dy = float(v%Root::getDim() - value%Root::getDim());
+        float dx = v/Root::getDim() - value/Root::getDim();
+        float dy = v%Root::getDim() - value%Root::getDim();
 
-        dx = (dx == 0) ? dy*2.0f : dx*4.0f;
-        dy = (dy == 0) ? dx*2.0f : dy*4.0f;
+        dx = (dx > 0) ? 2.0f : -2.0f;
+        dy = (dy > 0) ? 2.0f : -2.0f;
 
         Entity* temp = new Enemy(0, 0, 3, 3, dx, dy, false);
         temp->reposition(value);
@@ -191,7 +184,7 @@ void Level::initMap() {
         allocation.push_back(temp);
         entities[temp->pos()] = temp;
     
-        cout << " - " << temp << ": " << dx << ":" << dy << "\n"; 
+        cout << " - " << temp << ": " << temp->getX() << ":" << temp->getY() << "\n"; 
     }
 }
 
@@ -249,11 +242,6 @@ bool Level::canSpawn() const {
     return false;
 }
 
-bool Level::checkForBounds(int a) const {
-    
-    return checkRange(a, 0, Root::getDim()*Root::getDim(), true, false);
-}
-
 int Level::getArea() const {
 
     int retval = 0;
@@ -307,6 +295,7 @@ int Level::gameLoop() {
     al_flip_display();
 
 //    al_hide_mouse_cursor(al_get_current_display()); //nasconde il cursore poichè non utilizzato.
+    cout << "prova a inizializzare \n";
     initMap();
 
     al_start_timer(timer);
@@ -314,6 +303,7 @@ int Level::gameLoop() {
     bool STOP = false;
     bool redraw = true;
 
+    cout << "inizia il loop\n";
     while(!STOP) {
     
         ALLEGRO_EVENT ev;
@@ -332,7 +322,7 @@ int Level::gameLoop() {
             bool youCanOnlyDieOnce = false;
             for(const auto& it : entities) {
 
-                if(!checkForBounds(it.second->pos())) {
+                if(!Root::checkForBounds(it.second->pos())) {
                     
                     it.second->deathEvent();
                     continue;
@@ -381,7 +371,7 @@ int Level::gameLoop() {
                     //cout << (int)getBody(it.second->pos()) << " ";
                     if(getBody(it.second->pos()) == Body::PLAYER) {
 
-                        cout << "player: " << it.second << endl;  
+                        //cout << "player: " << it.second << endl;  
                         Hitbox* temp = new Hitbox(0, 0, 1, 1);
                         temp->reposition(it.second->pos());
                             
@@ -392,7 +382,7 @@ int Level::gameLoop() {
                     
                     } else if(getBody(it.second->pos()) == Body::ENEMY) {
 
-                        cout << "enemy: " << it.second << endl;
+                        //cout << "enemy: " << it.second << endl;
                         if(!youCanOnlyDieOnce and it.second->checkForCollision(player)) {
 
                             youCanOnlyDieOnce = true;
@@ -406,7 +396,7 @@ int Level::gameLoop() {
                     
                     } else if(getBody(it.second->pos()) == Body::BOSS) {
 
-                        cout << "boss: " << it.second << endl;
+                        //cout << "boss: " << it.second << endl;
                         if(!youCanOnlyDieOnce and it.second->checkForCollision(player)) {
 
                             youCanOnlyDieOnce = true;
@@ -525,15 +515,21 @@ int Level::gameLoop() {
             redraw = false;
             
             ScaledBitmap::clear();
+            
             for(const auto& it : borders)
                 it.second->draw();
+            
             for(const auto& it : entities)
              if(it.second->isActive())
                 it.second->draw();
+
+            if(player->isActive())  player->draw();
+            if(boss[0]->isActive()) boss[0]->draw();
+            
             ScaledBitmap::render();
         }
 
-        cout << endl << endl;
+        //cout << "fine ciclo" << endl << endl;
     }
 
 //    for(const auto& element : entities)

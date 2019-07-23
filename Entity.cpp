@@ -32,13 +32,13 @@ void Entity::bounce(int val) {
 
     bool enablePrint = false;
 
-    if(pos() - val >= -1 or pos() - val <= 1) {
+    if(pos() - val >= -1 and pos() - val <= 1) {
         xspeed = -xspeed;
     
         if(enablePrint)
             cout << "Entity::bounce() " << this << " x changed\n";
     }
-    if(pos() - val >= -Root::getDim() or pos() - val <= Root::getDim()) {
+    if(pos() - val >= -Root::getDim() and pos() - val <= Root::getDim()) {
         yspeed = -yspeed;
 
         if(enablePrint)
